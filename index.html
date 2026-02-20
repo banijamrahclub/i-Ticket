@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i Ticket للسفر والسياحة | وجهتك المثالية للاكتشاف</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpg"
+        href="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/0ae74f5fcf60f264c9321da092cc81901949c5db/574253881_18532941568039264_5622425311968020289_n.jpg">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/0ae74f5fcf60f264c9321da092cc81901949c5db/574253881_18532941568039264_5622425311968020289_n.jpg"
+                alt="i Ticket Logo" style="border-radius: 50%;">
+            <span class="outfit">i <b>Ticket</b></span>
+        </div>
+        <div class="mobile-menu-btn" id="mobile-menu-toggle">
+            <i class="fa fa-bars"></i>
+        </div>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#home">الرئيسية</a></li>
+                <li><a href="#packages">الرحلات</a></li>
+                <li><a href="#about">من نحن</a></li>
+                <li><a href="https://wa.me/97317550054" class="nav-cta" target="_blank">اتصل بنا</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>اكتشف العالم مع <span class="outfit">i Ticket</span></h1>
+        <p>نقدم لك أفضل العروض السياحية والرحلات بأعلى معايير الجودة والراحة. رحلتك القادمة تبدأ بضغطة زر.</p>
+
+        <div class="search-container">
+            <input type="text" id="trip-search-input" class="search-input" placeholder="إلى أين تريد الذهاب؟">
+            <select id="trip-type-select" class="search-input">
+                <option value="">كل أنواع الرحلات</option>
+                <option value="tourism">سياحية</option>
+                <option value="religious">دينية</option>
+            </select>
+            <button id="search-btn-hero" class="search-btn">بحث <i class="fa fa-search"></i></button>
+        </div>
+
+        <!-- Search Results Container (Hidden by default) -->
+        <div id="search-results-home" class="package-grid" style="margin-top: 40px; display: none; width: 100%;">
+            <!-- Results will be injected here via JS -->
+        </div>
+    </section>
+
+    <!-- Featured Packages -->
+    <section class="section-padding" id="packages" style="background: rgba(255,255,255,0.02);">
+        <div class="section-title">
+            <h2>أحدث العروض والرحلات</h2>
+            <div class="underline"></div>
+        </div>
+
+        <div class="package-grid" id="main-package-grid">
+            <!-- Trips will be loaded dynamically from admin panel -->
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section-padding" id="about">
+        <div class="section-title">
+            <h2>من نحن</h2>
+            <div class="underline"></div>
+        </div>
+
+        <div class="about-container">
+            <div class="about-text">
+                <h3>i TICKET TRAVEL & TOURISM</h3>
+                <p>نحن رفيقك الموثوق في عالم السفر والسياحة. نسعى لتقديم تجارب استثنائية تجمع بين الراحة، الابتكار،
+                    والأسعار المنافسة. سواء كنت تبحث عن رحلة ترفيهية، دينية، أو عروض صيفية مميزة، فريق i Ticket هنا لجعل
+                    أحلامك حقيقة.</p>
+            </div>
+
+            <div class="links-grid">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/97317550054" class="social-link-card" target="_blank">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div class="link-info">
+                        <h4>واتس اب خدمة العملاء</h4>
+                        <p>تواصل معنا للحجز والاستفسار</p>
+                    </div>
+                </a>
+
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/iticket.bh/" class="social-link-card" target="_blank">
+                    <i class="fa-brands fa-instagram"></i>
+                    <div class="link-info">
+                        <h4>Instagram</h4>
+                        <p>تابعنا لأحدث العروض اليومية</p>
+                    </div>
+                </a>
+
+                <!-- TikTok -->
+                <a href="https://www.tiktok.com/@iticket.bh" class="social-link-card" target="_blank">
+                    <i class="fa-brands fa-tiktok"></i>
+                    <div class="link-info">
+                        <h4>TikTok</h4>
+                        <p>شاهد تجارب عملائنا ورحلاتنا</p>
+                    </div>
+                </a>
+
+                <!-- Catalog -->
+                <a href="https://wa.me/c/97317550054" class="social-link-card" target="_blank">
+                    <i class="fa-solid fa-book-open"></i>
+                    <div class="link-info">
+                        <h4>Catalog</h4>
+                        <p>تصفح كتالوج الخدمات المتكامل</p>
+                    </div>
+                </a>
+
+                <!-- Exclusive Offers -->
+                <a href="https://shorturl.at/WW4HX" class="social-link-card" target="_blank">
+                    <i class="fa-solid fa-star"></i>
+                    <div class="link-info">
+                        <h4>عروضنا الحصرية 📢</h4>
+                        <p>لا تفوت الفرص الذهبية</p>
+                    </div>
+                </a>
+
+                <!-- Office Location -->
+                <a href="https://maps.app.goo.gl/jUVQo9onMyBzE98q8" class="social-link-card" target="_blank">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div class="link-info">
+                        <h4>موقع المكتب</h4>
+                        <p>تفضل بزيارتنا في مقرنا</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="map-container">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.411624835694!2d50.5186!3d26.2410!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e49af7943fcf3e1%3A0xe2c10776b6d859d9!2siTicket%20Travel%20%26%20Tourism!5e0!3m2!1sen!2sbh!4v1700000000000!5m2!1sen!2sbh"
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/97317550054" class="whatsapp-float" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
