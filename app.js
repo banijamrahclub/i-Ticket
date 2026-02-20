@@ -9,10 +9,6 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Section Switching Logic
-const navLinks = document.querySelectorAll('nav a');
-const sections = document.querySelectorAll('section');
-
 // Mobile Menu Toggle Logic
 const mobileToggle = document.getElementById('mobile-menu-toggle');
 const mainNav = document.getElementById('main-nav');
@@ -26,7 +22,10 @@ if (mobileToggle) {
     });
 }
 
-// Update showSection to close mobile menu
+// Section Switching Logic
+const navLinks = document.querySelectorAll('nav a');
+const sections = document.querySelectorAll('section');
+
 function showSection(id) {
     sections.forEach(section => section.classList.remove('active-section'));
     navLinks.forEach(link => link.classList.remove('active-link'));
@@ -36,7 +35,6 @@ function showSection(id) {
         targetSection.classList.add('active-section');
     }
 
-    // Close mobile menu if open
     if (mainNav) mainNav.classList.remove('mobile-active');
     if (mobileToggle) {
         const icon = mobileToggle.querySelector('i');
@@ -44,18 +42,11 @@ function showSection(id) {
         icon.classList.remove('fa-xmark');
     }
 
-    // Highlight active link in Nav
     const activeLink = document.querySelector(`nav a[href="#${id}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active-link');
-    }
+    if (activeLink) activeLink.classList.add('active-link');
 
-    // Header fix for internal pages
-    if (id !== 'home') {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
+    if (id !== 'home') header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
 }
 
 navLinks.forEach(link => {
@@ -70,15 +61,11 @@ navLinks.forEach(link => {
     });
 });
 
-// Set default section
-window.addEventListener('DOMContentLoaded', () => {
-    showSection('home');
-});
-
-// --- Global Database Configuration (Web Service) ---
+// --- Data & API ---
 const API_URL = "/api/trips";
+const packageGrid = document.getElementById('main-package-grid');
+let allTrips = [];
 
-// 30 Default Trips (The Full Professional List)
 const defaultTrips = [
     { id: 101, name: 'إسطنبول الساحرة - صيف 2024', type: 'tourism', price: 350, duration: '8 أيام', transport: 'طيران الخليج', image: 'https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?q=80&w=2071&auto=format&fit=crop', badge: 'الأكثر مبيعاً' },
     { id: 102, name: 'باكو وقبلة - طبيعة أذربيجان', type: 'tourism', price: 290, duration: '7 أيام', transport: 'شامل الفنادق', image: 'https://images.unsplash.com/photo-1528643501235-9856d8facfa4?q=80&w=1974&auto=format&fit=crop', badge: 'خصم 10%' },
@@ -112,19 +99,15 @@ const defaultTrips = [
     { id: 130, name: 'شيراز - جنة إيران', type: 'tourism', price: 210, duration: '7 أيام', transport: 'طيران + سياحة', image: 'https://images.unsplash.com/photo-1566373721348-7357c9197931?q=80&w=2070&auto=format&fit=crop', badge: 'طبيعة' }
 ];
 
-let allTrips = [];
-
-// Fetch Data (Local API)
 async function fetchTrips() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
 
-        // If server returns empty array (newly initialized), use defaultTrips
         if (!data || data.length === 0) {
             allTrips = defaultTrips;
-            // Seed the server with defaults
-            await fetch(API_URL, {
+            // Seed defaults to server
+            fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(defaultTrips)
@@ -133,21 +116,22 @@ async function fetchTrips() {
             allTrips = data;
         }
     } catch (error) {
-        console.error("API Error, using defaults:", error);
+        console.error("API Error:", error);
         allTrips = defaultTrips;
     }
     renderMainTrips();
 }
 
 function renderMainTrips() {
-    if (!packageGrid) return;
+    const grid = document.getElementById('main-package-grid');
+    if (!grid) return;
 
     if (allTrips.length === 0) {
-        packageGrid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">جاري التحميل...</p>';
+        grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">جاري التحميل...</p>';
         return;
     }
 
-    packageGrid.innerHTML = allTrips.map(trip => `
+    grid.innerHTML = allTrips.map(trip => `
         <div class="package-card">
             <div class="package-img">
                 <img src="${trip.image}" alt="${trip.name}" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
@@ -168,17 +152,7 @@ function renderMainTrips() {
     `).join('');
 }
 
-// Initial Load
-fetchTrips();
-
-// Global Booking Function
-window.bookViaWhatsapp = (packageName) => {
-    const message = `أهلاً "i Ticket للسفر"، أرغب في الاستفسار عن وحجز: ${packageName}`;
-    const whatsappUrl = `https://wa.me/97317550054?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-};
-
-// Update Search Logic to work with Dynamic elements
+// Search Logic
 const searchBtn = document.getElementById('search-btn-hero');
 const searchInput = document.getElementById('trip-search-input');
 const typeSelect = document.getElementById('trip-type-select');
@@ -186,12 +160,9 @@ const resultsContainer = document.getElementById('search-results-home');
 
 if (searchBtn) {
     searchBtn.addEventListener('click', () => {
-        const searchTerm = searchInput.value.trim().toLowerCase();
+        const searchTerm = (searchInput.value || "").trim().toLowerCase();
         const selectedType = typeSelect.value;
-        const trips = getTrips();
-        let foundAny = false;
 
-        // NEW: If search is empty, go to the packages page instead of showing results here
         if (searchTerm === "" && selectedType === "") {
             if (resultsContainer) {
                 resultsContainer.innerHTML = '';
@@ -201,19 +172,15 @@ if (searchBtn) {
             return;
         }
 
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
-        }
-
-        trips.forEach(trip => {
+        const filtered = allTrips.filter(trip => {
             const matchesSearch = trip.name.toLowerCase().includes(searchTerm);
-            const matchesType = selectedType === "" ||
-                (selectedType === "religious" && trip.type === "religious") ||
-                (selectedType === "tourism" && trip.type === "tourism");
+            const matchesType = !selectedType || trip.type === selectedType;
+            return matchesSearch && matchesType;
+        });
 
-            if (matchesSearch && matchesType) {
-                const cardHtml = `
+        if (resultsContainer) {
+            if (filtered.length > 0) {
+                resultsContainer.innerHTML = filtered.map(trip => `
                     <div class="package-card">
                         <div class="package-img">
                             <img src="${trip.image}" alt="${trip.name}" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
@@ -231,30 +198,25 @@ if (searchBtn) {
                             </button>
                         </div>
                     </div>
-                `;
-                if (resultsContainer) {
-                    resultsContainer.innerHTML += cardHtml;
-                }
-                foundAny = true;
-            }
-        });
-
-        if (foundAny) {
-            if (resultsContainer) {
+                `).join('');
                 resultsContainer.style.display = 'grid';
                 resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                alert('عذراً، لا توجد رحلات تطابق بحثك حالياً.');
+                resultsContainer.style.display = 'none';
             }
-        } else {
-            alert('عذراً، لا توجد رحلات تطابق بحثك حالياً.');
         }
     });
 }
 
-// Listen for updates from Admin Panel
-window.addEventListener('storage', renderMainTrips);
+// Global Booking
+window.bookViaWhatsapp = (packageName) => {
+    const message = `أهلاً "i Ticket للسفر"، أرغب في الاستفسار عن وحجز: ${packageName}`;
+    window.open(`https://wa.me/97317550054?text=${encodeURIComponent(message)}`, '_blank');
+};
 
-// Initial Render
+// Start
 window.addEventListener('DOMContentLoaded', () => {
     showSection('home');
-    renderMainTrips();
+    fetchTrips();
 });
