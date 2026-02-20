@@ -1,12 +1,12 @@
-// --- Global Database Configuration (Zero-Config) ---
-const DB_URL = "https://kvdb.io/Mz7u4p9Y3oE8K1S9V2B5T6/trips_data";
+// --- Global Database Configuration (Web Service) ---
+const API_URL = "/api/trips";
 
 let allTrips = [];
 
 // Fetch Data
 async function fetchTrips() {
     try {
-        const response = await fetch(DB_URL);
+        const response = await fetch(API_URL);
         if (response.ok) {
             allTrips = await response.json();
             renderTrips();
@@ -19,14 +19,15 @@ async function fetchTrips() {
 // Save Data (Global Sync)
 async function saveAllToCloud(trips) {
     try {
-        await fetch(DB_URL, {
+        await fetch(API_URL, {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(trips)
         });
         allTrips = trips;
         renderTrips();
     } catch (error) {
-        alert("خطأ في حفظ البيانات سحابياً");
+        alert("خطأ في حفظ البيانات");
     }
 }
 

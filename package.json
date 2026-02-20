@@ -1,0 +1,15 @@
+{
+  "name": "iticket",
+  "version": "1.0.0",
+  "description": "iTicket Web Service",
+  "main": "server.js",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
