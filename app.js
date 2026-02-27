@@ -103,18 +103,10 @@ async function fetchTrips() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
-
-        if (!data || data.length === 0) {
-            allTrips = defaultTrips;
-            // Seed defaults to server
-            fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(defaultTrips)
-            });
-        } else {
-            allTrips = data;
-        }
+        
+        // No longer re-seeding defaults if empty. 
+        // We only use defaults if the API call fails entirely.
+        allTrips = data || [];
     } catch (error) {
         console.error("API Error:", error);
         allTrips = defaultTrips;
