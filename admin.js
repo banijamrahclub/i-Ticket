@@ -1,7 +1,10 @@
 // --- Global Database Configuration (Web Service) ---
-const API_URL = "/api/trips";
+const brand = window.BRAND || 'iticket';
+const API_URL = `/api/${brand}/trips`;
 
 let allTrips = [];
+let currentPriceCategories = [];
+let currentImagesBase64 = [];
 
 // Fetch Data
 async function fetchTrips() {
@@ -16,18 +19,21 @@ async function fetchTrips() {
     }
 }
 
-// Save Data (Global Sync)
+// Save Data
 async function saveAllToCloud(trips) {
+    allTrips = trips;
+    renderTrips();
+
     try {
-        await fetch(API_URL, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(trips)
         });
-        allTrips = trips;
-        renderTrips();
+        if (!response.ok) throw new Error('Failed to save');
     } catch (error) {
-        alert("خطأ في حفظ البيانات");
+        console.error("Cloud Sync Error:", error);
+        alert("تنبيه: تم الحفظ محلياً ولكن فشلت المزامنة مع السيرفر.");
     }
 }
 
@@ -37,30 +43,59 @@ const tripModal = document.getElementById('trip-modal');
 const tripForm = document.getElementById('trip-form');
 const openAddModalBtn = document.getElementById('open-add-modal');
 const closeModalBtn = document.getElementById('close-modal');
+const priceContainer = document.getElementById('price-categories-container');
+const imagesPreviewContainer = document.getElementById('images-preview-container');
+
+// Price Categories Logic
+window.addPriceCategory = (label = '', value = '') => {
+    const div = document.createElement('div');
+    div.className = 'grid price-row';
+    div.style = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
+    div.innerHTML = `
+        <input type="text" placeholder="الفئة (مثلاً: كبار)" class="p-label" value="${label}" required>
+        <input type="number" placeholder="السعر" class="p-value" value="${value}" required>
+        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-times"></i></button>
+    `;
+    priceContainer.appendChild(div);
+};
 
 // Render Table
 function renderTrips() {
     if (!tripsList) return;
-    tripsList.innerHTML = allTrips.map((trip, index) => `
-        <tr>
-            <td>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="${trip.image}" class="trip-img-mini" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
-                    <span>${trip.name}</span>
-                </div>
-            </td>
-            <td>${trip.type === 'religious' ? 'دينية' : 'سياحية'}</td>
-            <td>${trip.price} دينار</td>
-            <td>${trip.duration}</td>
-            <td>
-                <div class="actions">
-                    <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
-                    <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    tripsList.innerHTML = allTrips.map((trip, index) => {
+        const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
+        const displayImage = trip.images && trip.images.length > 0 ? trip.images[0] : (trip.image || '');
+
+        return `
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="${displayImage}" class="trip-img-mini" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                        <div>
+                            <div style="font-weight: bold;">${trip.name}</div>
+                            <div style="font-size: 0.8rem; color: #888;">${trip.category || 'بدون تقسيم'}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>${trip.type}</td>
+                <td>${displayPrice} دينار</td>
+                <td>${trip.duration}</td>
+                <td>
+                    <div class="actions">
+                        <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
+                        <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
+                        <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
+
+window.copyTripLink = (tripId) => {
+    const link = `${window.location.origin}/trip?id=${tripId}&brand=${brand}`;
+    navigator.clipboard.writeText(link).then(() => alert("تم نسخ رابط الرحلة!"));
+};
 
 // Delete Trip
 window.deleteTrip = async (index) => {
@@ -71,20 +106,31 @@ window.deleteTrip = async (index) => {
     }
 }
 
-// Form Submission (Add/Edit)
+// Form Submission
 tripForm.onsubmit = async (e) => {
     e.preventDefault();
     const index = document.getElementById('trip-id').value;
     const isEdit = index !== "";
 
+    const prices = [];
+    document.querySelectorAll('.price-row').forEach(row => {
+        prices.push({
+            label: row.querySelector('.p-label').value,
+            value: row.querySelector('.p-value').value
+        });
+    });
+
     const tripData = {
         id: isEdit ? allTrips[index].id : Date.now().toString(),
         name: document.getElementById('trip-name').value,
         type: document.getElementById('trip-type').value,
-        price: document.getElementById('trip-price').value,
+        category: document.getElementById('trip-category').value,
+        price: prices.length > 0 ? prices[0].value : '0',
+        prices: prices,
         duration: document.getElementById('trip-duration').value,
         transport: document.getElementById('trip-transport').value,
-        image: document.getElementById('trip-image').value,
+        images: currentImagesBase64,
+        image: currentImagesBase64.length > 0 ? currentImagesBase64[0] : '',
         badge: document.getElementById('trip-badge').value
     };
 
@@ -96,43 +142,81 @@ tripForm.onsubmit = async (e) => {
     tripModal.style.display = 'none';
 };
 
-// Open Modals
-openAddModalBtn.onclick = () => {
-    tripForm.reset();
-    document.getElementById('trip-id').value = '';
-    document.getElementById('modal-title').innerText = 'إضافة رحلة جديدة';
-    document.getElementById('image-preview').style.display = 'none';
-    tripModal.style.display = 'flex';
-}
+// Multiple Images Handling
+document.getElementById('trip-images-file').addEventListener('change', async function (e) {
+    const files = Array.from(e.target.files);
+    if (files.length > 10) {
+        alert("الحد الأقصى هو 10 صور");
+        return;
+    }
 
-closeModalBtn.onclick = () => { tripModal.style.display = 'none'; }
+    currentImagesBase64 = [];
+    imagesPreviewContainer.innerHTML = '';
 
-// Live Image Preview
-document.getElementById('trip-image').addEventListener('input', function (e) {
-    const preview = document.getElementById('image-preview');
-    if (e.target.value) { preview.src = e.target.value; preview.style.display = 'block'; }
-    else { preview.style.display = 'none'; }
+    for (const file of files) {
+        const base64 = await toBase64(file);
+        currentImagesBase64.push(base64);
+
+        const img = document.createElement('img');
+        img.src = base64;
+        img.style = 'width: 100%; height: 50px; object-fit: cover; border-radius: 5px;';
+        imagesPreviewContainer.appendChild(img);
+    }
 });
 
-// Edit Trip Setup
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
+// Open Add Modal
+openAddModalBtn.onclick = () => {
+    tripForm.reset();
+    priceContainer.innerHTML = '';
+    imagesPreviewContainer.innerHTML = '';
+    currentImagesBase64 = [];
+    addPriceCategory('السعر الأساسي', '');
+    document.getElementById('trip-id').value = '';
+    document.getElementById('trip-category').value = '';
+    document.getElementById('modal-title').innerText = 'إضافة رحلة جديدة';
+    tripModal.style.display = 'flex';
+};
+
+closeModalBtn.onclick = () => tripModal.style.display = 'none';
+
+// Edit Trip
 window.editTrip = (index) => {
     const trip = allTrips[index];
     if (trip) {
         document.getElementById('trip-id').value = index;
         document.getElementById('trip-name').value = trip.name;
         document.getElementById('trip-type').value = trip.type;
-        document.getElementById('trip-price').value = trip.price;
+        document.getElementById('trip-category').value = trip.category || '';
         document.getElementById('trip-duration').value = trip.duration;
         document.getElementById('trip-transport').value = trip.transport;
-        document.getElementById('trip-image').value = trip.image;
         document.getElementById('trip-badge').value = trip.badge;
-        const preview = document.getElementById('image-preview');
-        preview.src = trip.image;
-        preview.style.display = 'block';
         document.getElementById('modal-title').innerText = 'تعديل بيانات الرحلة';
+
+        priceContainer.innerHTML = '';
+        if (trip.prices && trip.prices.length > 0) {
+            trip.prices.forEach(p => addPriceCategory(p.label, p.value));
+        } else {
+            addPriceCategory('السعر الأساسي', trip.price);
+        }
+
+        imagesPreviewContainer.innerHTML = '';
+        currentImagesBase64 = trip.images || (trip.image ? [trip.image] : []);
+        currentImagesBase64.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.style = 'width: 100%; height: 50px; object-fit: cover; border-radius: 5px;';
+            imagesPreviewContainer.appendChild(img);
+        });
+
         tripModal.style.display = 'flex';
     }
-}
+};
 
-// Initial Load
 fetchTrips();

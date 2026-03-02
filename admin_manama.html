@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة Manama Holidays | فنادق وشاليهات</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/uploads/manama-logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0f0f0f;
+        }
+
+        :root {
+            --primary-red: #e02b20;
+        }
+
+        .admin-header h2 {
+            color: #e02b20;
+        }
+
+        .btn-add {
+            background: #e02b20;
+        }
+
+        .btn-add:hover {
+            background: #b01b1b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="scrolled">
+        <div class="logo">
+            <img src="/uploads/manama-logo.png" style="border-radius: 10px; background: white; padding: 2px;">
+            <span class="outfit">Manama <b>Holidays</b> Admin</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="manama.html">معاينة الموقع</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h2>إدارة الفنادق والشاليهات والاستراحات</h2>
+            <button class="btn-add" id="open-add-modal"><i class="fa fa-plus"></i> إضافة عقار جديد</button>
+        </div>
+
+        <div class="trips-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>النوع</th>
+                        <th>السعر</th>
+                        <th>المنطقة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="trips-list">
+                    <!-- البيانات ستظهر هنا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="trip-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">إضافة عقار جديد</h3>
+            <form id="trip-form">
+                <input type="hidden" id="trip-id">
+                <div class="form-group">
+                    <label>اسم العقار (فندق/شاليه/استراحة)</label>
+                    <input type="text" id="trip-name" required placeholder="مثلاً: شاليه الجبنة - الزلاق">
+                </div>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>النوع</label>
+                        <select id="trip-type">
+                            <option value="hotel">فندق</option>
+                            <option value="chalet">شاليه</option>
+                            <option value="resort">استراحة / منتجع</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المنطقة (الزلاق، جزر الحوار، المحرق..)</label>
+                        <input type="text" id="trip-category" placeholder="الموقع...">
+                    </div>
+                </div>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>مدة الإقامة (يوم/ليلة)</label>
+                        <input type="text" id="trip-duration" placeholder="مثلاً: يوم كامل">
+                    </div>
+                    <div class="form-group">
+                        <label>تفاصيل المرافق</label>
+                        <input type="text" id="trip-transport" placeholder="مسبح خاص، إطلالة بحر، إلخ..">
+                    </div>
+                </div>
+
+                <div class="form-group"
+                    style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #e02b20;">
+                    <label style="color: #e02b20; font-weight: bold;">أسعار الحجز (يوم عادي، يوم عطلة، إلخ)</label>
+                    <div id="price-categories-container"></div>
+                    <button type="button" onclick="addPriceCategory()" class="btn-cancel"
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%;">
+                        <i class="fa fa-plus"></i> إضافة تصنيف سعر
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-top:20px;">
+                    <label>صور العقار (بحد أقصى 10)</label>
+                    <input type="file" id="trip-images-file" accept="image/*" multiple>
+                    <div id="images-preview-container"
+                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; background: #222; padding: 10px; border-radius: 10px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>تسمية التميز (Badge)</label>
+                    <input type="text" id="trip-badge" placeholder="مثلاً: مميز بجوار البحر">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="close-modal">إلغاء</button>
+                    <button type="submit" class="btn-add">حفظ البيانات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>window.BRAND = 'manama';</script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

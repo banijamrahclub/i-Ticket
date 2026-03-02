@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | i Ticket & Manama Holidays</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e63946;
+            --manama-gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --card-bg: #111;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .welcome-container {
+            text-align: center;
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            font-weight: 800;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .choice-card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 50px 30px;
+            text-decoration: none;
+            color: white;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-iticket:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-10px);
+        }
+
+        .card-manama:hover {
+            border-color: var(--manama-gold);
+            transform: translateY(-10px);
+        }
+
+        .brand-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary-red);
+        }
+
+        .card-manama .brand-icon {
+            color: var(--manama-gold);
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .brand-desc {
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .brand-btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            background: #222;
+            transition: 0.3s;
+        }
+
+        .card-iticket:hover .brand-btn {
+            background: var(--primary-red);
+        }
+
+        .card-manama:hover .brand-btn {
+            background: var(--manama-gold);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                overflow-y: auto;
+                padding: 40px 0;
+            }
+
+            .choices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="welcome-container">
+        <h1 class="welcome-title">لوحة التحكم الإدارية</h1>
+        <p style="margin-bottom: 40px; color: #888;">اختر النظام الذي ترغب في إدارته وتعديل بياناته</p>
+
+        <div class="choices-grid">
+            <!-- Admin i Ticket -->
+            <a href="admin_iticket" class="choice-card card-iticket">
+                <i class="fa fa-globe brand-icon"></i>
+                <div class="brand-name">i <b>Ticket</b> Admin</div>
+                <div class="brand-desc">إدارة الرحلات الدولية والبرامج السياحية الخارجية.</div>
+                <div class="brand-btn">دخول النظام</div>
+            </a>
+
+            <!-- Admin Manama Holidays -->
+            <a href="admin_manama" class="choice-card card-manama">
+                <i class="fa fa-landmark brand-icon"></i>
+                <div class="brand-name">Manama <b>Holidays</b> Admin</div>
+                <div class="brand-desc">إدارة برامج السياحة الداخلية داخل مملكة البحرين.</div>
+                <div class="brand-btn">دخول النظام</div>
+            </a>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manama Holidays | فنادق وشاليهات واستراحات البحرين</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/uploads/manama-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        :root {
+            --primary-red: #e02b20;
+        }
+
+        /* شعار منامة هوليديز الجديد باللون الأحمر */
+        header.scrolled {
+            border-bottom: 2px solid #e02b20;
+        }
+
+        .package-badge {
+            background: #e02b20;
+        }
+
+        .category-chip.active {
+            background: #e02b20;
+            border-color: #e02b20;
+        }
+
+        .book-btn {
+            border-color: #e02b20;
+            color: #e02b20;
+        }
+
+        .book-btn:hover {
+            background: #e02b20;
+        }
+
+        /* ضبط خلفية الهيرو لتناسب الفنادق */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop') center/cover !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="main-header">
+        <div class="logo">
+            <img src="/uploads/manama-logo.png" alt="Manama Logo"
+                style="border-radius: 10px; background: white; padding: 2px;">
+            <span>Manama <b>Holidays</b></span>
+        </div>
+        <div class="mobile-menu-btn" id="mobile-menu-toggle">
+            <i class="fa fa-bars"></i>
+        </div>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="#home">الرئيسية</a></li>
+                <li><a href="#packages">الإقامات</a></li>
+                <li><a href="#about">من نحن</a></li>
+                <li><a href="https://wa.me/97317550054" class="nav-cta" target="_blank" style="background:#e02b20;">احجز
+                        الآن</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="home">
+        <h1>أفضل الفنادق، الشاليهات والاستراحات مع <span>Manama Holidays</span></h1>
+        <p>استمتع بإقامة فاخرة وهادئة في أجمل بقاع مملكة البحرين. شاليهات، فنادق، واستراحات خاصة تناسب عائلتك.</p>
+
+        <div class="search-container">
+            <input type="text" id="trip-search-input" class="search-input"
+                placeholder="عن ماذا تبحث؟ (فندق، شاليه، استراحة)">
+            <select id="trip-type-select" class="search-input">
+                <option value="">الكل</option>
+                <option value="hotel">فنادق</option>
+                <option value="chalet">شاليهات</option>
+                <option value="resort">استراحات / منتجعات</option>
+            </select>
+            <button id="search-btn-hero" class="search-btn" style="background:#e02b20;">بحث <i
+                    class="fa fa-search"></i></button>
+        </div>
+
+        <div id="search-results-home" class="package-grid" style="margin-top: 40px; display: none; width: 100%;"></div>
+    </section>
+
+    <section class="section-padding" id="packages" style="background: rgba(255,255,255,0.02);">
+        <div class="section-title">
+            <h2>عروض الإقامة والترفيه الداخلي</h2>
+            <div class="underline" style="background:#e02b20;"></div>
+        </div>
+
+        <div id="category-filter-bar" class="category-filter-container"></div>
+        <div class="package-grid" id="main-package-grid"></div>
+    </section>
+
+    <section class="section-padding" id="about">
+        <div class="section-title">
+            <h2>عن منامة هوليديز</h2>
+            <div class="underline" style="background:#e02b20;"></div>
+        </div>
+        <div class="about-container">
+            <div class="about-text">
+                <h3>MANAMA HOLIDAYS</h3>
+                <p>نحن بوابتك الأولى لحجز أفضل وجهات الإقامة في البحرين. نوفر لك خيارات متنوعة من الفنادق الفاخرة،
+                    الشاليهات الشاطئية، والاستراحات الخاصة التي تضمن لك الخصوصية والمتعة.</p>
+            </div>
+            <div class="links-grid">
+                <a href="https://wa.me/97317550054" class="social-link-card" target="_blank"><i
+                        class="fa-brands fa-whatsapp"></i>
+                    <div class="link-info">
+                        <h4>واتساب</h4>
+                        <p>تواصل معنا للحجز المباشر</p>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/iticket.bh/" class="social-link-card" target="_blank"><i
+                        class="fa-brands fa-instagram"></i>
+                    <div class="link-info">
+                        <h4>الانستقرام</h4>
+                        <p>شاهد أجمل التغطيات</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <a href="https://wa.me/97317550054" class="whatsapp-float" target="_blank" style="background: #e02b20;">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <script>window.BRAND = 'manama';</script>
+    <script src="app.js"></script>
+</body>
+
+</html>
