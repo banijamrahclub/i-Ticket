@@ -280,16 +280,18 @@
             // تحديث الثيم
             if (brand === 'manama') {
                 document.documentElement.style.setProperty('--primary-red', '#e02b20');
-                document.getElementById('header-logo').src = '/uploads/manama-logo.png';
+                document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/6521582e9bea4975794d5615442ab831cdf20fe8/Screenshot%202026-03-03%20001253.png';
+                document.getElementById('header-logo').style.height = '65px';
+                document.getElementById('header-logo').style.width = 'auto';
                 document.getElementById('header-logo').style.borderRadius = '5px';
                 document.getElementById('header-logo').style.background = 'white';
                 document.getElementById('header-logo').style.padding = '2px';
-                document.getElementById('header-name').innerHTML = 'Manama <b>Holidays</b>';
+                document.getElementById('header-name').style.display = 'none';
                 document.getElementById('header-link').href = '/manama';
                 document.getElementById('back-btn').href = '/manama';
             } else {
-                document.getElementById('header-logo').src = '/uploads/iticket-logo.png';
-                document.getElementById('header-logo').style.height = '80px';
+                document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/6521582e9bea4975794d5615442ab831cdf20fe8/Screenshot%202026-03-03%20001548.png';
+                document.getElementById('header-logo').style.height = '65px';
                 document.getElementById('header-logo').style.width = 'auto';
                 document.getElementById('header-logo').style.borderRadius = '0';
                 document.getElementById('header-name').style.display = 'none';

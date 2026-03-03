@@ -134,12 +134,22 @@ tripForm.onsubmit = async (e) => {
         badge: document.getElementById('trip-badge').value
     };
 
+    const submitBtn = tripForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerText;
+    submitBtn.innerText = 'جاري الحفظ والرفع...';
+    submitBtn.disabled = true;
+
     const updated = [...allTrips];
     if (isEdit) updated[index] = tripData;
     else updated.push(tripData);
 
-    await saveAllToCloud(updated);
+    // إغلاق النافذة فوراً لتحسين السرعة للمستخدم
     tripModal.style.display = 'none';
+
+    await saveAllToCloud(updated);
+
+    submitBtn.innerText = originalBtnText;
+    submitBtn.disabled = false;
 };
 
 // Multiple Images Handling
