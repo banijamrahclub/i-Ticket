@@ -537,18 +537,106 @@ section.active-section {
 }
 
 /* Hero Section Enhancement */
+/* Hero Section Enhancement */
 .hero {
     min-height: 100vh;
-    /* Changed from height to min-height */
     width: 100%;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop') center/cover no-repeat;
+    position: relative;
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     padding: 120px 5% 60px;
-    /* Added more space for results */
+    overflow: hidden;
+}
+
+/* Ensure the hero section uses flex when active for centering */
+section#home.active-section {
+    display: flex !important;
+}
+
+.hero h1,
+.hero p,
+.hero .search-container {
+    position: relative;
+    z-index: 20;
+}
+
+.hero-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.hero-slider::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.85));
+    z-index: 10;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    z-index: 1;
+    animation: slideFade 24s infinite ease-in-out;
+}
+
+.hero-slide:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.hero-slide:nth-child(2) {
+    animation-delay: 6s;
+}
+
+.hero-slide:nth-child(3) {
+    animation-delay: 12s;
+}
+
+.hero-slide:nth-child(4) {
+    animation-delay: 18s;
+}
+
+@keyframes slideFade {
+    0% {
+        opacity: 0;
+        transform: scale(1.15);
+    }
+
+    4% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    25% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    29% {
+        opacity: 0;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 @keyframes heroReveal {
