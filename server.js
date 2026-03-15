@@ -5,12 +5,33 @@ const sheetsService = require('./sheetsService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
-if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR);
+// --- إعدادات مسار التخزين المستمر (Render Disk) ---
+// إذا كان التطبيق يعمل على ريندر، سنستخدم المسار المعرف في المتغيرات البيئية، وإلا سنستخدم المجلد الحالي
+const STORAGE_ROOT = process.env.RENDER_DISK_PATH || __dirname;
+const UPLOADS_DIR = path.join(STORAGE_ROOT, 'uploads');
+
+// التأكد من وجود مجلد الرفع
+if (!fs.existsSync(UPLOADS_DIR)) {
+    console.log(`Creating uploads directory at: ${UPLOADS_DIR}`);
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+// هجرة البيانات: إذا كانت هناك ملفات JSON في المجلد الحالي وليست في الديسك، انقلها
+const brands = ['iticket', 'manama'];
+brands.forEach(brand => {
+    const localFile = path.join(__dirname, `trips_${brand}.json`);
+    const diskFile = path.join(STORAGE_ROOT, `trips_${brand}.json`);
+    if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile) && !fs.existsSync(diskFile)) {
+        console.log(`Migrating ${brand} data to persistent disk...`);
+        fs.copyFileSync(localFile, diskFile);
+    }
+});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
+
+// تقديم الصور من المجلد المستمر (Disk)
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // توجيهات الصفحات
@@ -24,36 +45,54 @@ app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin_welcome
 app.get('/admin_iticket', (req, res) => res.sendFile(path.join(__dirname, 'admin_iticket.html')));
 app.get('/admin_manama', (req, res) => res.sendFile(path.join(__dirname, 'admin_manama.html')));
 
-// API لكل ماركة
+// API لربط الملفات مع المجلد المستمر
+function getDataFilePath(brand) {
+    return path.join(STORAGE_ROOT, `trips_${brand}.json`);
+}
+
 app.get('/api/:brand/trips', async (req, res) => {
     const { brand } = req.params;
-    const DATA_FILE = path.join(__dirname, `trips_${brand}.json`);
+    const DATA_FILE = getDataFilePath(brand);
 
-    let localData = [];
     if (fs.existsSync(DATA_FILE)) {
-        localData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-        return res.json(localData);
+        try {
+            const localData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+            return res.json(localData);
+        } catch (e) {
+            console.error("Error reading data file:", e);
+        }
     }
     res.json([]);
 });
 
-// --- إعدادات قيت هاب (GitHub) لتخزين الصور ---
-const GITHUB_CONFIG = {
-    token: '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', // تم التحديث إلى Classic Token
-    owner: 'banijamrahclub', // اسم المستخدم
-    repo: 'i-Ticket-photo', // اسم المستودع
-    branch: 'main'
-};
+// دالة لحفظ الصورة محلياً (في Render Disk)
+function saveImageLocally(fileName, base64Data) {
+    try {
+        const filePath = path.join(UPLOADS_DIR, fileName);
+        fs.writeFileSync(filePath, base64Data, 'base64');
+        return `/uploads/${fileName}`; // المسار الذي سيتم استخدامه في المتصفح
+    } catch (error) {
+        console.error('Local Save Error:', error);
+        return null;
+    }
+}
 
-// دالة لرفع الصورة إلى قيت هاب
+// دالة لرفع الصورة إلى قيت هاب (اختياري، كنسخة احتياطية)
 async function uploadToGitHub(fileName, base64Data) {
-    if (GITHUB_CONFIG.token === 'YOUR_GITHUB_TOKEN') return null;
+    const GITHUB_CONFIG = {
+        token: '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',
+        owner: 'banijamrahclub',
+        repo: 'i-Ticket-photo',
+        branch: 'main'
+    };
+
+    if (GITHUB_CONFIG.token === 'YOUR_GITHUB_TOKEN' || !GITHUB_CONFIG.token) return null;
 
     const axios = require('axios');
     const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/uploads/${fileName}`;
 
     try {
-        const response = await axios.put(url, {
+        await axios.put(url, {
             message: `Upload image: ${fileName}`,
             content: base64Data,
             branch: GITHUB_CONFIG.branch
@@ -61,23 +100,21 @@ async function uploadToGitHub(fileName, base64Data) {
             headers: {
                 'Authorization': `token ${GITHUB_CONFIG.token}`,
                 'Content-Type': 'application/json',
-                'User-Agent': 'Travel-App' // هيدر مطلوب من قيت هاب
+                'User-Agent': 'Travel-App'
             }
         });
-        // إرجاع الرابط المباشر للصورة على قيت هاب
         return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/uploads/${fileName}`;
     } catch (error) {
-        console.error('GitHub Upload Error:', error.response ? error.response.data : error.message);
+        // لا نريد تعطيل العملية إذا فشل قيت هاب، طالما تم الحفظ في التخزين المستمر
         return null;
     }
 }
 
 app.post('/api/:brand/trips', async (req, res) => {
     const { brand } = req.params;
-    const DATA_FILE = path.join(__dirname, `trips_${brand}.json`);
+    const DATA_FILE = getDataFilePath(brand);
     let trips = req.body;
 
-    // معالجة الصور ورفعها لقيت هاب (بشكل متوازي لتسريع العملية)
     for (let t of trips) {
         if (t.images && Array.isArray(t.images)) {
             const uploadPromises = t.images.map(async (img, idx) => {
@@ -88,12 +125,17 @@ app.post('/api/:brand/trips', async (req, res) => {
                     const fileName = `img_${brand}_${t.id}_${idx}_${Date.now()}.${ext}`;
                     const base64Content = parts[1];
 
-                    const githubUrl = await uploadToGitHub(fileName, base64Content);
-                    if (githubUrl) return githubUrl;
+                    // أولاً: حفظ الصورة في ريندر ديسك (التخزين الأساسي والمضمون)
+                    const localUrl = saveImageLocally(fileName, base64Content);
+                    
+                    // ثانياً: محاولة الرفع لقيت هاب (اختياري كنسخة احتياطية)
+                    // إذا أردت الرفع لقيت هاب أيضاً، افعل ذلك هنا. 
+                    // إذا كان localUrl موجوداً، سنستخدمه لضمان ظهور الصورة حتى لو فشل قيت هاب.
+                    
+                    // سنستخدم الرابط المحلي كخيار افتراضي لأنه الأسرع والأضمن مع ريندر ديسك
+                    if (localUrl) return localUrl;
 
-                    // في حال فشل الرفع، نرجع رابطاً فارغاً أو رسالة خطأ بدلاً من التخزين المحلي
-                    console.error(`Failed to upload ${fileName} to GitHub. Local storage is skipped.`);
-                    return 'https://via.placeholder.com/800x600?text=Upload+Failed+Check+Permissions';
+                    return 'https://via.placeholder.com/800x600?text=Save+Failed';
                 }
                 return img;
             });
@@ -109,4 +151,6 @@ app.post('/api/:brand/trips', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`Persistent storage set to: ${STORAGE_ROOT}`);
 });
+
