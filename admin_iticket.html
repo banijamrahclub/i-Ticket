@@ -5,6 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة تحكم i Ticket | إدارة الرحلات</title>
+    <script>
+        (function() {
+            if (sessionStorage.getItem('admin_pass') === '1357') return;
+            document.documentElement.style.visibility = 'hidden';
+            window.addEventListener('DOMContentLoaded', () => {
+                const overlay = document.createElement('div');
+                overlay.id = 'admin-lock-overlay';
+                overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;color:white;font-family:Cairo,sans-serif;';
+                overlay.innerHTML = `
+                    <div style="background:#111;padding:40px;border-radius:24px;border:1px solid #e63946;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.5);max-width:400px;width:90%;">
+                        <i class="fa fa-lock" style="font-size:3rem;color:#e63946;margin-bottom:20px;"></i>
+                        <h2 style="margin-bottom:10px;">منطقة محمية</h2>
+                        <p style="color:#888;margin-bottom:25px;">يرجى إدخال كلمة المرور للمتابعة</p>
+                        <input type="password" id="admin-pass-input" placeholder="••••" style="width:100%;padding:15px;background:#222;border:1px solid #333;border-radius:12px;color:white;text-align:center;font-size:1.5rem;letter-spacing:5px;margin-bottom:20px;outline:none;box-sizing:border-box;">
+                        <button onclick="checkAdminPass()" style="width:100%;padding:15px;background:#e63946;color:white;border:none;border-radius:12px;font-weight:bold;cursor:pointer;font-size:1.1rem;transition:0.3s;">دخول النظام</button>
+                        <p id="lock-error" style="color:#e63946;margin-top:15px;display:none;">كلمة المرور غير صحيحة!</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                document.documentElement.style.visibility = 'visible';
+                window.checkAdminPass = () => {
+                    const val = document.getElementById('admin-pass-input').value;
+                    if (val === '1357') {
+                        sessionStorage.setItem('admin_pass', '1357');
+                        overlay.remove();
+                    } else {
+                        document.getElementById('lock-error').style.display = 'block';
+                        document.getElementById('admin-pass-input').value = '';
+                    }
+                };
+                document.getElementById('admin-pass-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkAdminPass();
+                });
+            });
+        })();
+    </script>
     <link rel="stylesheet" href="style.css?v=1.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
@@ -174,7 +210,7 @@
 
     <header class="scrolled">
         <div class="logo">
-            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/6521582e9bea4975794d5615442ab831cdf20fe8/Screenshot%202026-03-03%20001548.png"
+            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/FINAL_LOGO%20copy-1.png"
                 alt="Logo" style="height: 65px; width: auto;">
         </div>
         <nav>
