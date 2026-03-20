@@ -18,12 +18,12 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 // هجرة البيانات: إذا كانت هناك ملفات JSON في المجلد الحالي وليست في الديسك، انقلها
-const brands = ['iticket', 'manama'];
-brands.forEach(brand => {
-    const localFile = path.join(__dirname, `trips_${brand}.json`);
-    const diskFile = path.join(STORAGE_ROOT, `trips_${brand}.json`);
+const filesToMigrate = ['trips_iticket.json', 'trips_manama.json', 'config.json'];
+filesToMigrate.forEach(fileName => {
+    const localFile = path.join(__dirname, fileName);
+    const diskFile = path.join(STORAGE_ROOT, fileName);
     if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile) && !fs.existsSync(diskFile)) {
-        console.log(`Migrating ${brand} data to persistent disk...`);
+        console.log(`Migrating ${fileName} to persistent disk...`);
         fs.copyFileSync(localFile, diskFile);
     }
 });
@@ -44,6 +44,43 @@ app.get('/trip', (req, res) => res.sendFile(path.join(__dirname, 'trip.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin_welcome.html')));
 app.get('/admin_iticket', (req, res) => res.sendFile(path.join(__dirname, 'admin_iticket.html')));
 app.get('/admin_manama', (req, res) => res.sendFile(path.join(__dirname, 'admin_manama.html')));
+
+// --- إدارة الإعدادات العامة (Config) ---
+const CONFIG_FILE = path.join(STORAGE_ROOT, 'config.json');
+
+app.get('/api/config', (req, res) => {
+    if (fs.existsSync(CONFIG_FILE)) {
+        try {
+            const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+            return res.json(config);
+        } catch (e) {
+            console.error("Error reading config:", e);
+        }
+    }
+    res.json({
+        iticket_desc: "الرحلات الخارجية والمؤتمرات والسياحة الدولية. استمتع بأفضل العروض حول العالم.",
+        manama_desc: "اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة البحرين. إقامتك المثالية تبدأ هنا."
+    });
+});
+
+app.post('/api/config', (req, res) => {
+    try {
+        let currentConfig = {};
+        if (fs.existsSync(CONFIG_FILE)) {
+            const raw = fs.readFileSync(CONFIG_FILE, 'utf8').trim();
+            if (raw) {
+                try { currentConfig = JSON.parse(raw); } catch (pe) {}
+            }
+        }
+        const updatedConfig = { ...currentConfig, ...req.body };
+        fs.writeFileSync(CONFIG_FILE, JSON.stringify(updatedConfig, null, 2), 'utf8');
+        res.json({ success: true, config: updatedConfig });
+    } catch (e) {
+        res.status(500).json({ error: e.toString() });
+    }
+});
+
+app.get('/ping', (req, res) => res.send('pong ' + Date.now()));
 
 // API لربط الملفات مع المجلد المستمر
 function getDataFilePath(brand) {

@@ -54,8 +54,12 @@ header.scrolled {
 }
 
 .logo img {
-    height: 50px;
-    width: auto;
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--primary-red);
+    background: white;
 }
 
 .logo span {

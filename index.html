@@ -10,7 +10,7 @@
         href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Outfit:wght@300;600;800&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png"
-        href="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/574253881_18532941568039264_5622425311968020289_n.jpg">
+        href="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/FINAL_LOGO%20copy-1.png">
     <style>
         :root {
             --primary-red: #e63946;
@@ -168,20 +168,20 @@
         <div class="choices-grid">
             <!-- i Ticket Card -->
             <a href="/iticket" class="choice-card card-iticket">
-                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/574253881_18532941568039264_5622425311968020289_n.jpg"
+                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/FINAL_LOGO%20copy-1.png"
                     class="brand-logo" style="background: white;">
                 <div class="brand-name outfit">i <b>Ticket</b></div>
-                <div class="brand-desc">الرحلات الخارجية والمؤتمرات والسياحة الدولية. استمتع بأفضل العروض حول العالم.
+                <div class="brand-desc" id="iticket-desc">الرحلات الخارجية والمؤتمرات والسياحة الدولية. استمتع بأفضل العروض حول العالم.
                 </div>
                 <div class="brand-btn">اكتشف الآن</div>
             </a>
 
             <!-- Manama Holidays Card -->
             <a href="/manama" class="choice-card card-manama">
-                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png"
+                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/59879d329862954c3aeaac4b8a845a74144e7bb8/Screenshot%202026-03-20%20232636.png"
                     class="brand-logo" style="border-radius: 20px;">
                 <div class="brand-name">Manama <b>Holidays</b></div>
-                <div class="brand-desc">اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة البحرين. إقامتك
+                <div class="brand-desc" id="manama-desc">اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة البحرين. إقامتك
                     المثالية تبدأ هنا.</div>
                 <div class="brand-btn" style="background: var(--primary-red); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);">احجز إقامتك</div>
             </a>
@@ -190,6 +190,19 @@
         <p style="margin-top: 50px; color: #555;">جميع الحقوق محفوظة &copy; 2026</p>
     </div>
 
+    <script>
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config?v=' + Date.now());
+                const config = await res.json();
+                if (config.iticket_desc) document.getElementById('iticket-desc').innerText = config.iticket_desc;
+                if (config.manama_desc) document.getElementById('manama-desc').innerText = config.manama_desc;
+            } catch (e) {
+                console.error("Config load error:", e);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
 </body>
 
 </html>

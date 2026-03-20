@@ -74,8 +74,7 @@
 
     <header class="scrolled">
         <div class="logo">
-            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png"
-                style="height: 65px; width: auto; border-radius: 8px; background: white; padding: 2px;">
+            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png">
         </div>
         <nav>
             <ul>
@@ -85,10 +84,54 @@
     </header>
 
     <div class="admin-container">
+        <!-- Edit Description Section -->
+        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
+            <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">وصف العلامة التجارية (يظهر في صفحة اختيار الموقع)</label>
+                <textarea id="brand-desc-input" placeholder="أدخل الوصف هنا..." style="width: 100%; height: 60px; background: #222; color: white; border: 1px solid #333; border-radius: 12px; padding: 12px; resize: none; font-family: Cairo; line-height: 1.4; outline: none;"></textarea>
+            </div>
+            <button onclick="saveBrandDesc()" id="save-desc-btn" style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 50px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-save"></i> حفظ الوصف
+            </button>
+        </div>
+
         <div class="admin-header">
             <h2>إدارة الفنادق والشاليهات والاستراحات</h2>
             <button class="btn-add" id="open-add-modal"><i class="fa fa-plus"></i> إضافة عقار جديد</button>
         </div>
+
+        <script>
+            async function loadBrandDesc() {
+                try {
+                    const res = await fetch('/api/config');
+                    const config = await res.json();
+                    if (config.manama_desc) document.getElementById('brand-desc-input').value = config.manama_desc;
+                } catch (e) { console.error(e); }
+            }
+            async function saveBrandDesc() {
+                const btn = document.getElementById('save-desc-btn');
+                const desc = document.getElementById('brand-desc-input').value;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+                try {
+                    const res = await fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ manama_desc: desc })
+                    });
+                    if (res.ok) alert('تم حفظ الوصف بنجاح');
+                    else {
+                        const errorRes = await res.json();
+                        alert('حدث خطأ في الخادم: ' + (errorRes.error || 'خطأ غير معروف'));
+                    }
+                } catch (e) { alert('حدث خطأ في الشبكة: ' + e); }
+                finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa fa-save"></i> حفظ الوصف';
+                }
+            }
+            window.addEventListener('DOMContentLoaded', loadBrandDesc);
+        </script>
 
         <div class="trips-table-container">
             <table>

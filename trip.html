@@ -232,7 +232,7 @@
         <div class="logo">
             <a href="/" id="header-link"
                 style="text-decoration: none; color: white; display: flex; align-items: center;">
-                <img id="header-logo" src="/uploads/iticket-logo.png" style="border-radius: 8px;">
+                <img id="header-logo" src="/uploads/iticket-logo.png">
                 <span id="header-name" class="outfit">i <b>Ticket</b></span>
             </a>
         </div>
@@ -281,19 +281,12 @@
             if (brand === 'manama') {
                 document.documentElement.style.setProperty('--primary-red', '#e02b20');
                 document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png';
-                document.getElementById('header-logo').style.height = '65px';
-                document.getElementById('header-logo').style.width = 'auto';
-                document.getElementById('header-logo').style.borderRadius = '5px';
-                document.getElementById('header-logo').style.background = 'white';
                 document.getElementById('header-logo').style.padding = '2px';
                 document.getElementById('header-name').style.display = 'none';
                 document.getElementById('header-link').href = '/manama';
                 document.getElementById('back-btn').href = '/manama';
             } else {
                 document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/574253881_18532941568039264_5622425311968020289_n.jpg';
-                document.getElementById('header-logo').style.height = '65px';
-                document.getElementById('header-logo').style.width = 'auto';
-                document.getElementById('header-logo').style.borderRadius = '0';
                 document.getElementById('header-name').style.display = 'none';
                 document.getElementById('header-link').href = '/iticket';
                 document.getElementById('back-btn').href = '/iticket';
