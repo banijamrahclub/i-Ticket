@@ -1,7 +1,6 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const sheetsService = require('./sheetsService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -87,14 +86,14 @@ function getDataFilePath(brand) {
     return path.join(STORAGE_ROOT, `trips_${brand}.json`);
 }
 
-app.get('/api/:brand/trips', async (req, res) => {
+app.get('/api/:brand/trips', (req, res) => {
     const { brand } = req.params;
     const DATA_FILE = getDataFilePath(brand);
 
     if (fs.existsSync(DATA_FILE)) {
         try {
-            const localData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-            return res.json(localData);
+            const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+            return res.json(data);
         } catch (e) {
             console.error("Error reading data file:", e);
         }
@@ -182,8 +181,13 @@ app.post('/api/:brand/trips', async (req, res) => {
         }
     }
 
-    fs.writeFileSync(DATA_FILE, JSON.stringify(trips, null, 2));
-    res.json({ success: true });
+    try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify(trips, null, 2), 'utf8');
+        res.json({ success: true });
+    } catch (e) {
+        console.error("Critical Save Error:", e);
+        res.status(500).json({ error: "Failed to save data to disk" });
+    }
 });
 
 app.listen(PORT, () => {
