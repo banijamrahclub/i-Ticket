@@ -369,9 +369,10 @@
         }
 
         function bookNow(packageName, brand) {
+            const phone = brand === 'manama' ? '97313313100' : '97317550054';
             const brandLabel = brand === 'manama' ? '"Manama Holidays"' : '"i Ticket"';
             const message = `أهلاً ${brandLabel}، أرغب في الاستفسار عن وحجز: ${packageName}\nرابط التفاصيل: ${window.location.href}`;
-            window.open(`https://wa.me/97317550054?text=${encodeURIComponent(message)}`, '_blank');
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         window.onload = loadTripDetails;

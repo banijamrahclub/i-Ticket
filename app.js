@@ -86,14 +86,26 @@ function renderFilterBar() {
     if (!filterBar) return;
 
     // الحصول على كل التصنيفات الفريدة
-    const categories = ['all', ...new Set(allTrips.map(t => t.category).filter(c => c && c.trim() !== ''))];
+    let categories = [];
+    if (brand === 'manama') {
+        categories = ['all', 'hotel_resort', 'chalet_pool'];
+    } else {
+        categories = ['all', ...new Set(allTrips.map(t => t.category).filter(c => c && c.trim() !== ''))];
+    }
 
-    filterBar.innerHTML = categories.map(cat => `
-        <div class="category-chip ${activeCategory === cat ? 'active' : ''}" 
-             onclick="filterByCategory('${cat}')">
-            ${cat === 'all' ? 'عرض الكل' : cat}
-        </div>
-    `).join('');
+    filterBar.innerHTML = categories.map(cat => {
+        let label = cat;
+        if (cat === 'all') label = 'عرض الكل';
+        else if (cat === 'hotel_resort') label = 'فنادق ومنتجعات';
+        else if (cat === 'chalet_pool') label = 'شاليهات واستراحات';
+        
+        return `
+            <div class="category-chip ${activeCategory === cat ? 'active' : ''}" 
+                 onclick="filterByCategory('${cat}')">
+                ${label}
+            </div>
+        `;
+    }).join('');
 }
 
 window.filterByCategory = (category) => {
@@ -101,7 +113,11 @@ window.filterByCategory = (category) => {
     if (category === 'all') {
         filteredTrips = allTrips;
     } else {
-        filteredTrips = allTrips.filter(t => t.category === category);
+        if (brand === 'manama') {
+            filteredTrips = allTrips.filter(t => t.type === category);
+        } else {
+            filteredTrips = allTrips.filter(t => t.category === category);
+        }
     }
     renderFilterBar();
     renderMainTrips();
@@ -143,7 +159,7 @@ function generateTripCard(trip) {
             </div>
             <div class="package-content">
                 <div style="font-size: 0.8rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">
-                    ${trip.category || 'عام'}
+                    ${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : (trip.category || 'عام')}
                 </div>
                 <h3 style="margin-bottom: 15px;">${trip.name}</h3>
                 <div class="package-info">
@@ -161,7 +177,7 @@ function generateTripCard(trip) {
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <a href="/trip?id=${trip.id}" class="book-btn" style="background: var(--card-bg); border: 1px solid var(--primary-red); color: white; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                    <a href="/trip?id=${trip.id}&brand=${brand}" class="book-btn" style="background: var(--card-bg); border: 1px solid var(--primary-red); color: white; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-eye"></i> التفاصيل
                     </a>
                     <button class="book-btn" onclick="bookViaWhatsapp('${trip.name}', '${trip.id}')" style="flex: 2;">
@@ -217,7 +233,16 @@ if (searchBtn) {
 
         const filtered = allTrips.filter(trip => {
             const matchesSearch = trip.name.toLowerCase().includes(searchTerm);
-            const matchesType = !selectedType || trip.type === selectedType;
+            let matchesType = !selectedType;
+            
+            if (selectedType === 'hotel_resort') {
+                matchesType = trip.type === 'hotel' || trip.type === 'resort';
+            } else if (selectedType === 'chalet_pool') {
+                matchesType = trip.type === 'chalet' || trip.type === 'pool' || trip.type === 'resort_pool'; // تعميم بسيط
+            } else if (selectedType) {
+                matchesType = trip.type === selectedType;
+            }
+            
             return matchesSearch && matchesType;
         });
 
@@ -236,9 +261,11 @@ if (searchBtn) {
 
 // Global Booking
 window.bookViaWhatsapp = (packageName, tripId) => {
-    const tripUrl = tripId ? `${window.location.origin}/trip?id=${tripId}` : '';
-    const message = `أهلاً "i Ticket للسفر"، أرغب في الاستفسار عن وحجز: ${packageName}${tripUrl ? `\nرابط التفاصيل: ${tripUrl}` : ''}`;
-    window.open(`https://wa.me/97317550054?text=${encodeURIComponent(message)}`, '_blank');
+    const tripUrl = tripId ? `${window.location.origin}/trip?id=${tripId}&brand=${brand}` : '';
+    const phone = brand === 'manama' ? '97313313100' : '97317550054';
+    const brandName = brand === 'manama' ? 'Manama Holidays' : 'i Ticket';
+    const message = `أهلاً "${brandName}"، أرغب في الاستفسار عن وحجز: ${packageName}${tripUrl ? `\nرابط التفاصيل: ${tripUrl}` : ''}`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
 };
 
 // Start

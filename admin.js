@@ -155,8 +155,8 @@ tripForm.onsubmit = async (e) => {
 // Multiple Images Handling
 document.getElementById('trip-images-file').addEventListener('change', async function (e) {
     const files = Array.from(e.target.files);
-    if (files.length > 10) {
-        alert("الحد الأقصى هو 10 صور");
+    if (files.length > 16) {
+        alert("الحد الأقصى هو 16 صورة");
         return;
     }
 
