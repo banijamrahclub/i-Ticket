@@ -129,6 +129,7 @@ tripForm.onsubmit = async (e) => {
         prices: prices,
         duration: document.getElementById('trip-duration').value,
         transport: document.getElementById('trip-transport').value,
+        description: document.getElementById('trip-description').value, // إضافة الوصف
         images: currentImagesBase64,
         image: currentImagesBase64.length > 0 ? currentImagesBase64[0] : '',
         badge: document.getElementById('trip-badge').value
@@ -190,6 +191,7 @@ openAddModalBtn.onclick = () => {
     addPriceCategory('السعر الأساسي', '');
     document.getElementById('trip-id').value = '';
     document.getElementById('trip-category').value = '';
+    document.getElementById('trip-description').value = ''; // تصفير الوصف
     document.getElementById('modal-title').innerText = 'إضافة رحلة جديدة';
     tripModal.style.display = 'flex';
 };
@@ -206,6 +208,7 @@ window.editTrip = (index) => {
         document.getElementById('trip-category').value = trip.category || '';
         document.getElementById('trip-duration').value = trip.duration;
         document.getElementById('trip-transport').value = trip.transport;
+        document.getElementById('trip-description').value = trip.description || ''; // تحميل الوصف
         document.getElementById('trip-badge').value = trip.badge;
         document.getElementById('modal-title').innerText = 'تعديل بيانات الرحلة';
 

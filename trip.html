@@ -342,8 +342,18 @@
                             </div>
                             <div class="info-item">
                                 <i class="fa-solid fa-tag"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">النوع</div><div>${trip.type}</div></div>
+                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">النوع</div><div>${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : trip.type}</div></div>
                             </div>
+
+                            ${trip.description ? `
+                                <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                    <h3 style="color: var(--primary-red); margin-bottom: 10px;">
+                                        <i class="fa-solid fa-circle-info"></i> 
+                                        ${brand === 'manama' ? 'عن المكان' : 'عن الرحلة'}
+                                    </h3>
+                                    <div style="white-space: pre-line; color: #ddd; font-size: 1.05rem; line-height: 1.8;">${trip.description}</div>
+                                </div>
+                            ` : ''}
                         </div>
 
                         <div class="price-list-box">

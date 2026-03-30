@@ -146,14 +146,14 @@ function generateTripCard(trip) {
     const hasMultiImages = imgs.length > 1;
 
     return `
-        <div class="package-card" id="card-${trip.id}">
+        <div class="package-card" id="card-${trip.id}" onclick="location.href='/trip?id=${trip.id}&brand=${brand}'" style="cursor: pointer;">
             <div class="package-img">
                 <img src="${displayImg}" class="main-img" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
                 ${trip.badge ? `<div class="package-badge">${trip.badge}</div>` : ''}
                 
                 ${hasMultiImages ? `
-                    <button class="carousel-arrow prev" onclick="changeCardImage('${trip.id}', 1)">❮</button>
-                    <button class="carousel-arrow next" onclick="changeCardImage('${trip.id}', -1)">❯</button>
+                    <button class="carousel-arrow prev" onclick="event.stopPropagation(); changeCardImage('${trip.id}', 1)">❮</button>
+                    <button class="carousel-arrow next" onclick="event.stopPropagation(); changeCardImage('${trip.id}', -1)">❯</button>
                     <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white;"> ${currentIndex + 1} / ${imgs.length} </div>
                 ` : ''}
             </div>
@@ -177,10 +177,10 @@ function generateTripCard(trip) {
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <a href="/trip?id=${trip.id}&brand=${brand}" class="book-btn" style="background: var(--card-bg); border: 1px solid var(--primary-red); color: white; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                    <a href="/trip?id=${trip.id}&brand=${brand}" class="book-btn" onclick="event.stopPropagation()" style="background: var(--card-bg); border: 1px solid var(--primary-red); color: white; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-eye"></i> التفاصيل
                     </a>
-                    <button class="book-btn" onclick="bookViaWhatsapp('${trip.name}', '${trip.id}')" style="flex: 2;">
+                    <button class="book-btn" onclick="event.stopPropagation(); bookViaWhatsapp('${trip.name}', '${trip.id}')" style="flex: 2;">
                         <i class="fa-brands fa-whatsapp"></i> احجز واتساب
                     </button>
                 </div>
