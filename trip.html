@@ -337,8 +337,8 @@
                                 <div><div style="color: var(--text-gray); font-size: 0.8rem;">المدة</div><div>${trip.duration}</div></div>
                             </div>
                             <div class="info-item">
-                                <i class="fa-solid fa-plane"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">وسائل النقل</div><div>${trip.transport}</div></div>
+                                <i class="fa-solid fa-file-lines"></i>
+                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">${brand === 'manama' ? 'عن المكان' : 'وصف الرحلة'}</div><div>${trip.transport || 'لا يوجد وصف'}</div></div>
                             </div>
                             <div class="info-item">
                                 <i class="fa-solid fa-tag"></i>
