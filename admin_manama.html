@@ -67,6 +67,7 @@
         .btn-add:hover {
             background: #b01b1b;
         }
+        .cat-input { padding:12px; background:#222; border:1px solid #333; color:white; border-radius:12px; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 
@@ -83,7 +84,28 @@
         </nav>
     </header>
 
-    <div class="admin-container">
+    <div class="admin-container" style="padding: 40px 5%; margin-top: 80px;">
+        
+        <!-- Manage Categories Section -->
+        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #5bc0de;"><i class="fa fa-map-location-dot"></i> إدارة أنواع الخدمات والأماكن</h3>
+                <button onclick="addNewCategoryRow()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fa fa-plus"></i> إضافة نوع جديد
+                </button>
+            </div>
+            
+            <div id="categories-manage-container" style="display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px;">
+                <!-- ستظهر التصنيفات هنا من الإعدادات -->
+            </div>
+            
+            <div style="text-align: left;">
+                <button onclick="saveCategories()" id="save-cats-btn" style="background: #5bc0de; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; margin-right: auto;">
+                    <i class="fa fa-save"></i> حفظ جميع الأنواع
+                </button>
+            </div>
+        </div>
+
         <!-- Edit Description Section -->
         <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
             <div style="flex: 1;">
@@ -95,43 +117,10 @@
             </button>
         </div>
 
-        <div class="admin-header">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2>إدارة الفنادق والشاليهات والاستراحات</h2>
-            <button class="btn-add" id="open-add-modal"><i class="fa fa-plus"></i> إضافة عقار جديد</button>
+            <button class="btn-add" id="open-add-modal" style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i class="fa fa-plus"></i> إضافة عقار جديد</button>
         </div>
-
-        <script>
-            async function loadBrandDesc() {
-                try {
-                    const res = await fetch('/api/config');
-                    const config = await res.json();
-                    if (config.manama_desc) document.getElementById('brand-desc-input').value = config.manama_desc;
-                } catch (e) { console.error(e); }
-            }
-            async function saveBrandDesc() {
-                const btn = document.getElementById('save-desc-btn');
-                const desc = document.getElementById('brand-desc-input').value;
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                try {
-                    const res = await fetch('/api/config', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ manama_desc: desc })
-                    });
-                    if (res.ok) alert('تم حفظ الوصف بنجاح');
-                    else {
-                        const errorRes = await res.json();
-                        alert('حدث خطأ في الخادم: ' + (errorRes.error || 'خطأ غير معروف'));
-                    }
-                } catch (e) { alert('حدث خطأ في الشبكة: ' + e); }
-                finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa fa-save"></i> حفظ الوصف';
-                }
-            }
-            window.addEventListener('DOMContentLoaded', loadBrandDesc);
-        </script>
 
         <div class="trips-table-container">
             <table>
@@ -165,8 +154,7 @@
                     <div class="form-group">
                         <label>النوع</label>
                         <select id="trip-type">
-                            <option value="hotel_resort">فنادق ومنتجعات</option>
-                            <option value="chalet_pool">شاليهات واستراحات</option>
+                            <!-- سيتم ملؤه ديناميكياً -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -219,6 +207,131 @@
             </form>
         </div>
     </div>
+
+    <script>
+        let manamaCategories = [];
+
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                if (config.manama_desc) document.getElementById('brand-desc-input').value = config.manama_desc;
+                
+                manamaCategories = config.manama_categories || [
+                    { id: 'hotels', label: 'فنادق', icon: 'fa-hotel' },
+                    { id: 'resorts', label: 'منتجع', icon: 'fa-umbrella-beach' },
+                    { id: 'chalets', label: 'شاليهات', icon: 'fa-house-chimney' },
+                    { id: 'rest_houses', label: 'استراحات', icon: 'fa-tree' },
+                    { id: 'jacuzzi', label: 'جاكوزي', icon: 'fa-hot-tub-person' },
+                    { id: 'romantic_dinner', label: 'عشاء رومانسي', icon: 'fa-utensils' },
+                    { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
+                    { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' }
+                ];
+                renderCategoryManagement();
+                populateTypeDropdown();
+            } catch (e) { console.error(e); }
+        }
+
+        function guessIcon(label) {
+            const l = label.toLowerCase();
+            if (l.includes('فندق') || l.includes('فنادق') || l.includes('سكن')) return 'fa-hotel';
+            if (l.includes('منتجع')) return 'fa-umbrella-beach';
+            if (l.includes('شاليه') || l.includes('استراحة') || l.includes('مزرعة') || l.includes('بيت')) return 'fa-house-chimney';
+            if (l.includes('بحر') || l.includes('شاطئ') || l.includes('بحرية')) return 'fa-ship';
+            if (l.includes('جاكوزي') || l.includes('مسبح')) return 'fa-hot-tub-person';
+            if (l.includes('عشاء') || l.includes('مطعم')) return 'fa-utensils';
+            if (l.includes('خيل') || l.includes('ركوب')) return 'fa-horse';
+            if (l.includes('طيران')) return 'fa-plane';
+            if (l.includes('عرض') || l.includes('عروض')) return 'fa-tags';
+            return 'fa-location-dot';
+        }
+
+        function renderCategoryManagement() {
+            const container = document.getElementById('categories-manage-container');
+            if(!container) return;
+            container.innerHTML = `
+                <div style="color: #888; font-size: 0.8rem;">اسم النوع</div>
+                <div></div>
+            ` + manamaCategories.map((cat, idx) => `
+                <div style="position:relative;">
+                    <input type="text" class="cat-label cat-input" value="${cat.label}" placeholder="مثال: شاليهات فاخرة">
+                    <input type="hidden" class="cat-id" value="${cat.id}">
+                    <input type="hidden" class="cat-icon" value="${cat.icon || 'fa-location-dot'}">
+                </div>
+                <button onclick="removeCategoryRow(${idx})" style="background:rgba(231, 76, 60, 0.1); color:#e74c3c; border:none; border-radius:12px; padding:0 20px; cursor:pointer;"><i class="fa fa-trash"></i></button>
+            `).join('');
+        }
+
+        function addNewCategoryRow() {
+            manamaCategories.push({ id: '', label: '', icon: 'fa-location-dot' });
+            renderCategoryManagement();
+        }
+
+        function removeCategoryRow(idx) {
+            if (manamaCategories.length <= 1) return alert('يجب وجود نوع واحد على الأقل');
+            manamaCategories.splice(idx, 1);
+            renderCategoryManagement();
+        }
+
+        async function saveCategories() {
+            const btn = document.getElementById('save-cats-btn');
+            const labels = document.querySelectorAll('.cat-label');
+            const ids = document.querySelectorAll('.cat-id');
+            const icons = document.querySelectorAll('.cat-icon');
+            
+            const updatedCats = [];
+            for(let i=0; i<labels.length; i++) {
+                let label = labels[i].value.trim();
+                if(!label) continue;
+                let id = ids[i].value || 'mc_' + Math.random().toString(36).substr(2, 9);
+                let icon = icons[i].value;
+                if (!icon || icon === 'fa-location-dot') {
+                    icon = guessIcon(label);
+                }
+                updatedCats.push({ label, id, icon });
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manama_categories: updatedCats })
+                });
+                if (res.ok) {
+                    alert('تم الحفظ بنجاح');
+                    manamaCategories = updatedCats;
+                    renderCategoryManagement();
+                    populateTypeDropdown();
+                }
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        function populateTypeDropdown() {
+            const select = document.getElementById('trip-type');
+            if(!select) return;
+            select.innerHTML = manamaCategories.map(cat => `<option value="${cat.id}">${cat.label}</option>`).join('');
+            window.manamaCategories = manamaCategories; // For admin.js access
+        }
+
+        async function saveBrandDesc() {
+            const btn = document.getElementById('save-desc-btn');
+            const desc = document.getElementById('brand-desc-input').value;
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manama_desc: desc })
+                });
+                if (res.ok) alert('تم حفظ الوصف بنجاح');
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
 
     <script>window.BRAND = 'manama';</script>
     <script src="admin.js"></script>

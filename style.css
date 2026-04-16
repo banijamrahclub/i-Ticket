@@ -23,6 +23,7 @@ body {
     background-color: var(--dark-bg);
     color: var(--text-white);
     overflow-x: hidden;
+    overflow-y: auto !important;
     line-height: 1.6;
 }
 
@@ -146,6 +147,32 @@ section.active-section {
 .category-chip:hover {
     border-color: var(--primary-red);
     color: white;
+}
+
+.category-chip.active {
+    background: var(--primary-red);
+    color: white;
+    border-color: var(--primary-red);
+}
+
+.sub-chip {
+    padding: 8px 18px;
+    background: #f5f5f5;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #555;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.3s;
+    border: 1px solid #ddd;
+}
+
+.sub-chip.active {
+    background: white;
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .category-chip.active {
@@ -510,11 +537,17 @@ section.active-section {
 
 /* Section Management for Navigation */
 section {
-    display: none;
-    min-height: calc(100vh - 80px);
-    opacity: 0;
-    transform: translateY(30px) scale(0.98);
+    display: block;
+    min-height: auto;
+    opacity: 1;
+    transform: none;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: 0.8s;
 }
 
 section.active-section {

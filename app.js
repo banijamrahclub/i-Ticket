@@ -1,134 +1,202 @@
-// Header Scroll Effect
-const header = document.getElementById('main-header');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
-
-// Mobile Menu Toggle Logic
-const mobileToggle = document.getElementById('mobile-menu-toggle');
-const mainNav = document.getElementById('main-nav');
-
-if (mobileToggle) {
-    mobileToggle.addEventListener('click', () => {
-        mainNav.classList.toggle('mobile-active');
-        const icon = mobileToggle.querySelector('i');
-        icon.classList.toggle('fa-bars');
-        icon.classList.toggle('fa-xmark');
-    });
-}
-
-// Section Switching Logic
-const navLinks = document.querySelectorAll('nav a');
-const sections = document.querySelectorAll('section');
-
-function showSection(id) {
-    sections.forEach(section => section.classList.remove('active-section'));
-    navLinks.forEach(link => link.classList.remove('active-link'));
-
-    const targetSection = document.getElementById(id);
-    if (targetSection) {
-        targetSection.classList.add('active-section');
-    }
-
-    if (mainNav) mainNav.classList.remove('mobile-active');
-    if (mobileToggle) {
-        const icon = mobileToggle.querySelector('i');
-        icon.classList.add('fa-bars');
-        icon.classList.remove('fa-xmark');
-    }
-
-    const activeLink = document.querySelector(`nav a[href="#${id}"]`);
-    if (activeLink) activeLink.classList.add('active-link');
-
-    if (id !== 'home') header.classList.add('scrolled');
-    else header.classList.remove('scrolled');
-}
-
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        const href = link.getAttribute('href');
-        if (href.startsWith('#')) {
-            const id = href.substring(1);
-            e.preventDefault();
-            showSection(id);
-            window.scrollTo(0, 0);
-        }
-    });
-});
-
-// --- Data & API ---
-const brand = window.BRAND || 'iticket'; // القيمة الافتراضية
+// --- Global Config ---
+let currentCategories = [];
+const brand = window.BRAND || 'iticket';
 const API_URL = `/api/${brand}/trips`;
+const CONFIG_URL = '/api/config';
 let allTrips = [];
 let filteredTrips = [];
 let activeCategory = 'all';
 let cardImageIndexes = {};
 
-async function fetchTrips() {
+// 1. Fetch Everything
+async function initApp() {
     try {
-        const response = await fetch(API_URL);
-        allTrips = await response.json() || [];
+        const configRes = await fetch(CONFIG_URL);
+        const config = await configRes.json();
+        
+        if (brand === 'manama') {
+            currentCategories = config.manama_categories || [
+                { id: 'hotels', label: 'فنادق', icon: 'fa-hotel' },
+                { id: 'resorts', label: 'منتجع', icon: 'fa-umbrella-beach' },
+                { id: 'chalets', label: 'شاليهات', icon: 'fa-house-chimney' },
+                { id: 'rest_houses', label: 'استراحات', icon: 'fa-tree' },
+                { id: 'jacuzzi', label: 'جاكوزي', icon: 'fa-hot-tub-person' },
+                { id: 'romantic_dinner', label: 'عشاء رومانسي', icon: 'fa-utensils' },
+                { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
+                { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' }
+            ];
+        } else {
+            currentCategories = config.iticket_categories || [
+                { id: 'flight_tickets', label: 'تذاكر طيران', icon: 'fa-plane' },
+                { id: 'group_trips', label: 'رحلات جماعية', icon: 'fa-users' },
+                { id: 'individual_trips', label: 'رحلات فردية', icon: 'fa-user' },
+                { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' }
+            ];
+        }
+
+        renderChoicesGrid(); // نعبئ التصنيفات بالأعلى
+        
+        const tripsRes = await fetch(API_URL);
+        allTrips = await tripsRes.json() || [];
         filteredTrips = allTrips;
+        
         renderFilterBar();
         renderMainTrips();
-    } catch (error) {
-        console.error("API Error:", error);
+        // renderRecentTrips() removed per user request
+    } catch (e) {
+        console.error("Initialization Error:", e);
     }
 }
 
+// 2. Render Choices Grid (Top)
+function renderChoicesGrid() {
+    const grid = document.getElementById('main-choices-grid');
+    if (!grid) return;
+    
+    // أضفنا خيار "عرض الكل" في البداية
+    const categories = [{ id: 'all', label: 'عرض الكل', icon: 'fa-border-all' }, ...currentCategories];
+    
+    grid.innerHTML = categories.map(cat => `
+        <a href="javascript:void(0)" onclick="filterByCategory('${cat.id}')" class="choice-item">
+            <i class="fa-solid ${cat.icon}"></i>
+            <span>${cat.label}</span>
+        </a>
+    `).join('');
+}
+
+// 3. Render Filter Bar (Main + Sub)
 function renderFilterBar() {
-    const filterBar = document.getElementById('category-filter-bar');
-    if (!filterBar) return;
+    const filterContainer = document.getElementById('category-filter-bar');
+    if (!filterContainer) return;
 
-    // الحصول على كل التصنيفات الفريدة
-    let categories = [];
-    if (brand === 'manama') {
-        categories = ['all', 'hotel_resort', 'chalet_pool'];
-    } else {
-        categories = ['all', ...new Set(allTrips.map(t => t.category).filter(c => c && c.trim() !== ''))];
-    }
+    // Main Categories Row
+    const mainCats = [{ id: 'all', label: 'عرض الكل' }, ...currentCategories];
+    let html = `
+        <div class="main-filter-row" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
+            ${mainCats.map(cat => `
+                <div class="category-chip ${activeCategory === cat.id ? 'active' : ''}" 
+                     onclick="filterByCategory('${cat.id}')">
+                    ${cat.label}
+                </div>
+            `).join('')}
+        </div>
+    `;
 
-    filterBar.innerHTML = categories.map(cat => {
-        let label = cat;
-        if (cat === 'all') label = 'عرض الكل';
-        else if (cat === 'hotel_resort') label = 'فنادق ومنتجعات';
-        else if (cat === 'chalet_pool') label = 'شاليهات واستراحات';
-        
-        return `
-            <div class="category-chip ${activeCategory === cat ? 'active' : ''}" 
-                 onclick="filterByCategory('${cat}')">
-                ${label}
-            </div>
-        `;
-    }).join('');
-}
+    // Sub-Categories Row (Destinations)
+    if (activeCategory !== 'all') {
+        const subCategories = [...new Set(allTrips
+            .filter(t => t.type === activeCategory && t.category)
+            .map(t => t.category))];
 
-window.filterByCategory = (category) => {
-    activeCategory = category;
-    if (category === 'all') {
-        filteredTrips = allTrips;
-    } else {
-        if (brand === 'manama') {
-            filteredTrips = allTrips.filter(t => t.type === category);
-        } else {
-            filteredTrips = allTrips.filter(t => t.category === category);
+        if (subCategories.length > 0) {
+            html += `
+                <div class="sub-filter-row" style="display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; border-top: 1px solid #eee; margin-top: 5px;">
+                    <div class="sub-chip ${!window.activeSubCategory ? 'active' : ''}" onclick="filterBySubCategory(null)">الكل</div>
+                    ${subCategories.map(sub => `
+                        <div class="sub-chip ${window.activeSubCategory === sub ? 'active' : ''}" 
+                             onclick="filterBySubCategory('${sub}')">
+                            ${sub}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
     }
+
+    filterContainer.innerHTML = html;
+}
+
+// 4. Filtering Logic
+window.filterByCategory = (category) => {
+    activeCategory = category;
+    window.activeSubCategory = null; // Reset sub when main changes
+    applyFilters();
     renderFilterBar();
-    renderMainTrips();
+
+    // Scroll
+    const target = document.getElementById('trips-section') || document.getElementById('services-section') || document.getElementById('main-package-grid');
+    if (target) {
+        window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+    }
 };
 
+window.filterBySubCategory = (sub) => {
+    window.activeSubCategory = sub;
+    applyFilters();
+    renderFilterBar();
+};
+
+function applyFilters() {
+    if (activeCategory === 'all') {
+        filteredTrips = allTrips;
+    } else {
+        filteredTrips = allTrips.filter(t => t.type === activeCategory);
+        if (window.activeSubCategory) {
+            filteredTrips = filteredTrips.filter(t => t.category === window.activeSubCategory);
+        }
+    }
+    renderMainTrips();
+}
+
+function getCategoryLabel(type) {
+    if (type === 'all') return 'عام';
+    const found = currentCategories.find(c => c.id === type);
+    return found ? found.label : 'وجهة';
+}
+
+function initRecentSlider() {
+    const track = document.getElementById('recent-trips-track');
+    const container = document.querySelector('.offers-section');
+    if (!track || !container) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let autoPlayInterval;
+
+    const startAutoPlay = () => {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+            if (isDown) return;
+            const max = track.scrollWidth - track.clientWidth;
+            if (track.scrollLeft >= max - 5) {
+                track.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                track.scrollBy({ left: 280, behavior: 'smooth' });
+            }
+        }, 3000);
+    };
+
+    const stopAutoPlay = () => clearInterval(autoPlayInterval);
+
+    track.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - track.offsetLeft;
+        scrollLeft = track.scrollLeft;
+        stopAutoPlay();
+    });
+    track.addEventListener('mouseleave', () => { isDown = false; startAutoPlay(); });
+    track.addEventListener('mouseup', () => { isDown = false; startAutoPlay(); });
+    track.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - track.offsetLeft;
+        const walk = (x - startX) * 2;
+        track.scrollLeft = scrollLeft - walk;
+    });
+    track.addEventListener('touchstart', stopAutoPlay);
+    track.addEventListener('touchend', startAutoPlay);
+
+    startAutoPlay();
+}
+
+// 6. Main Grid Rendering
 function renderMainTrips() {
     const grid = document.getElementById('main-package-grid');
     if (!grid) return;
 
     if (filteredTrips.length === 0) {
-        grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1;">عذراً، لا توجد رحلات لهذه الوجهة حالياً.</p>';
+        grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; padding: 40px; color: #888;">عذراً، لا توجد نتائج حالياً لهذا التصنيف.</p>';
         return;
     }
 
@@ -143,44 +211,35 @@ function generateTripCard(trip) {
     const currentIndex = cardImageIndexes[trip.id];
     const displayImg = imgs[currentIndex] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop';
 
-    const hasMultiImages = imgs.length > 1;
-
     return `
-        <div class="package-card" id="card-${trip.id}" onclick="location.href='/trip?id=${trip.id}&brand=${brand}'" style="cursor: pointer;">
+        <div class="package-card" id="card-${trip.id}" onclick="location.href='/trip?id=${trip.id}&brand=${brand}'" style="cursor:pointer;">
             <div class="package-img">
                 <img src="${displayImg}" class="main-img" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
                 ${trip.badge ? `<div class="package-badge">${trip.badge}</div>` : ''}
-                
-                ${hasMultiImages ? `
+                ${imgs.length > 1 ? `
                     <button class="carousel-arrow prev" onclick="event.stopPropagation(); changeCardImage('${trip.id}', 1)">❮</button>
                     <button class="carousel-arrow next" onclick="event.stopPropagation(); changeCardImage('${trip.id}', -1)">❯</button>
-                    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white;"> ${currentIndex + 1} / ${imgs.length} </div>
+                    <div class="img-counter" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white;">${currentIndex + 1} / ${imgs.length}</div>
                 ` : ''}
             </div>
             <div class="package-content">
-                <div style="font-size: 0.8rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">
-                    ${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : (trip.category || 'عام')}
-                </div>
-                <h3 style="margin-bottom: 15px;">${trip.name}</h3>
-                <div class="package-info">
+                <div class="package-category" style="font-size: 0.8rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">${getCategoryLabel(trip.type)}</div>
+                <h3 style="margin-bottom: 10px;">${trip.name}</h3>
+                <div class="package-info" style="display: flex; gap: 15px; font-size: 0.8rem; color: #666; margin-bottom: 15px;">
                     <span><i class="fa fa-calendar-days"></i> ${trip.duration}</span>
                     <span><i class="fa fa-plane"></i> ${trip.transport}</span>
                 </div>
-                
                 <div class="package-price-container">
                     ${prices.map(p => `
-                        <div class="package-price-row">
-                            <span class="package-price-label">${p.label}</span>
-                            <span class="package-price-value">${p.value} <span>دينار</span></span>
+                        <div class="package-price-row" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span class="package-price-label" style="color: #888;">${p.label}</span>
+                            <span class="package-price-value" style="font-weight: 800; color: var(--primary-red);">${p.value} <span>دينار</span></span>
                         </div>
                     `).join('')}
                 </div>
-
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <a href="/trip?id=${trip.id}&brand=${brand}" class="book-btn" onclick="event.stopPropagation()" style="background: var(--card-bg); border: 1px solid var(--primary-red); color: white; flex: 1; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa fa-eye"></i> التفاصيل
-                    </a>
-                    <button class="book-btn" onclick="event.stopPropagation(); bookViaWhatsapp('${trip.name}', '${trip.id}')" style="flex: 2;">
+                <div class="package-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <a href="/trip?id=${trip.id}&brand=${brand}" class="btn-details" style="flex: 1; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 8px; text-decoration: none; color: #333; font-size: 0.9rem;" onclick="event.stopPropagation()">التفاصيل</a>
+                    <button class="btn-whatsapp" style="flex: 2; background: #25d366; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;" onclick="event.stopPropagation(); bookViaWhatsapp('${trip.name}', '${trip.id}')">
                         <i class="fa-brands fa-whatsapp"></i> احجز واتساب
                     </button>
                 </div>
@@ -192,84 +251,24 @@ function generateTripCard(trip) {
 window.changeCardImage = (tripId, delta) => {
     const trip = allTrips.find(t => t.id.toString() === tripId.toString());
     if (!trip) return;
-
-    const imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
-    if (imgs.length <= 1) return;
-
+    const imgs = trip.images || [];
     let newIndex = (cardImageIndexes[tripId] || 0) + delta;
     if (newIndex >= imgs.length) newIndex = 0;
     if (newIndex < 0) newIndex = imgs.length - 1;
-
     cardImageIndexes[tripId] = newIndex;
-
     const card = document.getElementById(`card-${tripId}`);
     if (card) {
-        const img = card.querySelector('.main-img');
+        card.querySelector('.main-img').src = imgs[newIndex];
         const counter = card.querySelector('div[style*="font-size: 10px"]');
-        if (img) img.src = imgs[newIndex];
         if (counter) counter.innerText = `${newIndex + 1} / ${imgs.length}`;
     }
 };
 
-// Search Logic
-const searchBtn = document.getElementById('search-btn-hero');
-const searchInput = document.getElementById('trip-search-input');
-const typeSelect = document.getElementById('trip-type-select');
-const resultsContainer = document.getElementById('search-results-home');
-
-if (searchBtn) {
-    searchBtn.addEventListener('click', () => {
-        const searchTerm = (searchInput.value || "").trim().toLowerCase();
-        const selectedType = typeSelect.value;
-
-        if (searchTerm === "" && selectedType === "") {
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.style.display = 'none';
-            }
-            showSection('packages');
-            return;
-        }
-
-        const filtered = allTrips.filter(trip => {
-            const matchesSearch = trip.name.toLowerCase().includes(searchTerm);
-            let matchesType = !selectedType;
-            
-            if (selectedType === 'hotel_resort') {
-                matchesType = trip.type === 'hotel' || trip.type === 'resort';
-            } else if (selectedType === 'chalet_pool') {
-                matchesType = trip.type === 'chalet' || trip.type === 'pool' || trip.type === 'resort_pool'; // تعميم بسيط
-            } else if (selectedType) {
-                matchesType = trip.type === selectedType;
-            }
-            
-            return matchesSearch && matchesType;
-        });
-
-        if (resultsContainer) {
-            if (filtered.length > 0) {
-                resultsContainer.innerHTML = filtered.map(trip => generateTripCard(trip)).join('');
-                resultsContainer.style.display = 'grid';
-                resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                alert('عذراً، لا توجد رحلات تطابق بحثك حالياً.');
-                resultsContainer.style.display = 'none';
-            }
-        }
-    });
-}
-
-// Global Booking
-window.bookViaWhatsapp = (packageName, tripId) => {
-    const tripUrl = tripId ? `${window.location.origin}/trip?id=${tripId}&brand=${brand}` : '';
-    const phone = brand === 'manama' ? '97313313100' : '97317550054';
-    const brandName = brand === 'manama' ? 'Manama Holidays' : 'i Ticket';
-    const message = `أهلاً "${brandName}"، أرغب في الاستفسار عن وحجز: ${packageName}${tripUrl ? `\nرابط التفاصيل: ${tripUrl}` : ''}`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+window.bookViaWhatsapp = (name, id) => {
+    const phone = brand === 'iticket' ? '97317550054' : '97313313100';
+    const text = `السلام عليكم، أرغب في الاستفسار عن ${name} (ID: ${id})`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
 };
 
 // Start
-window.addEventListener('DOMContentLoaded', () => {
-    showSection('home');
-    fetchTrips();
-});
+initApp();

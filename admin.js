@@ -62,6 +62,16 @@ window.addPriceCategory = (label = '', value = '') => {
 // Render Table
 function renderTrips() {
     if (!tripsList) return;
+    
+    // Helper to get labels from the categories loaded in the HTML script
+    const getCatLabel = (typeId) => {
+        let cats = [];
+        if (brand === 'iticket') cats = window.iticketCategories || [];
+        else cats = window.manamaCategories || [];
+        const found = cats.find(c => c.id === typeId);
+        return found ? found.label : typeId;
+    };
+
     tripsList.innerHTML = allTrips.map((trip, index) => {
         const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
         const displayImage = trip.images && trip.images.length > 0 ? trip.images[0] : (trip.image || '');
@@ -77,8 +87,8 @@ function renderTrips() {
                         </div>
                     </div>
                 </td>
-                <td>${trip.type}</td>
-                <td>${displayPrice} دينار</td>
+                <td><span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">${getCatLabel(trip.type)}</span></td>
+                <td><b style="color: var(--primary-red);">${displayPrice}</b> دينار</td>
                 <td>${trip.duration}</td>
                 <td>
                     <div class="actions">
@@ -156,24 +166,35 @@ tripForm.onsubmit = async (e) => {
 // Multiple Images Handling
 document.getElementById('trip-images-file').addEventListener('change', async function (e) {
     const files = Array.from(e.target.files);
-    if (files.length > 16) {
-        alert("الحد الأقصى هو 16 صورة");
+    if (files.length + currentImagesBase64.length > 16) {
+        alert("الحد الأقصى هو 16 صورة إجمالاً");
         return;
     }
-
-    currentImagesBase64 = [];
-    imagesPreviewContainer.innerHTML = '';
 
     for (const file of files) {
         const base64 = await toBase64(file);
         currentImagesBase64.push(base64);
-
-        const img = document.createElement('img');
-        img.src = base64;
-        img.style = 'width: 100%; height: 50px; object-fit: cover; border-radius: 5px;';
-        imagesPreviewContainer.appendChild(img);
     }
+    renderImagesPreview();
 });
+
+function renderImagesPreview() {
+    imagesPreviewContainer.innerHTML = '';
+    currentImagesBase64.forEach((src, idx) => {
+        const div = document.createElement('div');
+        div.style = 'position:relative; width:100%; height:60px;';
+        div.innerHTML = `
+            <img src="${src}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+            <button type="button" onclick="removeImage(${idx})" style="position:absolute; top:-5px; right:-5px; background:#e22; color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);"><i class="fa fa-times"></i></button>
+        `;
+        imagesPreviewContainer.appendChild(div);
+    });
+}
+
+window.removeImage = (idx) => {
+    currentImagesBase64.splice(idx, 1);
+    renderImagesPreview();
+}
 
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -219,14 +240,8 @@ window.editTrip = (index) => {
             addPriceCategory('السعر الأساسي', trip.price);
         }
 
-        imagesPreviewContainer.innerHTML = '';
         currentImagesBase64 = trip.images || (trip.image ? [trip.image] : []);
-        currentImagesBase64.forEach(src => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.style = 'width: 100%; height: 50px; object-fit: cover; border-radius: 5px;';
-            imagesPreviewContainer.appendChild(img);
-        });
+        renderImagesPreview();
 
         tripModal.style.display = 'flex';
     }

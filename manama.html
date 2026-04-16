@@ -13,35 +13,272 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-blue: #003a5d; /* لون شبيه بالمسافر */
+            --accent-teal: #eef9f9;
+            --primary-red: #e02b20;
+            --soft-gray: #f8f9fa;
+            --card-border: #e6e6e6;
+            --text-dark: #1a1a1a;
+        }
+
         body {
             font-family: 'Cairo', sans-serif;
+            background-color: #fff;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-y: auto !important;
+            overflow-x: hidden;
         }
 
-        :root {
-            --primary-red: #e02b20;
+        .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+            visibility: visible !important;
         }
 
-        /* شعار منامة هوليديز الجديد باللون الأحمر */
-        header.scrolled {
-            border-bottom: 2px solid #e02b20;
+        /* Almosafer Style Header */
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .package-badge {
-            background: #e02b20;
+        header .logo img { height: 60px; object-fit: contain; }
+
+        /* Welcome Section */
+        .welcome-hero {
+            background: var(--accent-teal);
+            padding: 30px 20px 80px;
+            text-align: right;
+            position: relative;
         }
 
-        .category-chip.active {
-            background: #e02b20;
-            border-color: #e02b20;
+        .welcome-hero h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0 0 5px;
+            color: var(--primary-blue);
         }
 
-        .book-btn {
-            border-color: #e02b20;
-            color: #e02b20;
+        .welcome-hero p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
         }
 
-        .book-btn:hover {
-            background: #e02b20;
+        .user-avatar {
+            position: absolute;
+            left: 20px;
+            top: 30px;
+            width: 45px;
+            height: 45px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        /* Category Choice Grid (Floating) */
+        .choices-wrapper {
+            padding: 0 20px;
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .choice-item {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px 15px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--primary-blue);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .choice-item:hover { 
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(91, 192, 222, 0.12) !important;
+            border-color: #5bc0de !important;
+            background: #fff !important;
+        }
+
+        .choice-item i {
+            display: block;
+            font-size: 2.2rem;
+            margin-bottom: 12px;
+            color: #5bc0de;
+            transition: transform 0.4s ease;
+        }
+
+        .choice-item:hover i {
+            transform: scale(1.2) rotate(-5deg);
+        }
+
+        .item-badge {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: #4caf50;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .choice-item i {
+            display: block;
+            font-size: 2.22rem;
+            margin-bottom: 12px;
+            color: #5bc0de;
+        }
+
+        .choice-item span {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        /* Large Offer Cards (Horizontal Scroll) */
+        .offers-section {
+            padding: 35px 0 20px;
+        }
+
+        .section-header {
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary-blue); font-weight: 800; }
+        .section-header .see-all { color: #5bc0de; font-size: 0.85rem; text-decoration: none; font-weight: 700; }
+
+        .offers-track {
+            display: flex;
+            gap: 15px;
+            padding: 0 20px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .offers-track::-webkit-scrollbar { display: none; }
+
+        .offer-banner {
+            min-width: 300px;
+            width: 300px;
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+        }
+
+        .offer-img { height: 160px; position: relative; }
+        .offer-img img { width: 100%; height: 100%; object-fit: cover; }
+        .promo-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--primary-blue);
+            font-weight: 700;
+            border: 1px solid #ddd;
+        }
+
+        .offer-info { padding: 15px; }
+        .offer-info h4 { margin: 0 0 5px; font-size: 0.95rem; color: var(--primary-blue); }
+        .offer-info p { margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4; }
+
+        /* More Services (Circle Icons) */
+        .services-row {
+            padding: 0 20px 40px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .services-row::-webkit-scrollbar { display: none; }
+
+        .service-mini {
+            text-align: center;
+            min-width: 65px;
+        }
+
+        .icon-circle {
+            width: 65px;
+            height: 65px;
+            background: var(--accent-teal);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5bc0de;
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .service-mini span { font-size: 0.75rem; color: #555; font-weight: 700; }
+
+        /* Grid section reset */
+        .grid-section { background: #fff; padding: 20px; }
+
+        /* Premium Aesthetics & Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .see-all {
+            padding: 8px 16px;
+            background: var(--accent-teal);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            color: var(--primary-blue) !important;
+        }
+
+        .see-all:hover {
+            background: var(--primary-blue);
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(0, 58, 93, 0.2);
+        }
+
+        .welcome-hero {
+            background: linear-gradient(135deg, var(--accent-teal) 0%, #fff 100%);
+            overflow: hidden;
         }
     </style>
 </head>
@@ -50,113 +287,75 @@
 
     <header id="main-header">
         <div class="logo">
-            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png"
-                alt="Manama Logo">
+            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png" alt="Manama Logo">
         </div>
-        <div class="mobile-menu-btn" id="mobile-menu-toggle">
-            <i class="fa fa-bars"></i>
-        </div>
-        <nav id="main-nav">
-            <ul>
-                <li><a href="#home">الرئيسية</a></li>
-                <li><a href="#packages">الإقامات</a></li>
-                <li><a href="#about">من نحن</a></li>
-                <li><a href="https://wa.me/97313313100" class="nav-cta" target="_blank" style="background:#e02b20;">احجز
-                        الآن</a></li>
-            </ul>
-        </nav>
     </header>
 
-    <section class="hero" id="home">
-        <div class="hero-slider">
-            <div class="hero-slide"
-                style="background-image: url('https://www.diyar.bh/public/business-friendly-bahrain/assets/img/bh.png');">
+    <div class="welcome-hero">
+        <div class="user-avatar"><i class="fa-solid fa-suitcase" style="color: #5bc0de;"></i></div>
+        <h1>مرحباً بك</h1>
+        <p>ماذا ينتظرك لاكتشافه اليوم؟</p>
+    </div>
+
+    <div class="choices-wrapper">
+        <div class="choices-grid" id="main-choices-grid">
+            <!-- سيتم ملؤه ديناميكياً بواسطة JS -->
+        </div>
+    </div>
+
+    <!-- تم إزالة قسم أحدث الأماكن بناءً على طلب المستخدم -->
+
+    <section class="grid-section" id="services-section">
+        <div class="section-header" style="padding: 0; margin-bottom: 20px;">
+            <a href="#main-package-grid" class="see-all">عرض الكل</a>
+            <h2>استكشف كافة الخدمات</h2>
+        </div>
+        <div class="services-row">
+            <div class="service-mini">
+                <div class="icon-circle"><i class="fa-solid fa-ellipsis"></i></div>
+                <span>المزيد</span>
             </div>
-            <div class="hero-slide"
-                style="background-image: url('https://tourismbh.com/uploads/Travel_to_Bahrain_Banner_4.webp');">
+            <div class="service-mini">
+                <div class="icon-circle"><i class="fa-solid fa-car-side"></i></div>
+                <span>مواصلات</span>
             </div>
-            <div class="hero-slide"
-                style="background-image: url('https://www.bahrainedb.com/app/uploads/2024/05/Bahrain-Bay-Skyline-YDI-scaled.jpg');">
-            </div>
-            <div class="hero-slide"
-                style="background-image: url('https://marsalqatar.qa/uploads/images/2024/12/mv4d0.png');">
+            <div class="service-mini">
+                <div class="icon-circle"><i class="fa-solid fa-phone-volume"></i></div>
+                <span>دعم 24/7</span>
             </div>
         </div>
-        <h1>أفضل الفنادق، الشاليهات والاستراحات مع <span>Manama Holidays</span></h1>
-        <p>استمتع بإقامة فاخرة وهادئة في أجمل بقاع مملكة البحرين. شاليهات، فنادق، واستراحات خاصة تناسب عائلتك.</p>
 
-        <div class="search-container">
-            <input type="text" id="trip-search-input" class="search-input"
-                placeholder="عن ماذا تبحث؟ (فندق، شاليه، استراحة)">
-            <select id="trip-type-select" class="search-input">
-                <option value="">الكل</option>
-                <option value="hotel_resort">فنادق ومنتجعات</option>
-                <option value="chalet_pool">شاليهات واستراحات</option>
-            </select>
-            <button id="search-btn-hero" class="search-btn" style="background:#e02b20;">بحث <i
-                    class="fa fa-search"></i></button>
-        </div>
-
-        <div id="search-results-home" class="package-grid" style="margin-top: 40px; display: none; width: 100%;"></div>
-    </section>
-
-    <section class="section-padding" id="packages" style="background: rgba(255,255,255,0.02);">
-        <div class="section-title">
-            <h2>عروض الإقامة والترفيه الداخلي</h2>
-            <div class="underline" style="background:#e02b20;"></div>
-        </div>
-
-        <div id="category-filter-bar" class="category-filter-container"></div>
+        <div id="category-filter-bar" class="category-filter-container" style="justify-content: flex-start; padding: 5px 0;"></div>
         <div class="package-grid" id="main-package-grid"></div>
     </section>
 
-    <section class="section-padding" id="about">
-        <div class="section-title">
-            <h2>عن منامة هوليديز</h2>
-            <div class="underline" style="background:#e02b20;"></div>
+    <section class="about-minimal" id="about" style="padding: 80px 20px; background: #fafafa;">
+        <div class="section-title" style="text-align: center; margin-bottom: 50px;">
+            <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 12px;">منامة هوليديز</h2>
+            <p style="color: #666; font-size: 1.1rem;">وجهتك لراحة الروح واستجمام العائلة</p>
+            <div style="width: 60px; height: 4px; background: var(--primary-blue); margin: 20px auto; border-radius: 2px;"></div>
         </div>
-        <div class="about-container">
-            <div class="about-text">
-                <h3>MANAMA HOLIDAYS</h3>
-                <p>نحن بوابتك الأولى لحجز أفضل وجهات الإقامة في البحرين. نوفر لك خيارات متنوعة من الفنادق الفاخرة،
-                    الشاليهات الشاطئية، والاستراحات الخاصة التي تضمن لك الخصوصية والمتعة.</p>
+        
+        <div class="about-container" style="max-width: 1100px; margin: 0 auto;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 50px;">
+                <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; border: 1px solid #f2f2f2;">
+                    <i class="fa-solid fa-hotel" style="font-size: 2.5rem; color: #5bc0de; margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-blue);">خدماتنا الفندقية</h3>
+                    <p style="font-size: 1rem; color: #666; line-height: 1.7;">نقدم أرقى الفنادق والمنتجعات والشاليهات في مملكة البحرين، مع ضمان أفضل الأسعار وكافة سبل الراحة والخصوصية.</p>
+                </div>
+                <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; border: 1px solid #f2f2f2;">
+                    <i class="fa-solid fa-umbrella-beach" style="font-size: 2.5rem; color: #5bc0de; margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-blue);">التزامنا</h3>
+                    <p style="font-size: 1rem; color: #666; line-height: 1.7;">نسعى لأن نكون شركاءكم في صنع أجمل الذكريات العائلية من خلال توفير وجهات سياحية داخلية متميزة وفريدة.</p>
+                </div>
             </div>
-            <div class="links-grid">
-                <a href="https://wa.me/97313313100" class="social-link-card" target="_blank"><i
-                        class="fa-brands fa-whatsapp"></i>
-                    <div class="link-info">
-                        <h4>واتساب</h4>
-                        <p>13313100 (973+)</p>
-                    </div>
-                </a>
-                <a href="https://www.instagram.com/manama_holidays" class="social-link-card" target="_blank"><i
-                        class="fa-brands fa-instagram"></i>
-                    <div class="link-info">
-                        <h4>انستقرام الفنادق</h4>
-                        <p>فنادق - منتجعات</p>
-                    </div>
-                </a>
-                <a href="https://www.instagram.com/manama.pools/" class="social-link-card" target="_blank"><i
-                        class="fa-brands fa-instagram"></i>
-                    <div class="link-info">
-                        <h4>انستقرام الشاليهات</h4>
-                        <p>برك سباحة - استراحات</p>
-                    </div>
-                </a>
-                <a href="https://www.tiktok.com/@manamaholidays" class="social-link-card" target="_blank"><i
-                        class="fa-brands fa-tiktok"></i>
-                    <div class="link-info">
-                        <h4>تيك توك</h4>
-                        <p>@manamaholidays</p>
-                    </div>
-                </a>
-                <a href="https://www.snapchat.com/add/manamaholidays" class="social-link-card" target="_blank"><i
-                        class="fa-brands fa-snapchat"></i>
-                    <div class="link-info">
-                        <h4>سناب شات</h4>
-                        <p>@manamaholidays</p>
-                    </div>
-                </a>
+
+            <div style="background: #fff; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f2f2f2;">
+                <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.3rem; color: var(--primary-blue);">تواصل معنا مباشرة</h3>
+                <div class="links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <a href="https://wa.me/97313313100" class="social-link-card" style="padding: 18px; background: #25d366; color: white; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 1rem;"><i class="fa-brands fa-whatsapp"></i> واتساب الحجوزات</a>
+                    <a href="https://www.instagram.com/manama_holidays" class="social-link-card" style="padding: 18px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 1rem;"><i class="fa-brands fa-instagram"></i> انستقرام</a>
+                </div>
             </div>
         </div>
     </section>
@@ -167,6 +366,14 @@
 
     <script>window.BRAND = 'manama';</script>
     <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.reveal').forEach(el => {
+                el.classList.add('active');
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+        });
+    </script>
 </body>
-
 </html>

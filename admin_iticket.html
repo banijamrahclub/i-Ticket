@@ -48,6 +48,8 @@
         body {
             font-family: 'Cairo', sans-serif;
             background: #0f0f0f;
+            min-height: 100vh;
+            overflow-y: auto !important;
         }
 
         .admin-container {
@@ -131,7 +133,6 @@
             border-radius: 8px;
         }
 
-        /* Modal Style */
         .modal {
             display: none;
             position: fixed;
@@ -143,10 +144,8 @@
             z-index: 2000;
             justify-content: center;
             align-items: flex-start;
-            /* تغيير من center لتبدأ من الأعلى */
             backdrop-filter: blur(5px);
             overflow-y: auto;
-            /* السماح بالتمرير في النافذة ككل */
             padding: 20px 0;
         }
 
@@ -158,7 +157,6 @@
             max-width: 600px;
             border: 1px solid var(--primary-red);
             margin: auto;
-            /* لضمان التمركز عند التمرير */
             position: relative;
         }
 
@@ -182,10 +180,6 @@
             border-radius: 10px;
             color: white;
             outline: none;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary-red);
         }
 
         .modal-footer {
@@ -215,12 +209,33 @@
         </div>
         <nav>
             <ul>
-                <li><a href="index.html">معاينة الموقع</a></li>
+                <li><a href="iticket.html">معاينة الموقع</a></li>
             </ul>
         </nav>
     </header>
 
     <div class="admin-container">
+        <!-- Manage Categories Section -->
+        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: var(--primary-red);"><i class="fa fa-tags"></i> إدارة أنواع التصنيفات</h3>
+                <button onclick="addNewCategoryRow()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fa fa-plus"></i> إضافة تصنيف جديد
+                </button>
+            </div>
+            
+            <div id="categories-manage-container" style="display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px;">
+                <!-- ستظهر التصنيفات هنا من الإعدادات -->
+            </div>
+            
+            <div style="text-align: left;">
+                <button onclick="saveCategories()" id="save-cats-btn" style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; margin-right: auto;">
+                    <i class="fa fa-save"></i> حفظ جميع التصنيفات
+                </button>
+            </div>
+            <p style="color: #888; font-size: 0.8rem; margin-top: 10px;">* بمجرد كتابة الاسم، سيتم تفعيل التصنيف تلقائياً في الموقع.</p>
+        </div>
+
         <!-- Edit Description Section -->
         <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
             <div style="flex: 1;">
@@ -233,42 +248,9 @@
         </div>
 
         <div class="admin-header">
-            <h2>إدارة رحلات وخدمات i Ticket</h2>
+            <h2>إدارة الرحلات والعروض</h2>
             <button class="btn-add" id="open-add-modal"><i class="fa fa-plus"></i> إضافة رحلة جديدة</button>
         </div>
-
-        <script>
-            async function loadBrandDesc() {
-                try {
-                    const res = await fetch('/api/config');
-                    const config = await res.json();
-                    if (config.iticket_desc) document.getElementById('brand-desc-input').value = config.iticket_desc;
-                } catch (e) { console.error(e); }
-            }
-            async function saveBrandDesc() {
-                const btn = document.getElementById('save-desc-btn');
-                const desc = document.getElementById('brand-desc-input').value;
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
-                try {
-                    const res = await fetch('/api/config', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ iticket_desc: desc })
-                    });
-                    if (res.ok) alert('تم حفظ الوصف بنجاح');
-                    else {
-                        const errorRes = await res.json();
-                        alert('حدث خطأ في الخادم: ' + (errorRes.error || 'خطأ غير معروف'));
-                    }
-                } catch (e) { alert('حدث خطأ في الشبكة: ' + e); }
-                finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fa fa-save"></i> حفظ الوصف';
-                }
-            }
-            window.addEventListener('DOMContentLoaded', loadBrandDesc);
-        </script>
 
         <div class="trips-table-container">
             <table>
@@ -302,13 +284,8 @@
                     <div class="form-group">
                         <label>النوع</label>
                         <select id="trip-type">
-                            <option value="tourism">سياحية</option>
-                            <option value="religious">دينية</option>
+                            <!-- ديناميكي -->
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label>السعر (بالدينار)</label>
-                        <input type="number" id="trip-price" required>
                     </div>
                 </div>
                 <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -330,32 +307,30 @@
                 <div class="form-group"
                     style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #444;">
                     <label style="color: var(--primary-red); font-weight: bold;">أسعار الرحلة (فئات متعددة)</label>
-                    <div id="price-categories-container">
-                        <!-- ديناميكي -->
-                    </div>
+                    <div id="price-categories-container"></div>
                     <button type="button" onclick="addPriceCategory()" class="btn-cancel"
                         style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
-                        <i class="fa fa-plus"></i> إضافة فئة سعر (كبار، صغار، الخ)
+                        <i class="fa fa-plus"></i> إضافة فئة سعر
                     </button>
                 </div>
 
                 <div class="form-group" style="margin-top:20px;">
                     <label>صور الرحلة (حتى 16 صورة)</label>
-                    <input type="file" id="trip-images-file" accept="image/*" multiple
-                        style="padding: 10px; width: 100%; box-sizing: border-box;">
+                    <input type="file" id="trip-images-file" accept="image/*" multiple>
                     <div id="images-preview-container"
-                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; min-height: 50px; background: #222; padding: 10px; border-radius: 10px;">
-                        <!-- معاينة الصور -->
+                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; background: #222; padding: 10px; border-radius: 10px;">
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label>الوصف التفصيلي (مطول)</label>
-                    <textarea id="trip-description" rows="5" placeholder="اكتب تفاصيل الرحلة أو العقار هنا..." style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical; box-sizing: border-box;"></textarea>
+                    <label>وصف الرحلة (اختياري)</label>
+                    <textarea id="trip-description" rows="4"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>تسمية إضافية (Badge)</label>
-                    <input type="text" id="trip-badge" placeholder="مثلاً: عرض خاص">
+                    <label>تسمية التميز (Badge)</label>
+                    <input type="text" id="trip-badge" placeholder="مثلاً: عرض حصري">
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn-cancel" id="close-modal">إلغاء</button>
                     <button type="submit" class="btn-add">حفظ البيانات</button>
@@ -363,6 +338,131 @@
             </form>
         </div>
     </div>
+
+    <script>
+        let iticketCategories = [];
+
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                if (config.iticket_desc) document.getElementById('brand-desc-input').value = config.iticket_desc;
+                
+                iticketCategories = config.iticket_categories || [
+                    { id: 'flight_tickets', label: 'تذاكر طيران', icon: 'fa-plane' },
+                    { id: 'group_trips', label: 'رحلات جماعية', icon: 'fa-users' },
+                    { id: 'individual_trips', label: 'رحلات فردية', icon: 'fa-user' },
+                    { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' }
+                ];
+                renderCategoryManagement();
+                populateTypeDropdown();
+            } catch (e) { console.error(e); }
+        }
+
+        function guessIcon(label) {
+            const l = label.toLowerCase();
+            if (l.includes('طيران') || l.includes('تذاكر') || l.includes('سفر')) return 'fa-plane-departure';
+            if (l.includes('فندق') || l.includes('فنادق') || l.includes('منتجع')) return 'fa-hotel';
+            if (l.includes('شاليه') || l.includes('استراحة') || l.includes('مزرعة')) return 'fa-house-chimney';
+            if (l.includes('بحر') || l.includes('شاطئ') || l.includes('بحرية')) return 'fa-umbrella-beach';
+            if (l.includes('دينية') || l.includes('مكة') || l.includes('مدينة') || l.includes('عمرة')) return 'fa-mosque';
+            if (l.includes('جماعية') || l.includes('عائلة') || l.includes('شباب')) return 'fa-users';
+            if (l.includes('فردية') || l.includes('شخص')) return 'fa-user';
+            if (l.includes('خيل') || l.includes('ركوب')) return 'fa-horse';
+            if (l.includes('سيارة') || l.includes('مواصلات')) return 'fa-car';
+            if (l.includes('عشاء') || l.includes('مطعم')) return 'fa-utensils';
+            if (l.includes('جاكوزي') || l.includes('مسبح')) return 'fa-hot-tub-person';
+            if (l.includes('غوص') || l.includes('سمك')) return 'fa-fish';
+            if (l.includes('عرض') || l.includes('عروض')) return 'fa-tags';
+            return 'fa-location-dot'; // Default better icon
+        }
+
+        function renderCategoryManagement() {
+            const container = document.getElementById('categories-manage-container');
+            if(!container) return;
+            container.innerHTML = `
+                <div style="color: #888; font-size: 0.8rem;">اسم التصنيف</div>
+                <div></div>
+            ` + iticketCategories.map((cat, idx) => `
+                <div style="position:relative;">
+                    <input type="text" class="cat-label cat-input" value="${cat.label}" placeholder="ادخل اسم التصنيف...">
+                    <input type="hidden" class="cat-id" value="${cat.id}">
+                    <input type="hidden" class="cat-icon" value="${cat.icon || 'fa-circle-dot'}">
+                </div>
+                <button onclick="removeCategoryRow(${idx})" style="background:rgba(231, 76, 60, 0.1); color:#e74c3c; border:none; border-radius:12px; padding:0 20px; cursor:pointer;"><i class="fa fa-trash"></i></button>
+            `).join('');
+        }
+
+        function addNewCategoryRow() {
+            iticketCategories.push({ id: '', label: '', icon: 'fa-circle-dot' });
+            renderCategoryManagement();
+        }
+
+        function removeCategoryRow(idx) {
+            if (iticketCategories.length <= 1) return alert('يجب وجود تصنيف واحد على الأقل');
+            iticketCategories.splice(idx, 1);
+            renderCategoryManagement();
+        }
+
+        async function saveCategories() {
+            const btn = document.getElementById('save-cats-btn');
+            const labels = document.querySelectorAll('.cat-label');
+            const ids = document.querySelectorAll('.cat-id');
+            const icons = document.querySelectorAll('.cat-icon');
+            
+            const updatedCats = [];
+            for(let i=0; i<labels.length; i++) {
+                let label = labels[i].value.trim();
+                if(!label) continue;
+                let id = ids[i].value || 'tc_' + Math.random().toString(36).substr(2, 9);
+                let icon = icons[i].value;
+                if (!icon || icon === 'fa-circle-dot') {
+                    icon = guessIcon(label);
+                }
+                updatedCats.push({ label, id, icon });
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ iticket_categories: updatedCats })
+                });
+                if (res.ok) {
+                    alert('تم الحفظ بنجاح');
+                    iticketCategories = updatedCats;
+                    renderCategoryManagement();
+                    populateTypeDropdown();
+                }
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        function populateTypeDropdown() {
+            const select = document.getElementById('trip-type');
+            if(!select) return;
+            select.innerHTML = iticketCategories.map(cat => `<option value="${cat.id}">${cat.label}</option>`).join('');
+            window.iticketCategories = iticketCategories; // For admin.js
+        }
+
+        async function saveBrandDesc() {
+            const btn = document.getElementById('save-desc-btn');
+            const desc = document.getElementById('brand-desc-input').value;
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ iticket_desc: desc })
+                });
+                if (res.ok) alert('تم حفظ الوصف بنجاح');
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
 
     <script>window.BRAND = 'iticket';</script>
     <script src="admin.js"></script>
