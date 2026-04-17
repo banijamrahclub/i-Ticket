@@ -227,7 +227,7 @@ function generateTripCard(trip) {
                 <h3 style="margin-bottom: 10px;">${trip.name}</h3>
                 <div class="package-info" style="display: flex; gap: 15px; font-size: 0.8rem; color: #666; margin-bottom: 15px;">
                     <span><i class="fa fa-calendar-days"></i> ${trip.duration}</span>
-                    <span><i class="fa fa-plane"></i> ${trip.transport}</span>
+                    <span><i class="fa ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}"></i> ${trip.transport}</span>
                 </div>
                 <div class="package-price-container">
                     ${prices.map(p => `
