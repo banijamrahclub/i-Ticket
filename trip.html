@@ -12,17 +12,20 @@
     <style>
         :root {
             --primary-red: #e63946;
-            --dark-bg: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --text-gray: #b0b0b0;
+            --soft-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-dark: #222222;
+            --text-gray: #666666;
+            --light-border: #eeeeee;
         }
 
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--dark-bg);
-            color: white;
+            background-color: var(--soft-bg);
+            color: var(--text-dark);
             margin: 0;
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .trip-detail-container {
@@ -37,9 +40,9 @@
             height: 500px;
             border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             margin-bottom: 40px;
-            background: #222;
+            background: #fdfdfd;
         }
 
         .carousel-slide {
@@ -50,28 +53,23 @@
         }
 
         @keyframes fadeEffect {
-            from {
-                opacity: 0.4
-            }
-
-            to {
-                opacity: 1
-            }
+            from { opacity: 0.4 }
+            to { opacity: 1 }
         }
 
         .carousel-slide img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            background: #000;
+            background: #f9f9f9;
         }
 
         .carousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
+            background: rgba(255, 255, 255, 0.8);
+            color: #222;
             border: none;
             width: 50px;
             height: 50px;
@@ -80,19 +78,16 @@
             z-index: 10;
             font-size: 1.5rem;
             transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .carousel-btn:hover {
             background: var(--primary-red);
+            color: #fff;
         }
 
-        .prev-btn {
-            right: 20px;
-        }
-
-        .next-btn {
-            left: 20px;
-        }
+        .prev-btn { right: 20px; }
+        .next-btn { left: 20px; }
 
         .carousel-indicators {
             position: absolute;
@@ -107,14 +102,14 @@
         .dot {
             height: 10px;
             width: 10px;
-            background-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(0, 0, 0, 0.2);
             border-radius: 50%;
             cursor: pointer;
             transition: 0.3s;
         }
 
         .dot.active {
-            background-color: white;
+            background-color: var(--primary-red);
             width: 25px;
             border-radius: 5px;
         }
@@ -123,7 +118,7 @@
             position: absolute;
             bottom: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            background: linear-gradient(transparent, rgba(255, 255, 255, 0.95));
             padding: 40px;
             width: 100%;
             box-sizing: border-box;
@@ -133,6 +128,7 @@
             font-size: 2.2rem;
             margin: 0;
             font-weight: 800;
+            color: #1a1a1a;
         }
 
         .trip-grid {
@@ -143,9 +139,10 @@
 
         .trip-info-card {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 35px;
+            border-radius: 24px;
+            border: 1px solid var(--light-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         }
 
         .info-item {
@@ -164,43 +161,33 @@
         .price-list-box {
             background: var(--card-bg);
             padding: 30px;
-            border-radius: 20px;
-            border: 1px solid var(--primary-red);
+            border-radius: 24px;
+            border: 2px solid var(--primary-red);
             position: sticky;
             top: 100px;
+            box-shadow: 0 15px 40px rgba(230, 57, 70, 0.08);
         }
 
         .price-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-border);
         }
 
-        .price-row:last-child {
-            border-bottom: none;
-        }
-
-        .p-label {
-            color: var(--text-gray);
-            font-size: 1rem;
-        }
-
-        .p-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary-red);
-        }
+        .price-row:last-child { border-bottom: none; }
+        .p-label { color: var(--text-gray); font-size: 1.05rem; }
+        .p-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-red); }
 
         .book-btn {
             background: #25d366;
             color: white;
             border: none;
             width: 100%;
-            padding: 15px;
+            padding: 18px;
             border-radius: 12px;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 700;
             cursor: pointer;
             margin-top: 25px;
@@ -208,20 +195,30 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            transition: 0.3s;
+        }
+        .book-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2); }
+
+        header.scrolled {
+            background: #ffffff !important;
+            border-bottom: 2px solid var(--primary-red) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header.scrolled .logo span, 
+        header.scrolled .logo b {
+            color: #1a1a1a !important;
+        }
+
+        #header-logo {
+            border: 1px solid #eee;
         }
 
         @media (max-width: 768px) {
-            .trip-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .carousel-container {
-                height: 350px;
-            }
-
-            .trip-title {
-                font-size: 1.5rem;
-            }
+            .trip-grid { grid-template-columns: 1fr; }
+            .carousel-container { height: 350px; }
+            .trip-title { font-size: 1.6rem; }
+            .trip-detail-container { margin-top: 80px; }
         }
     </style>
 </head>
@@ -323,51 +320,52 @@
                         </div>
 
                         <div class="trip-title-overlay">
-                            <div style="font-size: 0.9rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px;">${trip.category || ''}</div>
+                            <div style="font-size: 0.95rem; color: var(--primary-red); font-weight: 800; margin-bottom: 5px; letter-spacing: 1px;">${trip.category || ''}</div>
                             <h1 class="trip-title">${trip.name}</h1>
                         </div>
                     </div>
 
                     <div class="trip-grid">
                         <div class="trip-info-card">
-                            <h2 style="margin-top:0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:15px;">معلومات الرحلة</h2>
+                            <h2 style="margin-top:0; border-bottom: 2px solid #f5f5f5; padding-bottom:15px; font-size: 1.5rem;">تفاصيل ومعلومات</h2>
                             
                             <div class="info-item">
                                 <i class="fa-solid fa-calendar-days"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">المدة</div><div>${trip.duration}</div></div>
+                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">المدة</div><div style="font-weight: 700;">${trip.duration}</div></div>
                             </div>
                             <div class="info-item">
                                 <i class="fa-solid ${brand === 'manama' ? 'fa-list-check' : 'fa-plane'}"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">${brand === 'manama' ? 'المواصفات' : 'وسائل النقل'}</div><div>${trip.transport || 'متوفر بالتفاصيل'}</div></div>
+                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">${brand === 'manama' ? 'المواصفات' : 'وسائل النقل'}</div><div style="font-weight: 700;">${trip.transport || 'متوفر بالتفاصيل'}</div></div>
                             </div>
                             <div class="info-item">
                                 <i class="fa-solid fa-tag"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.8rem;">النوع</div><div>${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : trip.type}</div></div>
+                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">النوع</div><div style="font-weight: 700;">${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : trip.type}</div></div>
                             </div>
 
                             ${trip.description ? `
-                                <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
-                                    <h3 style="color: var(--primary-red); margin-bottom: 10px;">
+                                <div style="margin-top: 30px; border-top: 2px solid #f5f5f5; padding-top: 25px;">
+                                    <h3 style="color: var(--primary-red); margin-bottom: 15px; font-size: 1.3rem;">
                                         <i class="fa-solid fa-circle-info"></i> 
                                         ${brand === 'manama' ? 'عن المكان' : 'عن الرحلة'}
                                     </h3>
-                                    <div style="white-space: pre-line; color: #ddd; font-size: 1.05rem; line-height: 1.8;">${trip.description}</div>
+                                    <div style="white-space: pre-line; color: #444; font-size: 1.1rem; line-height: 1.8;">${trip.description}</div>
                                 </div>
                             ` : ''}
                         </div>
 
                         <div class="price-list-box">
-                            <h3 style="margin-top:0; color: white;">قائمة الأسعار</h3>
+                            <h3 style="margin-top:0; color: #1a1a1a; border-bottom: 1px solid #eee; padding-bottom: 10px;">أسعار الحجز</h3>
                             ${prices.map(p => `
                                 <div class="price-row">
                                     <span class="p-label">${p.label}</span>
-                                    <span class="p-value">${p.value} <span style="font-size: 0.8rem;">دينار</span></span>
+                                    <span class="p-value">${p.value} <span style="font-size: 0.9rem; color: #666;">دينار</span></span>
                                 </div>
                             `).join('')}
                             
                             <button class="book-btn" onclick="bookNow('${trip.name}', '${brand}')">
                                 <i class="fa-brands fa-whatsapp"></i> احجز الآن عبر واتساب
                             </button>
+                            <p style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 15px;">* سيتم الرد عليكم فوراً لتأكيد الحجز</p>
                         </div>
                     </div>
                 `;

@@ -14,9 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #003a5d; /* لون شبيه بالمسافر */
-            --accent-teal: #eef9f9;
-            --primary-red: #e02b20;
+            --primary-red: #e31e24; /* نفس لون إي تكت */
+            --accent-red: #fff5f5;
             --soft-gray: #f8f9fa;
             --card-border: #e6e6e6;
             --text-dark: #1a1a1a;
@@ -57,7 +56,7 @@
 
         /* Welcome Section */
         .welcome-hero {
-            background: var(--accent-teal);
+            background: var(--accent-red);
             padding: 30px 20px 80px;
             text-align: right;
             position: relative;
@@ -67,7 +66,7 @@
             font-size: 1.6rem;
             font-weight: 800;
             margin: 0 0 5px;
-            color: var(--primary-blue);
+            color: var(--primary-red);
         }
 
         .welcome-hero p {
@@ -112,7 +111,7 @@
             padding: 25px 15px;
             text-align: center;
             text-decoration: none;
-            color: var(--primary-blue);
+            color: var(--primary-red);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
             position: relative;
@@ -154,7 +153,7 @@
             display: block;
             font-size: 2.22rem;
             margin-bottom: 12px;
-            color: #5bc0de;
+            color: var(--primary-red);
         }
 
         .choice-item span {
@@ -175,8 +174,8 @@
             margin-bottom: 15px;
         }
 
-        .section-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary-blue); font-weight: 800; }
-        .section-header .see-all { color: #5bc0de; font-size: 0.85rem; text-decoration: none; font-weight: 700; }
+        .section-header h2 { font-size: 1.1rem; margin: 0; color: var(--primary-red); font-weight: 800; }
+        .section-header .see-all { color: var(--primary-red); font-size: 0.85rem; text-decoration: none; font-weight: 700; }
 
         .offers-track {
             display: flex;
@@ -208,13 +207,13 @@
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.7rem;
-            color: var(--primary-blue);
+            color: var(--primary-red);
             font-weight: 700;
             border: 1px solid #ddd;
         }
 
         .offer-info { padding: 15px; }
-        .offer-info h4 { margin: 0 0 5px; font-size: 0.95rem; color: var(--primary-blue); }
+        .offer-info h4 { margin: 0 0 5px; font-size: 0.95rem; color: var(--primary-red); }
         .offer-info p { margin: 0; font-size: 0.8rem; color: #666; line-height: 1.4; }
 
         /* More Services (Circle Icons) */
@@ -235,12 +234,12 @@
         .icon-circle {
             width: 65px;
             height: 65px;
-            background: var(--accent-teal);
+            background: var(--accent-red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #5bc0de;
+            color: var(--primary-red);
             font-size: 1.4rem;
             margin-bottom: 8px;
             border: 1px solid rgba(0,0,0,0.03);
@@ -264,20 +263,20 @@
 
         .see-all {
             padding: 8px 16px;
-            background: var(--accent-teal);
+            background: var(--accent-red);
             border-radius: 20px;
             transition: all 0.3s ease;
-            color: var(--primary-blue) !important;
+            color: var(--primary-red) !important;
         }
 
         .see-all:hover {
-            background: var(--primary-blue);
+            background: var(--primary-red);
             color: #fff !important;
             box-shadow: 0 4px 12px rgba(0, 58, 93, 0.2);
         }
 
         .welcome-hero {
-            background: linear-gradient(135deg, var(--accent-teal) 0%, #fff 100%);
+            background: linear-gradient(135deg, var(--accent-red) 0%, #fff 100%);
             overflow: hidden;
         }
     </style>
@@ -292,7 +291,7 @@
     </header>
 
     <div class="welcome-hero">
-        <div class="user-avatar"><i class="fa-solid fa-suitcase" style="color: #5bc0de;"></i></div>
+        <div class="user-avatar"><i class="fa-solid fa-suitcase" style="color: var(--primary-red);"></i></div>
         <h1>مرحباً بك</h1>
         <p>ماذا ينتظرك لاكتشافه اليوم؟</p>
     </div>
@@ -331,27 +330,27 @@
 
     <section class="about-minimal" id="about" style="padding: 80px 20px; background: #fafafa;">
         <div class="section-title" style="text-align: center; margin-bottom: 50px;">
-            <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 12px;">منامة هوليديز</h2>
+            <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--primary-red); margin-bottom: 12px;">منامة هوليديز</h2>
             <p style="color: #666; font-size: 1.1rem;">وجهتك لراحة الروح واستجمام العائلة</p>
-            <div style="width: 60px; height: 4px; background: var(--primary-blue); margin: 20px auto; border-radius: 2px;"></div>
+            <div style="width: 60px; height: 4px; background: var(--primary-red); margin: 20px auto; border-radius: 2px;"></div>
         </div>
         
         <div class="about-container" style="max-width: 1100px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 50px;">
                 <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; border: 1px solid #f2f2f2;">
-                    <i class="fa-solid fa-hotel" style="font-size: 2.5rem; color: #5bc0de; margin-bottom: 20px;"></i>
-                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-blue);">خدماتنا الفندقية</h3>
+                    <i class="fa-solid fa-hotel" style="font-size: 2.5rem; color: var(--primary-red); margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-red);">خدماتنا الفندقية</h3>
                     <p style="font-size: 1rem; color: #666; line-height: 1.7;">نقدم أرقى الفنادق والمنتجعات والشاليهات في مملكة البحرين، مع ضمان أفضل الأسعار وكافة سبل الراحة والخصوصية.</p>
                 </div>
                 <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); text-align: center; border: 1px solid #f2f2f2;">
-                    <i class="fa-solid fa-umbrella-beach" style="font-size: 2.5rem; color: #5bc0de; margin-bottom: 20px;"></i>
-                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-blue);">التزامنا</h3>
+                    <i class="fa-solid fa-umbrella-beach" style="font-size: 2.5rem; color: var(--primary-red); margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px; font-size: 1.4rem; color: var(--primary-red);">التزامنا</h3>
                     <p style="font-size: 1rem; color: #666; line-height: 1.7;">نسعى لأن نكون شركاءكم في صنع أجمل الذكريات العائلية من خلال توفير وجهات سياحية داخلية متميزة وفريدة.</p>
                 </div>
             </div>
 
             <div style="background: #fff; padding: 35px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f2f2f2;">
-                <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.3rem; color: var(--primary-blue);">تواصل معنا مباشرة</h3>
+                <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.3rem; color: var(--primary-red);">تواصل معنا مباشرة</h3>
                 <div class="links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <a href="https://wa.me/97313313100" class="social-link-card" style="padding: 18px; background: #25d366; color: white; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 1rem;"><i class="fa-brands fa-whatsapp"></i> واتساب الحجوزات</a>
                     <a href="https://www.instagram.com/manama_holidays" class="social-link-card" style="padding: 18px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; border-radius: 12px; text-decoration: none; text-align: center; font-weight: bold; font-size: 1rem;"><i class="fa-brands fa-instagram"></i> انستقرام</a>
