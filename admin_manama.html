@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة Manama Holidays | فنادق وشاليهات</title>
     <script>
-        (function() {
+        (function () {
             if (sessionStorage.getItem('admin_pass') === '1357') return;
             document.documentElement.style.visibility = 'hidden';
             window.addEventListener('DOMContentLoaded', () => {
@@ -67,7 +67,16 @@
         .btn-add:hover {
             background: #b01b1b;
         }
-        .cat-input { padding:12px; background:#222; border:1px solid #333; color:white; border-radius:12px; width: 100%; box-sizing: border-box; }
+
+        .cat-input {
+            padding: 12px;
+            background: #222;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
@@ -75,7 +84,8 @@
 
     <header class="scrolled">
         <div class="logo">
-            <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png">
+            <img
+                src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png">
         </div>
         <nav>
             <ul>
@@ -85,41 +95,53 @@
     </header>
 
     <div class="admin-container" style="padding: 40px 5%; margin-top: 80px;">
-        
+
         <!-- Manage Categories Section -->
-        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+        <div
+            style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin: 0; color: #5bc0de;"><i class="fa fa-map-location-dot"></i> إدارة أنواع الخدمات والأماكن</h3>
-                <button onclick="addNewCategoryRow()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                <h3 style="margin: 0; color: #5bc0de;"><i class="fa fa-map-location-dot"></i> إدارة أنواع الخدمات
+                    والأماكن</h3>
+                <button onclick="addNewCategoryRow()"
+                    style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
                     <i class="fa fa-plus"></i> إضافة نوع جديد
                 </button>
             </div>
-            
-            <div id="categories-manage-container" style="display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px;">
+
+            <div id="categories-manage-container"
+                style="display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px;">
                 <!-- ستظهر التصنيفات هنا من الإعدادات -->
             </div>
-            
+
             <div style="text-align: left;">
-                <button onclick="saveCategories()" id="save-cats-btn" style="background: #5bc0de; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; margin-right: auto;">
+                <button onclick="saveCategories()" id="save-cats-btn"
+                    style="background: #5bc0de; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; margin-right: auto;">
                     <i class="fa fa-save"></i> حفظ جميع الأنواع
                 </button>
             </div>
         </div>
 
         <!-- Edit Description Section -->
-        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
+        <div
+            style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
             <div style="flex: 1;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">وصف العلامة التجارية (يظهر في صفحة اختيار الموقع)</label>
-                <textarea id="brand-desc-input" placeholder="أدخل الوصف هنا..." style="width: 100%; height: 60px; background: #222; color: white; border: 1px solid #333; border-radius: 12px; padding: 12px; resize: none; font-family: Cairo; line-height: 1.4; outline: none;"></textarea>
+                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">وصف العلامة التجارية
+                    (يظهر في صفحة اختيار الموقع)</label>
+                <textarea id="brand-desc-input" placeholder="أدخل الوصف هنا..."
+                    style="width: 100%; height: 60px; background: #222; color: white; border: 1px solid #333; border-radius: 12px; padding: 12px; resize: none; font-family: Cairo; line-height: 1.4; outline: none;"></textarea>
             </div>
-            <button onclick="saveBrandDesc()" id="save-desc-btn" style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 50px; display: flex; align-items: center; gap: 10px;">
+            <button onclick="saveBrandDesc()" id="save-desc-btn"
+                style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 50px; display: flex; align-items: center; gap: 10px;">
                 <i class="fa fa-save"></i> حفظ الوصف
             </button>
         </div>
 
-        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div class="admin-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h2>إدارة الفنادق والشاليهات والاستراحات</h2>
-            <button class="btn-add" id="open-add-modal" style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i class="fa fa-plus"></i> إضافة عقار جديد</button>
+            <button class="btn-add" id="open-add-modal"
+                style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i
+                    class="fa fa-plus"></i> إضافة عقار جديد</button>
         </div>
 
         <div class="trips-table-container">
@@ -183,17 +205,21 @@
                     </button>
                 </div>
 
-                <div class="form-group" style="margin-top:20px;">
-                    <label>صور العقار (بحد أقصى 16)</label>
-                    <input type="file" id="trip-images-file" accept="image/*" multiple>
-                    <div id="images-preview-container"
-                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; background: #222; padding: 10px; border-radius: 10px;">
-                    </div>
+
+                <div class="form-group"
+                    style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #e02b20;">
+                    <label style="color: #e02b20; font-weight: bold;">أقسام الصور الإضافية</label>
+                    <div id="gallery-groups-container"></div>
+                    <button type="button" onclick="addNewGalleryGroup()" class="btn-cancel"
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
+                        <i class="fa fa-plus"></i> إضافة قسم صور جديد
+                    </button>
                 </div>
 
                 <div class="form-group">
                     <label>الوصف التفصيلي (مطول)</label>
-                    <textarea id="trip-description" rows="5" placeholder="اكتب تفاصيل الرحلة أو العقار هنا..." style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                    <textarea id="trip-description" rows="5" placeholder="اكتب تفاصيل الرحلة أو العقار هنا..."
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
                 </div>
                 <div class="form-group">
                     <label>تسمية التميز (Badge)</label>
@@ -216,7 +242,7 @@
                 const res = await fetch('/api/config');
                 const config = await res.json();
                 if (config.manama_desc) document.getElementById('brand-desc-input').value = config.manama_desc;
-                
+
                 manamaCategories = config.manama_categories || [
                     { id: 'hotels', label: 'فنادق', icon: 'fa-hotel' },
                     { id: 'resorts', label: 'منتجع', icon: 'fa-umbrella-beach' },
@@ -225,7 +251,9 @@
                     { id: 'jacuzzi', label: 'جاكوزي', icon: 'fa-hot-tub-person' },
                     { id: 'romantic_dinner', label: 'عشاء رومانسي', icon: 'fa-utensils' },
                     { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
-                    { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' }
+                    { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' },
+                    { id: 'limo', label: 'ليموزين', icon: 'fa-car-side' },
+                    { id: 'coordination', label: 'تنسيق', icon: 'fa-cake-candles' }
                 ];
                 renderCategoryManagement();
                 populateTypeDropdown();
@@ -243,12 +271,15 @@
             if (l.includes('خيل') || l.includes('ركوب')) return 'fa-horse';
             if (l.includes('طيران')) return 'fa-plane';
             if (l.includes('عرض') || l.includes('عروض')) return 'fa-tags';
+            if (l.includes('تأشير') || l.includes('فيزا')) return 'fa-stamp';
+            if (l.includes('سارة') || l.includes('ليموزين') || l.includes('توصيل')) return 'fa-car-side';
+            if (l.includes('تنسيق') || l.includes('ترتيب') || l.includes('حفلة')) return 'fa-cake-candles';
             return 'fa-location-dot';
         }
 
         function renderCategoryManagement() {
             const container = document.getElementById('categories-manage-container');
-            if(!container) return;
+            if (!container) return;
             container.innerHTML = `
                 <div style="color: #888; font-size: 0.8rem;">اسم النوع</div>
                 <div></div>
@@ -278,11 +309,11 @@
             const labels = document.querySelectorAll('.cat-label');
             const ids = document.querySelectorAll('.cat-id');
             const icons = document.querySelectorAll('.cat-icon');
-            
+
             const updatedCats = [];
-            for(let i=0; i<labels.length; i++) {
+            for (let i = 0; i < labels.length; i++) {
                 let label = labels[i].value.trim();
-                if(!label) continue;
+                if (!label) continue;
                 let id = ids[i].value || 'mc_' + Math.random().toString(36).substr(2, 9);
                 let icon = icons[i].value;
                 if (!icon || icon === 'fa-location-dot') {
@@ -310,7 +341,7 @@
 
         function populateTypeDropdown() {
             const select = document.getElementById('trip-type');
-            if(!select) return;
+            if (!select) return;
             select.innerHTML = manamaCategories.map(cat => `<option value="${cat.id}">${cat.label}</option>`).join('');
             window.manamaCategories = manamaCategories; // For admin.js access
         }

@@ -204,24 +204,48 @@ function renderMainTrips() {
 }
 
 function generateTripCard(trip) {
-    const imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
-    const prices = trip.prices && trip.prices.length > 0 ? trip.prices : [{ label: 'السعر', value: trip.price }];
-
-    if (cardImageIndexes[trip.id] === undefined) cardImageIndexes[trip.id] = 0;
-    const currentIndex = cardImageIndexes[trip.id];
-    const displayImg = imgs[currentIndex] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop';
+    const hasGroups = trip.gallery_groups && trip.gallery_groups.length > 0;
+    let imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
+    
+    // Default context
+    if (cardImageIndexes[trip.id] === undefined) cardImageIndexes[trip.id] = { gIdx: -1, iIdx: 0 };
+    const context = cardImageIndexes[trip.id];
+    
+    // If not categorized, use all images. If categorized and gIdx != -1, use group images.
+    let displayImgs = imgs;
+    if (hasGroups && context.gIdx !== -1) {
+        displayImgs = trip.gallery_groups[context.gIdx].images;
+    }
+    
+    const currentIndex = context.iIdx;
+    const displayImg = displayImgs[currentIndex] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop';
 
     return `
         <div class="package-card" id="card-${trip.id}" onclick="location.href='/trip?id=${trip.id}&brand=${brand}'" style="cursor:pointer;">
-            <div class="package-img">
+            <div class="package-img" style="position: relative;">
                 <img src="${displayImg}" class="main-img" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                
+                ${hasGroups ? `
+                    <div class="card-cat-chips" style="position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; z-index: 10;">
+                        <div class="mini-cat-chip ${context.gIdx === -1 ? 'active' : ''}" onclick="event.stopPropagation(); setCardCategory('${trip.id}', -1)" style="white-space: nowrap; font-size: 10px; padding: 3px 8px; border-radius: 20px; background: rgba(0,0,0,0.5); color: white;">الكل</div>
+                        ${trip.gallery_groups.map((g, gi) => `
+                            <div class="mini-cat-chip ${context.gIdx === gi ? 'active' : ''}" onclick="event.stopPropagation(); setCardCategory('${trip.id}', ${gi})" style="white-space: nowrap; font-size: 10px; padding: 3px 8px; border-radius: 20px; background: rgba(0,0,0,0.5); color: white;">${g.label}</div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
                 ${trip.badge ? `<div class="package-badge">${trip.badge}</div>` : ''}
-                ${imgs.length > 1 ? `
+                
+                ${displayImgs.length > 1 ? `
                     <button class="carousel-arrow prev" onclick="event.stopPropagation(); changeCardImage('${trip.id}', 1)">❮</button>
-                    <button class="carousel-arrow next" onclick="event.stopPropagation(); changeCardImage('${trip.id}', -1)">❯</button>
-                    <div class="img-counter" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white;">${currentIndex + 1} / ${imgs.length}</div>
+                    <button class="carousel-btn next" style="left: 10px; right: auto; padding: 8px; background: rgba(0,0,0,0.4); border: none; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; position: absolute; top: 50%; transform: translateY(-50%); transition: 0.3s; display: flex; align-items: center; justify-content: center; z-index: 5;" onclick="event.stopPropagation(); changeCardImage('${trip.id}', -1)">❯</button>
+                    <div class="img-counter" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: white;">${currentIndex + 1} / ${displayImgs.length} ${context.gIdx !== -1 ? '(' + trip.gallery_groups[context.gIdx].label + ')' : ''}</div>
                 ` : ''}
             </div>
+            <style>
+                .mini-cat-chip.active { background: var(--primary-red) !important; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+                .mini-cat-chip:hover { background: rgba(0,0,0,0.7); }
+            </style>
             <div class="package-content">
                 <div class="package-category" style="font-size: 0.8rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">${getCategoryLabel(trip.type)}</div>
                 <h3 style="margin-bottom: 10px;">${trip.name}</h3>
@@ -230,7 +254,7 @@ function generateTripCard(trip) {
                     <span><i class="fa ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}"></i> ${trip.transport}</span>
                 </div>
                 <div class="package-price-container">
-                    ${prices.map(p => `
+                    ${(trip.prices || []).map(p => `
                         <div class="package-price-row" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                             <span class="package-price-label" style="color: #888;">${p.label}</span>
                             <span class="package-price-value" style="font-weight: 800; color: var(--primary-red);">${p.value} <span>دينار</span></span>
@@ -248,25 +272,41 @@ function generateTripCard(trip) {
     `;
 }
 
-window.changeCardImage = (tripId, delta) => {
-    const trip = allTrips.find(t => t.id.toString() === tripId.toString());
-    if (!trip) return;
-    const imgs = trip.images || [];
-    let newIndex = (cardImageIndexes[tripId] || 0) + delta;
-    if (newIndex >= imgs.length) newIndex = 0;
-    if (newIndex < 0) newIndex = imgs.length - 1;
-    cardImageIndexes[tripId] = newIndex;
-    const card = document.getElementById(`card-${tripId}`);
-    if (card) {
-        card.querySelector('.main-img').src = imgs[newIndex];
-        const counter = card.querySelector('div[style*="font-size: 10px"]');
-        if (counter) counter.innerText = `${newIndex + 1} / ${imgs.length}`;
+window.setCardCategory = (id, gIdx) => {
+    cardImageIndexes[id] = { gIdx: gIdx, iIdx: 0 };
+    const trip = allTrips.find(t => t.id.toString() === id.toString());
+    if (trip) {
+        const card = document.getElementById(`card-${id}`);
+        if (card) card.outerHTML = generateTripCard(trip);
     }
+};
+
+window.changeCardImage = (id, delta) => {
+    const trip = allTrips.find(t => t.id.toString() === id.toString());
+    if (!trip) return;
+
+    const context = cardImageIndexes[id] || { gIdx: -1, iIdx: 0 };
+    let displayImgs = [];
+    
+    if (trip.gallery_groups && trip.gallery_groups.length > 0 && context.gIdx !== -1) {
+        displayImgs = trip.gallery_groups[context.gIdx].images;
+    } else {
+        displayImgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
+    }
+
+    let nextImg = context.iIdx + delta;
+    if (nextImg < 0) nextImg = displayImgs.length - 1;
+    if (nextImg >= displayImgs.length) nextImg = 0;
+
+    cardImageIndexes[id] = { ...context, iIdx: nextImg };
+    const card = document.getElementById(`card-${id}`);
+    if (card) card.outerHTML = generateTripCard(trip);
 };
 
 window.bookViaWhatsapp = (name, id) => {
     const phone = brand === 'iticket' ? '97317550054' : '97313313100';
-    const text = `السلام عليكم، أرغب في الاستفسار عن ${name} (ID: ${id})`;
+    const url = `${window.location.origin}/trip?id=${id}&brand=${brand}`;
+    const text = `السلام عليكم، أرغب في الاستفسار عن: ${name}\nالرابط: ${url}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
 };
 

@@ -386,6 +386,9 @@ section.active-section {
     border-radius: 10px;
     font-size: 0.85rem;
     font-weight: 600;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 5;
 }
 
 .package-content {
@@ -1099,6 +1102,57 @@ td {
 /* Chrome fix for inputs */
 input[type="file"] {
     cursor: pointer;
+}
+
+/* Fixed Social Bar */
+.fixed-social-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--primary-red);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding: 12px 0;
+    z-index: 2000;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+}
+
+.fixed-social-bar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.4rem;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+}
+
+.fixed-social-bar a span {
+    font-size: 0.9rem;
+}
+
+.fixed-social-bar a:hover {
+    transform: translateY(-3px);
+    opacity: 0.9;
+}
+
+/* Adjust body padding for fixed bar */
+body {
+    padding-bottom: 70px !important;
+}
+
+@media (max-width: 768px) {
+    .fixed-social-bar {
+        gap: 20px;
+    }
+    .fixed-social-bar a span {
+        display: none;
+    }
 }
 
 input[type="file"]::file-selector-button {

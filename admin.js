@@ -4,7 +4,7 @@ const API_URL = `/api/${brand}/trips`;
 
 let allTrips = [];
 let currentPriceCategories = [];
-let currentImagesBase64 = [];
+let currentGalleryGroups = []; // Array of { label: string, images: string[] }
 
 // Fetch Data
 async function fetchTrips() {
@@ -44,7 +44,6 @@ const tripForm = document.getElementById('trip-form');
 const openAddModalBtn = document.getElementById('open-add-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const priceContainer = document.getElementById('price-categories-container');
-const imagesPreviewContainer = document.getElementById('images-preview-container');
 
 // Price Categories Logic
 window.addPriceCategory = (label = '', value = '') => {
@@ -139,13 +138,28 @@ tripForm.onsubmit = async (e) => {
         prices: prices,
         duration: document.getElementById('trip-duration').value,
         transport: document.getElementById('trip-transport').value,
-        description: document.getElementById('trip-description').value, // إضافة الوصف
-        images: currentImagesBase64,
-        image: currentImagesBase64.length > 0 ? currentImagesBase64[0] : '',
-        badge: document.getElementById('trip-badge').value
+        description: document.getElementById('trip-description').value,
+        // تجميع كافة الصور من الأقسام للعرض في البطاقات
+        images: currentGalleryGroups.reduce((acc, g) => acc.concat(g.images), []),
+        image: (currentGalleryGroups.length > 0 && currentGalleryGroups[0].images.length > 0) ? currentGalleryGroups[0].images[0] : '',
+        badge: document.getElementById('trip-badge').value,
+        gallery_groups: currentGalleryGroups
     };
 
     const submitBtn = tripForm.querySelector('button[type="submit"]');
+    
+    // التحقق من وجود تصنيفات صور
+    if (currentGalleryGroups.length === 0 || currentGalleryGroups.every(g => g.images.length === 0)) {
+        alert("يجب إضافة تصنيف صور واحد على الأقل يحتوي على صور.");
+        return;
+    }
+    
+    // التحقق من تسمية كافة التصنيفات
+    if (currentGalleryGroups.some(g => !g.label.trim())) {
+        alert("يرجى كتابة أسماء لكافة تصنيفات الصور.");
+        return;
+    }
+
     const originalBtnText = submitBtn.innerText;
     submitBtn.innerText = 'جاري الحفظ والرفع...';
     submitBtn.disabled = true;
@@ -163,37 +177,13 @@ tripForm.onsubmit = async (e) => {
     submitBtn.disabled = false;
 };
 
-// Multiple Images Handling
-document.getElementById('trip-images-file').addEventListener('change', async function (e) {
-    const files = Array.from(e.target.files);
-    if (files.length + currentImagesBase64.length > 16) {
-        alert("الحد الأقصى هو 16 صورة إجمالاً");
-        return;
-    }
-
-    for (const file of files) {
-        const base64 = await toBase64(file);
-        currentImagesBase64.push(base64);
-    }
-    renderImagesPreview();
-});
 
 function renderImagesPreview() {
-    imagesPreviewContainer.innerHTML = '';
-    currentImagesBase64.forEach((src, idx) => {
-        const div = document.createElement('div');
-        div.style = 'position:relative; width:100%; height:60px;';
-        div.innerHTML = `
-            <img src="${src}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
-            <button type="button" onclick="removeImage(${idx})" style="position:absolute; top:-5px; right:-5px; background:#e22; color:white; border:none; border-radius:50%; width:20px; height:20px; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.3);"><i class="fa fa-times"></i></button>
-        `;
-        imagesPreviewContainer.appendChild(div);
-    });
+    // This function is now superseded by Gallery Group management
 }
 
 window.removeImage = (idx) => {
-    currentImagesBase64.splice(idx, 1);
-    renderImagesPreview();
+    // This function is now superseded by Gallery Group management
 }
 
 const toBase64 = file => new Promise((resolve, reject) => {
@@ -203,48 +193,93 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onerror = error => reject(error);
 });
 
-// Open Add Modal
-openAddModalBtn.onclick = () => {
-    tripForm.reset();
+// Gallery Groups Management
+window.renderGalleryGroups = () => {
+    const container = document.getElementById('gallery-groups-container');
+    if (!container) return;
+    container.innerHTML = currentGalleryGroups.map((group, gIdx) => `
+        <div class="gallery-group-item" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #444;">
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" placeholder="اسم التصنيف (مثال: الغرف)" value="${group.label}" 
+                    style="flex: 1; padding: 8px; background: #111; border: 1px solid #333; border-radius: 8px; color: white;"
+                    onchange="currentGalleryGroups[${gIdx}].label = this.value">
+                <button type="button" onclick="removeGalleryGroup(${gIdx})" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-trash"></i></button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px;">
+                ${group.images.map((img, iIdx) => `
+                    <div style="position:relative; height: 50px;">
+                        <img src="${img}" style="width:100%; height:100%; object-fit:cover; border-radius: 6px;">
+                        <button type="button" onclick="removeImageFromGroup(${gIdx}, ${iIdx})" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; cursor:pointer;">&times;</button>
+                    </div>
+                `).join('')}
+            </div>
+            <input type="file" multiple accept="image/*" onchange="addImagesToGroup(event, ${gIdx})" style="font-size: 0.8rem; color: #888;">
+        </div>
+    `).join('');
+};
+
+window.addNewGalleryGroup = (label = '') => {
+    currentGalleryGroups.push({ label: label, images: [] });
+    renderGalleryGroups();
+};
+
+window.removeGalleryGroup = (idx) => {
+    currentGalleryGroups.splice(idx, 1);
+    renderGalleryGroups();
+};
+
+window.addImagesToGroup = async (e, gIdx) => {
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+        const base64 = await toBase64(file);
+        currentGalleryGroups[gIdx].images.push(base64);
+    }
+    renderGalleryGroups();
+};
+
+window.removeImageFromGroup = (gIdx, iIdx) => {
+    currentGalleryGroups[gIdx].images.splice(iIdx, 1);
+    renderGalleryGroups();
+};
+
+// Open Modals
+if (openAddModalBtn) {
+    openAddModalBtn.onclick = () => {
+        document.getElementById('trip-id').value = "";
+        document.getElementById('modal-title').innerText = "إضافة رحلة جديدة";
+        priceContainer.innerHTML = '';
+        
+        // Default Gallery Groups
+        currentGalleryGroups = [];
+        
+        renderGalleryGroups();
+        addPriceCategory('سعر الشخص', '');
+        tripModal.style.display = 'flex';
+    };
+}
+
+window.editTrip = (index) => {
+    const trip = allTrips[index];
+    document.getElementById('trip-id').value = index;
+    document.getElementById('modal-title').innerText = "تعديل الرحلة";
+    document.getElementById('trip-name').value = trip.name;
+    document.getElementById('trip-type').value = trip.type;
+    document.getElementById('trip-category').value = trip.category || '';
+    document.getElementById('trip-duration').value = trip.duration;
+    document.getElementById('trip-transport').value = trip.transport || '';
+    document.getElementById('trip-description').value = trip.description || '';
+    document.getElementById('trip-badge').value = trip.badge || '';
+
     priceContainer.innerHTML = '';
-    imagesPreviewContainer.innerHTML = '';
-    currentImagesBase64 = [];
-    addPriceCategory('السعر الأساسي', '');
-    document.getElementById('trip-id').value = '';
-    document.getElementById('trip-category').value = '';
-    document.getElementById('trip-description').value = ''; // تصفير الوصف
-    document.getElementById('modal-title').innerText = 'إضافة رحلة جديدة';
+    (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));
+    if (!trip.prices || trip.prices.length === 0) addPriceCategory('السعر', trip.price);
+    
+    currentGalleryGroups = [...(trip.gallery_groups || [])];
+    renderGalleryGroups();
+
     tripModal.style.display = 'flex';
 };
 
 closeModalBtn.onclick = () => tripModal.style.display = 'none';
-
-// Edit Trip
-window.editTrip = (index) => {
-    const trip = allTrips[index];
-    if (trip) {
-        document.getElementById('trip-id').value = index;
-        document.getElementById('trip-name').value = trip.name;
-        document.getElementById('trip-type').value = trip.type;
-        document.getElementById('trip-category').value = trip.category || '';
-        document.getElementById('trip-duration').value = trip.duration;
-        document.getElementById('trip-transport').value = trip.transport;
-        document.getElementById('trip-description').value = trip.description || ''; // تحميل الوصف
-        document.getElementById('trip-badge').value = trip.badge;
-        document.getElementById('modal-title').innerText = 'تعديل بيانات الرحلة';
-
-        priceContainer.innerHTML = '';
-        if (trip.prices && trip.prices.length > 0) {
-            trip.prices.forEach(p => addPriceCategory(p.label, p.value));
-        } else {
-            addPriceCategory('السعر الأساسي', trip.price);
-        }
-
-        currentImagesBase64 = trip.images || (trip.image ? [trip.image] : []);
-        renderImagesPreview();
-
-        tripModal.style.display = 'flex';
-    }
-};
 
 fetchTrips();

@@ -1,4 +1,23 @@
 {
   "iticket_desc": "الرحلات الخارجية والمؤتمرات والسياحة الدولية. استمتع بأفضل العروض حول العالم.",
-  "manama_desc": "اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة البحرين. إقامتك المثالية تبدأ هنا."
+  "manama_desc": "اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة البحرين. إقامتك المثالية تبدأ هنا.",
+  "iticket_categories": [
+    { "label": "تذاكر طيران", "id": "flight_tickets", "icon": "fa-plane" },
+    { "label": "رحلات جماعية", "id": "group_trips", "icon": "fa-users" },
+    { "label": "رحلات فردية", "id": "individual_trips", "icon": "fa-user" },
+    { "label": "رحلات دينية", "id": "religious", "icon": "fa-mosque" },
+    { "label": "تأشيرات", "id": "visas", "icon": "fa-stamp" }
+  ],
+  "manama_categories": [
+    { "id": "hotels", "label": "فنادق", "icon": "fa-hotel" },
+    { "id": "resorts", "label": "منتجع", "icon": "fa-umbrella-beach" },
+    { "id": "chalets", "label": "شاليهات", "icon": "fa-house-chimney" },
+    { "id": "rest_houses", "label": "استراحات", "icon": "fa-tree" },
+    { "id": "jacuzzi", "label": "جاكوزي", "icon": "fa-hot-tub-person" },
+    { "id": "romantic_dinner", "label": "عشاء رومانسي", "icon": "fa-utensils" },
+    { "id": "sea_trips", "label": "رحلات بحرية", "icon": "fa-ship" },
+    { "id": "horse_riding", "label": "ركوب الخيل", "icon": "fa-horse" },
+    { "id": "limo", "label": "ليموزين", "icon": "fa-car-side" },
+    { "id": "coordination", "label": "تنسيق", "icon": "fa-cake-candles" }
+  ]
 }

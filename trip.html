@@ -275,10 +275,21 @@
             const brand = params.get('brand') || 'iticket';
 
             // تحديث الثيم
+            let currentCategories = [];
+            try {
+                const configRes = await fetch('/api/config');
+                const config = await configRes.json();
+                currentCategories = brand === 'manama' ? (config.manama_categories || []) : (config.iticket_categories || []);
+            } catch(e) {}
+
+            function getCategoryLabel(type) {
+                const cat = currentCategories.find(c => c.id === type);
+                return cat ? cat.label : type;
+            }
+
             if (brand === 'manama') {
                 document.documentElement.style.setProperty('--primary-red', '#e02b20');
                 document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png';
-                document.getElementById('header-logo').style.padding = '2px';
                 document.getElementById('header-name').style.display = 'none';
                 document.getElementById('header-link').href = '/manama';
                 document.getElementById('back-btn').href = '/manama';
@@ -304,29 +315,121 @@
                 const imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
                 const prices = trip.prices && trip.prices.length > 0 ? trip.prices : [{ label: 'السعر', value: trip.price }];
 
-                document.getElementById('trip-content').innerHTML = `
-                    <div class="carousel-container">
-                        ${imgs.map(img => `
-                            <div class="carousel-slide">
-                                <img src="${img}" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                let galleryHtml = '';
+                if (trip.gallery_groups && trip.gallery_groups.length > 0) {
+                    galleryHtml = `
+                        <div class="gallery-explorer" id="gallery-explorer">
+                            <div class="gallery-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h3 id="gallery-view-title" style="color: var(--primary-red); margin: 0; font-size: 1.6rem; border-right: 5px solid var(--primary-red); padding-right: 15px;">اكتشف المرافق والخدمات</h3>
+                                <button id="btn-show-all" onclick="resetGalleryView()" style="display: none; background: #f5f5f5; border: 1px solid #ddd; padding: 8px 20px; border-radius: 12px; cursor: pointer; font-family: Cairo; font-weight: 700;">عرض كافة الأقسام <i class="fa fa-th-large"></i></button>
                             </div>
-                        `).join('')}
+                            
+                            <!-- Grid of Categories -->
+                            <div class="category-grid" id="category-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                                ${trip.gallery_groups.map((group, gIdx) => `
+                                    <div class="cat-viewer-card" id="cat-card-${gIdx}" style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; cursor: pointer;" onclick="filterToCategory(${gIdx})">
+                                        <div class="cat-mini-carousel" style="height: 220px; position: relative;">
+                                            <img id="group-img-${gIdx}" src="${group.images[0]}" style="width: 100%; height: 100%; object-fit: cover; transition: 0.5s;" onerror="this.src='/placeholder.jpg'">
+                                            
+                                            ${group.images.length > 1 ? `
+                                                <button class="mini-arr next" onclick="event.stopPropagation(); changeGroupImg(${gIdx}, 1)">❯</button>
+                                                <button class="mini-arr prev" onclick="event.stopPropagation(); changeGroupImg(${gIdx}, -1)">❮</button>
+                                                <div class="mini-counter" id="group-counter-${gIdx}">1 / ${group.images.length}</div>
+                                            ` : ''}
+                                        </div>
+                                        <div class="cat-label-bar" style="padding: 15px 20px; font-weight: 800; text-align: center; color: #1a1a1a; font-size: 1.1rem;">
+                                            ${group.label}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
 
-                        <button class="carousel-btn prev-btn" onclick="plusSlides(1)">❯</button>
-                        <button class="carousel-btn next-btn" onclick="plusSlides(-1)">❮</button>
-
-                        <div class="carousel-indicators">
-                            ${imgs.map((_, i) => `<span class="dot" onclick="currentSlide(${i + 1})"></span>`).join('')}
+                            <!-- Expanded Category View -->
+                            <div id="expanded-view" style="display: none;">
+                                <div class="expanded-grid" id="expanded-images-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px;">
+                                    <!-- الصور المكبرة ستظهر هنا -->
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="trip-title-overlay">
-                            <div style="font-size: 0.95rem; color: var(--primary-red); font-weight: 800; margin-bottom: 5px; letter-spacing: 1px;">${trip.category || ''}</div>
-                            <h1 class="trip-title">${trip.name}</h1>
-                        </div>
-                    </div>
+                        <style>
+                            .mini-arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; transition: 0.3s; z-index: 10; font-size: 12px; }
+                            .mini-arr:hover { background: var(--primary-red); }
+                            .mini-arr.next { right: 10px; }
+                            .mini-arr.prev { left: 10px; }
+                            .mini-counter { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+                            .cat-viewer-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+                            .cat-viewer-card { transition: 0.4s ease; }
+                        </style>
+                    `;
 
-                    <div class="trip-grid">
+                    // Logic to stay accessible
+                    window.groupImgIndices = trip.gallery_groups.map(() => 0);
+                    window.changeGroupImg = (gIdx, delta) => {
+                        const group = trip.gallery_groups[gIdx];
+                        let newIdx = window.groupImgIndices[gIdx] + delta;
+                        if (newIdx < 0) newIdx = group.images.length - 1;
+                        if (newIdx >= group.images.length) newIdx = 0;
+                        window.groupImgIndices[gIdx] = newIdx;
+                        document.getElementById(`group-img-${gIdx}`).src = group.images[newIdx];
+                        document.getElementById(`group-counter-${gIdx}`).innerText = `${newIdx + 1} / ${group.images.length}`;
+                    };
+
+                    window.filterToCategory = (gIdx) => {
+                        const group = trip.gallery_groups[gIdx];
+                        document.getElementById('category-grid').style.display = 'none';
+                        document.getElementById('expanded-view').style.display = 'block';
+                        document.getElementById('btn-show-all').style.display = 'block';
+                        document.getElementById('gallery-view-title').innerText = group.label;
+                        
+                        const grid = document.getElementById('expanded-images-grid');
+                        grid.innerHTML = group.images.map(img => `
+                            <div style="border-radius: 20px; overflow: hidden; height: 300px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer;" onclick="window.open('${img}', '_blank')">
+                                <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        `).join('');
+                        
+                        // Scroll to top of gallery
+                        document.getElementById('gallery-explorer').scrollIntoView({ behavior: 'smooth' });
+                    };
+
+                    window.resetGalleryView = () => {
+                        document.getElementById('category-grid').style.display = 'grid';
+                        document.getElementById('expanded-view').style.display = 'none';
+                        document.getElementById('btn-show-all').style.display = 'none';
+                        document.getElementById('gallery-view-title').innerText = 'اكتشف المرافق والخدمات';
+                    };
+
+                } else {
+                    galleryHtml = `
+                        <div class="carousel-container">
+                            ${imgs.map(img => `
+                                <div class="carousel-slide">
+                                    <img src="${img}" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                                </div>
+                            `).join('')}
+
+                            <button class="carousel-btn prev-btn" onclick="plusSlides(1)">❯</button>
+                            <button class="carousel-btn next-btn" onclick="plusSlides(-1)">❮</button>
+
+                            <div class="carousel-indicators">
+                                ${imgs.map((_, i) => `<span class="dot" onclick="currentSlide(${i + 1})"></span>`).join('')}
+                            </div>
+
+                            <div class="trip-title-overlay">
+                                <div style="font-size: 0.95rem; color: var(--primary-red); font-weight: 800; margin-bottom: 5px; letter-spacing: 1px;">${trip.category || ''}</div>
+                                <h1 class="trip-title">${trip.name}</h1>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('trip-content').innerHTML = `
+                    ${galleryHtml}
+
+                    <div class="trip-grid" style="margin-top: 40px;">
                         <div class="trip-info-card">
+                            <h1 class="trip-title" style="margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">${trip.name}</h1>
                             <h2 style="margin-top:0; border-bottom: 2px solid #f5f5f5; padding-bottom:15px; font-size: 1.5rem;">تفاصيل ومعلومات</h2>
                             
                             <div class="info-item">
@@ -339,7 +442,7 @@
                             </div>
                             <div class="info-item">
                                 <i class="fa-solid fa-tag"></i>
-                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">النوع</div><div style="font-weight: 700;">${brand === 'manama' ? (trip.type === 'hotel_resort' ? 'فندق ومنتجع' : 'شاليه واستراحة') : trip.type}</div></div>
+                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">النوع</div><div style="font-weight: 700;">${getCategoryLabel(trip.type)}</div></div>
                             </div>
 
                             ${trip.description ? `
@@ -378,8 +481,7 @@
 
         function bookNow(packageName, brand) {
             const phone = brand === 'manama' ? '97313313100' : '97317550054';
-            const brandLabel = brand === 'manama' ? '"Manama Holidays"' : '"i Ticket"';
-            const message = `أهلاً ${brandLabel}، أرغب في الاستفسار عن وحجز: ${packageName}\nرابط التفاصيل: ${window.location.href}`;
+            const message = `السلام عليكم، أرغب في حجز: ${packageName}\nالرابط: ${window.location.href}`;
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
 

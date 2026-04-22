@@ -314,12 +314,14 @@
                     </button>
                 </div>
 
-                <div class="form-group" style="margin-top:20px;">
-                    <label>صور الرحلة (حتى 16 صورة)</label>
-                    <input type="file" id="trip-images-file" accept="image/*" multiple>
-                    <div id="images-preview-container"
-                        style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 10px; background: #222; padding: 10px; border-radius: 10px;">
-                    </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555;">
+                    <label style="color: var(--primary-red); font-weight: bold;">أقسام الصور الإضافية (لا نهائية)</label>
+                    <div id="gallery-groups-container"></div>
+                    <button type="button" onclick="addNewGalleryGroup()" class="btn-cancel"
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
+                        <i class="fa fa-plus"></i> إضافة قسم صور جديد
+                    </button>
                 </div>
 
                 <div class="form-group">
@@ -352,7 +354,8 @@
                     { id: 'flight_tickets', label: 'تذاكر طيران', icon: 'fa-plane' },
                     { id: 'group_trips', label: 'رحلات جماعية', icon: 'fa-users' },
                     { id: 'individual_trips', label: 'رحلات فردية', icon: 'fa-user' },
-                    { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' }
+                    { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' },
+                    { id: 'visas', label: 'تأشيرات', icon: 'fa-stamp' }
                 ];
                 renderCategoryManagement();
                 populateTypeDropdown();
@@ -374,6 +377,8 @@
             if (l.includes('جاكوزي') || l.includes('مسبح')) return 'fa-hot-tub-person';
             if (l.includes('غوص') || l.includes('سمك')) return 'fa-fish';
             if (l.includes('عرض') || l.includes('عروض')) return 'fa-tags';
+            if (l.includes('تأشير') || l.includes('فيزا')) return 'fa-stamp';
+            if (l.includes('تنسيق') || l.includes('ترتيب')) return 'fa-cake-candles';
             return 'fa-location-dot'; // Default better icon
         }
 
