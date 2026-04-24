@@ -338,7 +338,7 @@
                                             ` : ''}
                                         </div>
                                         <div class="cat-label-bar" style="padding: 15px 20px; font-weight: 800; text-align: center; color: #1a1a1a; font-size: 1.1rem;">
-                                            ${group.label}
+                                            ${group.label || (gIdx === 0 ? 'صور مميزة' : 'صور إضافية')}
                                         </div>
                                     </div>
                                 `).join('')}
@@ -380,7 +380,7 @@
                         document.getElementById('category-grid').style.display = 'none';
                         document.getElementById('expanded-view').style.display = 'block';
                         document.getElementById('btn-show-all').style.display = 'block';
-                        document.getElementById('gallery-view-title').innerText = group.label;
+                        document.getElementById('gallery-view-title').innerText = group.label || (gIdx === 0 ? 'صور مميزة' : 'صور إضافية');
                         
                         const grid = document.getElementById('expanded-images-grid');
                         grid.innerHTML = group.images.map(img => `

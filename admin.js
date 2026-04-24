@@ -149,18 +149,9 @@ tripForm.onsubmit = async (e) => {
 
     const submitBtn = tripForm.querySelector('button[type="submit"]');
     
-    // التحقق من وجود تصنيفات صور
-    if (currentGalleryGroups.length === 0 || currentGalleryGroups.every(g => g.images.length === 0)) {
-        alert("يجب إضافة تصنيف صور واحد على الأقل يحتوي على صور.");
-        return;
-    }
+    // تم إزالة التحقق الإجباري من تصنيفات الصور بناءً على طلب المستخدم
+    // أصبحت تصنيفات الصور اختيارية الآن
     
-    // التحقق من تسمية كافة التصنيفات
-    if (currentGalleryGroups.some(g => !g.label.trim())) {
-        alert("يرجى كتابة أسماء لكافة تصنيفات الصور.");
-        return;
-    }
-
     const originalBtnText = submitBtn.innerText;
     submitBtn.innerText = 'جاري الحفظ والرفع...';
     submitBtn.disabled = true;
