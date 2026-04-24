@@ -8,12 +8,17 @@ let currentGalleryGroups = []; // Array of { label: string, images: string[] }
 
 // Fetch Data
 async function fetchTrips() {
+    console.log(`Attempting to fetch trips from: ${API_URL}`);
     try {
         const response = await fetch(API_URL);
         if (response.ok) {
-            allTrips = await response.json();
+            allTrips = await response.json() || [];
+            window.allTrips = allTrips; // Share with HTML script
+            console.log(`Successfully loaded ${allTrips.length} trips.`);
             renderTrips();
             if (typeof renderOffersManagement === 'function') renderOffersManagement();
+        } else {
+            console.error(`Fetch failed with status: ${response.status}`);
         }
     } catch (error) {
         console.error("Error fetching trips:", error);
@@ -23,6 +28,7 @@ async function fetchTrips() {
 // Save Data
 async function saveAllToCloud(trips) {
     allTrips = trips;
+    window.allTrips = allTrips; // Sync global
     renderTrips();
 
     try {
@@ -84,6 +90,11 @@ function renderTrips() {
         const found = cats.find(c => c.id === typeId);
         return found ? found.label : typeId;
     };
+
+    if (allTrips.length === 0) {
+        tripsList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">لا توجد رحلات مضافة حالياً.</td></tr>';
+        return;
+    }
 
     tripsList.innerHTML = allTrips.map((trip, index) => {
         const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
