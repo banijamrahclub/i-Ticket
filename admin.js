@@ -80,50 +80,57 @@ window.movePriceRow = (btn, direction) => {
 
 // Render Table
 function renderTrips() {
-    if (!tripsList) return;
+    const list = document.getElementById('trips-list');
+    if (!list) return;
     
-    // Helper to get labels from the categories loaded in the HTML script
+    // Helper to get labels
     const getCatLabel = (typeId) => {
         let cats = [];
         if (brand === 'iticket') cats = window.iticketCategories || [];
         else cats = window.manamaCategories || [];
-        const found = cats.find(c => c.id === typeId);
+        const found = (cats || []).find(c => c.id === typeId);
         return found ? found.label : typeId;
     };
 
-    if (allTrips.length === 0) {
-        tripsList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">لا توجد رحلات مضافة حالياً.</td></tr>';
+    if (!allTrips || allTrips.length === 0) {
+        list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">لا توجد رحلات مضافة حالياً.</td></tr>';
         return;
     }
 
-    tripsList.innerHTML = allTrips.map((trip, index) => {
-        const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
-        const displayImage = trip.images && trip.images.length > 0 ? trip.images[0] : (trip.image || '');
+    try {
+        list.innerHTML = allTrips.map((trip, index) => {
+            if (!trip) return '';
+            const displayPrice = (trip.prices && trip.prices.length > 0) ? trip.prices[0].value : (trip.price || '0');
+            const displayImage = (trip.images && trip.images.length > 0) ? trip.images[0] : (trip.image || '');
 
-        return `
-            <tr>
-                <td>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <img src="${displayImage}" class="trip-img-mini" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
-                        <div>
-                            <div style="font-weight: bold;">${trip.name}</div>
-                            <div style="font-size: 0.8rem; color: #888;">${trip.category || 'بدون تقسيم'}</div>
+            return `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="${displayImage}" class="trip-img-mini" onerror="this.src='https://via.placeholder.com/60/222/888?text=No+Img'">
+                            <div>
+                                <div style="font-weight: bold;">${trip.name || 'بدون اسم'}</div>
+                                <div style="font-size: 0.8rem; color: #888;">${trip.category || 'بدون تقسيم'}</div>
+                            </div>
                         </div>
-                    </div>
-                </td>
-                <td><span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">${getCatLabel(trip.type)}</span></td>
-                <td><b style="color: var(--primary-red);">${displayPrice}</b> دينار</td>
-                <td>${trip.duration}</td>
-                <td>
-                    <div class="actions">
-                        <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
-                        <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
-                        <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+                    </td>
+                    <td><span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">${getCatLabel(trip.type)}</span></td>
+                    <td><b style="color: var(--primary-red);">${displayPrice}</b> دينار</td>
+                    <td>${trip.duration || '-'}</td>
+                    <td>
+                        <div class="actions">
+                            <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
+                            <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
+                            <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Critical Render Error:", err);
+        list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #e74c3c;">خطأ في عرض البيانات. يرجى التأكد من صحة البيانات المضافة.</td></tr>';
+    }
 }
 
 window.copyTripLink = (tripId) => {
