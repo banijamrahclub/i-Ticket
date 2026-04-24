@@ -7,6 +7,9 @@ let allTrips = [];
 let filteredTrips = [];
 let activeCategory = 'all';
 let cardImageIndexes = {};
+let currentOffers = [];
+let currentOfferIndex = 0;
+let offerInterval;
 
 // 1. Fetch Everything
 async function initApp() {
@@ -25,16 +28,20 @@ async function initApp() {
                 { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
                 { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' }
             ];
+            currentOffers = config.manama_offers || [];
         } else {
             currentCategories = config.iticket_categories || [
                 { id: 'flight_tickets', label: 'تذاكر طيران', icon: 'fa-plane' },
                 { id: 'group_trips', label: 'رحلات جماعية', icon: 'fa-users' },
                 { id: 'individual_trips', label: 'رحلات فردية', icon: 'fa-user' },
-                { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' }
+                { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' },
+                { id: 'visas', label: 'تأشيرات', icon: 'fa-stamp' }
             ];
+            currentOffers = config.iticket_offers || [];
         }
 
         renderChoicesGrid(); // نعبئ التصنيفات بالأعلى
+        renderOffers();      // نعبئ سلايدر العروض
         
         const tripsRes = await fetch(API_URL);
         allTrips = await tripsRes.json() || [];
@@ -45,6 +52,57 @@ async function initApp() {
         // renderRecentTrips() removed per user request
     } catch (e) {
         console.error("Initialization Error:", e);
+    }
+}
+
+// 1.1 Render Offers Slider (Card Style)
+function renderOffers() {
+    const section = document.getElementById('offers-section');
+    const wrapper = document.getElementById('offers-wrapper');
+    
+    if (!section || !wrapper || !currentOffers || currentOffers.length === 0) {
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    wrapper.innerHTML = currentOffers.map(offer => `
+        <div class="offer-card">
+            <div class="offer-img-box">
+                <img src="${offer.image}" alt="${offer.title}" onerror="this.src='https://via.placeholder.com/400x200'">
+            </div>
+            <div class="offer-info">
+                <div class="offer-card-title Cairo">${offer.title}</div>
+                <div class="offer-card-sub Cairo">${offer.subtitle}</div>
+            </div>
+        </div>
+    `).join('');
+
+    // Auto scroll logic for card-based slider
+    startOfferTimer();
+}
+
+function startOfferTimer() {
+    if (offerInterval) clearInterval(offerInterval);
+    if (currentOffers.length > 1) {
+        offerInterval = setInterval(() => {
+            const wrapper = document.getElementById('offers-wrapper');
+            if (!wrapper || currentOffers.length <= 1) return;
+            
+            const firstCard = wrapper.querySelector('.offer-card');
+            if (!firstCard) return;
+            
+            const cardWidth = firstCard.offsetWidth;
+            const gap = 20; // Match CSS gap
+            const scrollAmount = cardWidth + gap;
+
+            // In RTL, scrolling left means negative scrollLeft
+            if (Math.abs(wrapper.scrollLeft) + wrapper.offsetWidth >= wrapper.scrollWidth - 50) {
+                wrapper.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                wrapper.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            }
+        }, 5000);
     }
 }
 

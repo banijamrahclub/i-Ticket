@@ -236,6 +236,60 @@
             <p style="color: #888; font-size: 0.8rem; margin-top: 10px;">* بمجرد كتابة الاسم، سيتم تفعيل التصنيف تلقائياً في الموقع.</p>
         </div>
 
+        <!-- Manage Offers Slider -->
+        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #f1c40f;"><i class="fa fa-star"></i> إدارة العروض المميزة</h3>
+                <button onclick="openOfferModal()" style="background: #f1c40f; color: black; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                    <i class="fa fa-plus"></i> إضافة عرض جديد
+                </button>
+            </div>
+            
+            <div class="trips-table-container">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: right; border-bottom: 1px solid #333;">
+                            <th style="padding: 15px;">الصورة</th>
+                            <th style="padding: 15px;">العنوان</th>
+                            <th style="padding: 15px;">العمليات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offers-list-tbody">
+                        <!-- ستظهر العروض هنا -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Offer Modal -->
+        <div id="offer-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+            <div style="background: #111; width: 90%; max-width: 500px; border-radius: 24px; border: 1px solid #333; overflow: hidden; animation: slideUp 0.4s ease;">
+                <div style="padding: 20px 30px; background: #1a1a1a; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="offer-modal-title" style="margin: 0; color: #f1c40f;">إضافة عرض جديد</h3>
+                    <button onclick="closeOfferModal()" style="background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div style="padding: 30px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">صورة العرض</label>
+                        <div id="offer-img-preview" style="width: 100%; height: 150px; background: #222; border-radius: 12px; border: 2px dashed #444; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; position: relative;" onclick="document.getElementById('offer-img-input').click()">
+                            <span id="offer-placeholder-text" style="color: #666;">اضغط لرفع صورة</span>
+                            <img id="offer-modal-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <input type="file" id="offer-img-input" style="display: none;" onchange="previewOfferImage(this)">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">العنوان الرئيسي</label>
+                        <input type="text" id="offer-title-input" class="cat-input" placeholder="مثال: رحلة تركيا للعوائل">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوصف الصغير</label>
+                        <input type="text" id="offer-sub-input" class="cat-input" placeholder="مثال: خصم 20% لفترة محدودة">
+                    </div>
+                    <button onclick="saveOfferFromModal()" style="width: 100%; padding: 15px; background: #f1c40f; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">حفظ العرض</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Edit Description Section -->
         <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
             <div style="flex: 1;">
@@ -357,8 +411,115 @@
                     { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' },
                     { id: 'visas', label: 'تأشيرات', icon: 'fa-stamp' }
                 ];
+                iticketOffers = config.iticket_offers || [];
                 renderCategoryManagement();
+                renderOffersManagement();
                 populateTypeDropdown();
+            } catch (e) { console.error(e); }
+        }
+
+        let iticketOffers = [];
+        let editingOfferIdx = null;
+
+        function renderOffersManagement() {
+            const tbody = document.getElementById('offers-list-tbody');
+            if(!tbody) return;
+            
+            tbody.innerHTML = iticketOffers.length === 0 ? `<tr><td colspan="3" style="text-align:center; padding:30px; color:#666;">لا توجد عروض مضافة حالياً</td></tr>` : 
+            iticketOffers.map((off, idx) => `
+                <tr style="border-bottom: 1px solid #222;">
+                    <td style="padding: 12px;"><img src="${off.image}" style="width:60px; height:40px; object-fit:cover; border-radius:6px;"></td>
+                    <td style="padding: 12px; color:white;">${off.title || 'بدون عنوان'}</td>
+                    <td style="padding: 12px;">
+                        <button onclick="openOfferModal(${idx})" style="background:none; border:none; color:#f1c40f; cursor:pointer; margin-left:10px;"><i class="fa fa-edit"></i> تعديل</button>
+                        <button onclick="deleteOffer(${idx})" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fa fa-trash"></i> حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getTripName(id) {
+            if(!id) return 'لا يوجد';
+            const trip = (window.allTrips || []).find(t => t.id == id);
+            return trip ? trip.name : 'رحلة محذوفة';
+        }
+
+        function openOfferModal(idx = null) {
+            editingOfferIdx = idx;
+            const modal = document.getElementById('offer-modal');
+            const title = document.getElementById('offer-modal-title');
+            
+            if(idx !== null) {
+                const off = iticketOffers[idx];
+                title.innerText = 'تعديل العرض';
+                document.getElementById('offer-title-input').value = off.title || '';
+                document.getElementById('offer-sub-input').value = off.subtitle || '';
+                document.getElementById('offer-modal-img').src = off.image;
+                document.getElementById('offer-modal-img').style.display = 'block';
+                document.getElementById('offer-placeholder-text').style.display = 'none';
+            } else {
+                title.innerText = 'إضافة عرض جديد';
+                document.getElementById('offer-title-input').value = '';
+                document.getElementById('offer-sub-input').value = '';
+                document.getElementById('offer-modal-img').style.display = 'none';
+                document.getElementById('offer-placeholder-text').style.display = 'block';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeOfferModal() {
+            document.getElementById('offer-modal').style.display = 'none';
+        }
+
+        function previewOfferImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('offer-modal-img');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('offer-placeholder-text').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function saveOfferFromModal() {
+            const title = document.getElementById('offer-title-input').value.trim();
+            const sub = document.getElementById('offer-sub-input').value.trim();
+            const img = document.getElementById('offer-modal-img').src;
+
+            if(!img || img.includes('placeholder')) return alert('يرجى اختيار صورة للعرض');
+            if(!title) return alert('يرجى إدخال عنوان للعرض');
+
+            const offerData = { image: img, title, subtitle: sub };
+
+            if(editingOfferIdx !== null) {
+                iticketOffers[editingOfferIdx] = offerData;
+            } else {
+                iticketOffers.push(offerData);
+            }
+
+            await syncOffersWithServer();
+            closeOfferModal();
+        }
+
+        async function deleteOffer(idx) {
+            if(!confirm('هل أنت متأكد من حذف هذا العرض؟')) return;
+            iticketOffers.splice(idx, 1);
+            await syncOffersWithServer();
+        }
+
+        async function syncOffersWithServer() {
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ iticket_offers: iticketOffers })
+                });
+                if (res.ok) {
+                    renderOffersManagement();
+                }
             } catch (e) { console.error(e); }
         }
 

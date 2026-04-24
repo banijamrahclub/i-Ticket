@@ -13,6 +13,7 @@ async function fetchTrips() {
         if (response.ok) {
             allTrips = await response.json();
             renderTrips();
+            if (typeof renderOffersManagement === 'function') renderOffersManagement();
         }
     } catch (error) {
         console.error("Error fetching trips:", error);
