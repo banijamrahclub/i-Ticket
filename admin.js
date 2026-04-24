@@ -8,17 +8,12 @@ let currentGalleryGroups = []; // Array of { label: string, images: string[] }
 
 // Fetch Data
 async function fetchTrips() {
-    console.log(`Attempting to fetch trips from: ${API_URL}`);
     try {
         const response = await fetch(API_URL);
         if (response.ok) {
-            allTrips = await response.json() || [];
-            window.allTrips = allTrips; // Share with HTML script
-            console.log(`Successfully loaded ${allTrips.length} trips.`);
+            allTrips = await response.json();
             renderTrips();
             if (typeof renderOffersManagement === 'function') renderOffersManagement();
-        } else {
-            console.error(`Fetch failed with status: ${response.status}`);
         }
     } catch (error) {
         console.error("Error fetching trips:", error);
@@ -28,7 +23,6 @@ async function fetchTrips() {
 // Save Data
 async function saveAllToCloud(trips) {
     allTrips = trips;
-    window.allTrips = allTrips; // Sync global
     renderTrips();
 
     try {
@@ -56,81 +50,56 @@ const priceContainer = document.getElementById('price-categories-container');
 window.addPriceCategory = (label = '', value = '') => {
     const div = document.createElement('div');
     div.className = 'grid price-row';
-    div.style = 'display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 10px; margin-bottom: 10px; align-items: center;';
+    div.style = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
     div.innerHTML = `
         <input type="text" placeholder="الفئة (مثلاً: كبار)" class="p-label" value="${label}" required>
         <input type="number" placeholder="السعر" class="p-value" value="${value}" required>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <button type="button" onclick="movePriceRow(this, -1)" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid #444; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem;"><i class="fa fa-chevron-up"></i></button>
-            <button type="button" onclick="movePriceRow(this, 1)" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid #444; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem;"><i class="fa fa-chevron-down"></i></button>
-        </div>
-        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 10px 15px;"><i class="fa fa-trash-alt"></i></button>
+        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-times"></i></button>
     `;
     priceContainer.appendChild(div);
 };
 
-window.movePriceRow = (btn, direction) => {
-    const row = btn.closest('.price-row');
-    if (direction === -1 && row.previousElementSibling) {
-        row.parentNode.insertBefore(row, row.previousElementSibling);
-    } else if (direction === 1 && row.nextElementSibling) {
-        row.parentNode.insertBefore(row.nextElementSibling, row);
-    }
-};
-
 // Render Table
 function renderTrips() {
-    const list = document.getElementById('trips-list');
-    if (!list) return;
+    if (!tripsList) return;
     
-    // Helper to get labels
+    // Helper to get labels from the categories loaded in the HTML script
     const getCatLabel = (typeId) => {
         let cats = [];
         if (brand === 'iticket') cats = window.iticketCategories || [];
         else cats = window.manamaCategories || [];
-        const found = (cats || []).find(c => c.id === typeId);
+        const found = cats.find(c => c.id === typeId);
         return found ? found.label : typeId;
     };
 
-    if (!allTrips || allTrips.length === 0) {
-        list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">لا توجد رحلات مضافة حالياً.</td></tr>';
-        return;
-    }
+    tripsList.innerHTML = allTrips.map((trip, index) => {
+        const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
+        const displayImage = trip.images && trip.images.length > 0 ? trip.images[0] : (trip.image || '');
 
-    try {
-        list.innerHTML = allTrips.map((trip, index) => {
-            if (!trip) return '';
-            const displayPrice = (trip.prices && trip.prices.length > 0) ? trip.prices[0].value : (trip.price || '0');
-            const displayImage = (trip.images && trip.images.length > 0) ? trip.images[0] : (trip.image || '');
-
-            return `
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <img src="${displayImage}" class="trip-img-mini" onerror="this.src='https://via.placeholder.com/60/222/888?text=No+Img'">
-                            <div>
-                                <div style="font-weight: bold;">${trip.name || 'بدون اسم'}</div>
-                                <div style="font-size: 0.8rem; color: #888;">${trip.category || 'بدون تقسيم'}</div>
-                            </div>
+        return `
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="${displayImage}" class="trip-img-mini" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                        <div>
+                            <div style="font-weight: bold;">${trip.name}</div>
+                            <div style="font-size: 0.8rem; color: #888;">${trip.category || 'بدون تقسيم'}</div>
                         </div>
-                    </td>
-                    <td><span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">${getCatLabel(trip.type)}</span></td>
-                    <td><b style="color: var(--primary-red);">${displayPrice}</b> دينار</td>
-                    <td>${trip.duration || '-'}</td>
-                    <td>
-                        <div class="actions">
-                            <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
-                            <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
-                            <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    } catch (err) {
-        console.error("Critical Render Error:", err);
-        list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #e74c3c;">خطأ في عرض البيانات. يرجى التأكد من صحة البيانات المضافة.</td></tr>';
-    }
+                    </div>
+                </td>
+                <td><span style="background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">${getCatLabel(trip.type)}</span></td>
+                <td><b style="color: var(--primary-red);">${displayPrice}</b> دينار</td>
+                <td>${trip.duration}</td>
+                <td>
+                    <div class="actions">
+                        <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
+                        <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
+                        <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 window.copyTripLink = (tripId) => {
