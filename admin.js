@@ -266,7 +266,15 @@ window.editTrip = (index) => {
     (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));
     if (!trip.prices || trip.prices.length === 0) addPriceCategory('السعر', trip.price);
     
-    currentGalleryGroups = [...(trip.gallery_groups || [])];
+    // التحقق من نظام الصور (جديد أو قديم) لضمان عدم فقدان البيانات
+    if (trip.gallery_groups && trip.gallery_groups.length > 0) {
+        currentGalleryGroups = JSON.parse(JSON.stringify(trip.gallery_groups));
+    } else if (trip.images && trip.images.length > 0) {
+        // تحويل الصور القديمة إلى تصنيف تلقائي "صور الرحلة"
+        currentGalleryGroups = [{ label: 'صور الرحلة', images: [...trip.images] }];
+    } else {
+        currentGalleryGroups = [];
+    }
     renderGalleryGroups();
 
     tripModal.style.display = 'flex';
