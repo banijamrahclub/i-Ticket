@@ -50,13 +50,26 @@ const priceContainer = document.getElementById('price-categories-container');
 window.addPriceCategory = (label = '', value = '') => {
     const div = document.createElement('div');
     div.className = 'grid price-row';
-    div.style = 'display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px;';
+    div.style = 'display: grid; grid-template-columns: 1fr 1fr auto auto; gap: 10px; margin-bottom: 10px; align-items: center;';
     div.innerHTML = `
         <input type="text" placeholder="الفئة (مثلاً: كبار)" class="p-label" value="${label}" required>
         <input type="number" placeholder="السعر" class="p-value" value="${value}" required>
-        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-times"></i></button>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <button type="button" onclick="movePriceRow(this, -1)" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid #444; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem;"><i class="fa fa-chevron-up"></i></button>
+            <button type="button" onclick="movePriceRow(this, 1)" style="background: rgba(255,255,255,0.05); color: #888; border: 1px solid #444; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem;"><i class="fa fa-chevron-down"></i></button>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 10px 15px;"><i class="fa fa-trash-alt"></i></button>
     `;
     priceContainer.appendChild(div);
+};
+
+window.movePriceRow = (btn, direction) => {
+    const row = btn.closest('.price-row');
+    if (direction === -1 && row.previousElementSibling) {
+        row.parentNode.insertBefore(row, row.previousElementSibling);
+    } else if (direction === 1 && row.nextElementSibling) {
+        row.parentNode.insertBefore(row.nextElementSibling, row);
+    }
 };
 
 // Render Table
@@ -147,19 +160,27 @@ tripForm.onsubmit = async (e) => {
         gallery_groups: currentGalleryGroups
     };
 
+    // relaxed validation
     const submitBtn = tripForm.querySelector('button[type="submit"]');
     
-    // التحقق من وجود تصنيفات صور
-    if (currentGalleryGroups.length === 0 || currentGalleryGroups.every(g => g.images.length === 0)) {
-        alert("يجب إضافة تصنيف صور واحد على الأقل يحتوي على صور.");
-        return;
-    }
-    
-    // التحقق من تسمية كافة التصنيفات
-    if (currentGalleryGroups.some(g => !g.label.trim())) {
-        alert("يرجى كتابة أسماء لكافة تصنيفات الصور.");
-        return;
-    }
+    // No longer mandatory to have groups or labels
+    // but we should filter out empty groups
+    const finalGroups = currentGalleryGroups.filter(g => g.images.length > 0);
+
+    const tripData = {
+        name: document.getElementById('trip-name').value,
+        type: document.getElementById('trip-type').value,
+        category: document.getElementById('trip-category').value,
+        duration: document.getElementById('trip-duration').value,
+        transport: document.getElementById('trip-transport').value,
+        prices: currentPriceCategories,
+        price: currentPriceCategories[0]?.value || 0,
+        description: document.getElementById('trip-description').value,
+        badge: document.getElementById('trip-badge').value,
+        gallery_groups: finalGroups,
+        // Fallback for older systems
+        images: finalGroups.length > 0 ? finalGroups[0].images : [] 
+    };
 
     const originalBtnText = submitBtn.innerText;
     submitBtn.innerText = 'جاري الحفظ والرفع...';
@@ -169,23 +190,14 @@ tripForm.onsubmit = async (e) => {
     if (isEdit) updated[index] = tripData;
     else updated.push(tripData);
 
-    // إغلاق النافذة فوراً لتحسين السرعة للمستخدم
     tripModal.style.display = 'none';
-
     await saveAllToCloud(updated);
-
     submitBtn.innerText = originalBtnText;
     submitBtn.disabled = false;
 };
 
-
-function renderImagesPreview() {
-    // This function is now superseded by Gallery Group management
-}
-
-window.removeImage = (idx) => {
-    // This function is now superseded by Gallery Group management
-}
+function renderImagesPreview() { }
+window.removeImage = (idx) => { }
 
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -201,7 +213,7 @@ window.renderGalleryGroups = () => {
     container.innerHTML = currentGalleryGroups.map((group, gIdx) => `
         <div class="gallery-group-item" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #444;">
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <input type="text" placeholder="اسم التصنيف (مثال: الغرف)" value="${group.label}" 
+                <input type="text" placeholder="اسم التصنيف (اختياري)" value="${group.label}" 
                     style="flex: 1; padding: 8px; background: #111; border: 1px solid #333; border-radius: 8px; color: white;"
                     onchange="currentGalleryGroups[${gIdx}].label = this.value">
                 <button type="button" onclick="removeGalleryGroup(${gIdx})" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-trash"></i></button>
@@ -220,7 +232,7 @@ window.renderGalleryGroups = () => {
 };
 
 window.addNewGalleryGroup = (label = '') => {
-    currentGalleryGroups.push({ label: label, images: [] });
+    currentGalleryGroups.push({ label: label || 'صور عامة', images: [] });
     renderGalleryGroups();
 };
 
@@ -248,11 +260,9 @@ if (openAddModalBtn) {
     openAddModalBtn.onclick = () => {
         document.getElementById('trip-id').value = "";
         document.getElementById('modal-title').innerText = "إضافة رحلة جديدة";
+        document.getElementById('trip-form').reset();
         priceContainer.innerHTML = '';
-        
-        // Default Gallery Groups
         currentGalleryGroups = [];
-        
         renderGalleryGroups();
         addPriceCategory('سعر الشخص', '');
         tripModal.style.display = 'flex';
@@ -275,9 +285,16 @@ window.editTrip = (index) => {
     (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));
     if (!trip.prices || trip.prices.length === 0) addPriceCategory('السعر', trip.price);
     
-    currentGalleryGroups = [...(trip.gallery_groups || [])];
+    // Handle migration from old images array to gallery groups
+    if (trip.gallery_groups && trip.gallery_groups.length > 0) {
+        currentGalleryGroups = JSON.parse(JSON.stringify(trip.gallery_groups));
+    } else if (trip.images && trip.images.length > 0) {
+        currentGalleryGroups = [{ label: 'صور عامة', images: [...trip.images] }];
+    } else {
+        currentGalleryGroups = [];
+    }
+    
     renderGalleryGroups();
-
     tripModal.style.display = 'flex';
 };
 
