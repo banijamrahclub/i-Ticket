@@ -92,6 +92,10 @@ function renderTrips() {
                 <td>${trip.duration}</td>
                 <td>
                     <div class="actions">
+                        <i class="fa ${trip.hidden ? 'fa-eye-slash' : 'fa-eye'}" 
+                           style="color: ${trip.hidden ? '#888' : '#3498db'}; cursor: pointer; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;" 
+                           title="${trip.hidden ? 'إظهار في الموقع' : 'إخفاء من الموقع'}" 
+                           onclick="toggleTripVisibility(${index})"></i>
                         <i class="fa fa-link" style="color: #f1c40f; cursor: pointer; background: rgba(241, 196, 15, 0.1); padding: 8px; border-radius: 8px;" title="نسخ الرابط" onclick="copyTripLink('${trip.id}')"></i>
                         <i class="fa fa-edit btn-edit" onclick="editTrip(${index})"></i>
                         <i class="fa fa-trash btn-delete" onclick="deleteTrip(${index})"></i>
@@ -114,6 +118,13 @@ window.deleteTrip = async (index) => {
         updated.splice(index, 1);
         await saveAllToCloud(updated);
     }
+}
+
+// Toggle Visibility
+window.toggleTripVisibility = async (index) => {
+    const updated = [...allTrips];
+    updated[index].hidden = !updated[index].hidden;
+    await saveAllToCloud(updated);
 }
 
 // Form Submission
@@ -140,11 +151,12 @@ tripForm.onsubmit = async (e) => {
         duration: document.getElementById('trip-duration').value,
         transport: document.getElementById('trip-transport').value,
         description: document.getElementById('trip-description').value,
-        // تجميع كافة الصور من الأقسام للعرض في البطاقات
         images: currentGalleryGroups.reduce((acc, g) => acc.concat(g.images), []),
         image: (currentGalleryGroups.length > 0 && currentGalleryGroups[0].images.length > 0) ? currentGalleryGroups[0].images[0] : '',
         badge: document.getElementById('trip-badge').value,
-        gallery_groups: currentGalleryGroups
+        hidden: isEdit ? (allTrips[index].hidden || false) : false,
+        gallery_groups: currentGalleryGroups,
+        monthly_prices: window.currentMonthlyPrices || {} // سيتم إضافته لاحقاً
     };
 
     const submitBtn = tripForm.querySelector('button[type="submit"]');
@@ -197,13 +209,31 @@ window.renderGalleryGroups = () => {
                     onchange="currentGalleryGroups[${gIdx}].label = this.value">
                 <button type="button" onclick="removeGalleryGroup(${gIdx})" class="btn-delete" style="padding: 5px 10px;"><i class="fa fa-trash"></i></button>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px;">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
                 ${group.images.map((img, iIdx) => `
                     <div style="position:relative; height: 50px;">
                         <img src="${img}" style="width:100%; height:100%; object-fit:cover; border-radius: 6px;">
                         <button type="button" onclick="removeImageFromGroup(${gIdx}, ${iIdx})" style="position:absolute; top:-5px; right:-5px; background:red; color:white; border:none; border-radius:50%; width:18px; height:18px; font-size:9px; cursor:pointer;">&times;</button>
                     </div>
                 `).join('')}
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="color: #888; font-size: 0.8rem; display: block; margin-bottom: 5px;">وصف خاص بهذا القسم (اختياري)</label>
+                <textarea style="width: 100%; background: #111; border: 1px solid #333; color: white; border-radius: 8px; padding: 10px; font-size: 0.9rem;" 
+                    onchange="currentGalleryGroups[${gIdx}].description = this.value">${group.description || ''}</textarea>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="color: #888; font-size: 0.8rem; display: block; margin-bottom: 5px;">أسعار خاصة بهذا القسم (إذا تركت فارغة سيظهر السعر الرئيسي)</label>
+                <div id="group-prices-${gIdx}">
+                    ${(group.prices || []).map((p, pIdx) => `
+                        <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                            <input type="text" value="${p.label}" placeholder="نوع السعر" style="flex:1; background:#000; border:1px solid #333; color:white; padding:5px; border-radius:5px;" onchange="updateGroupPrice(${gIdx}, ${pIdx}, 'label', this.value)">
+                            <input type="number" value="${p.value}" placeholder="السعر" style="width:80px; background:#000; border:1px solid #333; color:white; padding:5px; border-radius:5px;" onchange="updateGroupPrice(${gIdx}, ${pIdx}, 'value', this.value)">
+                            <button type="button" onclick="removeGroupPrice(${gIdx}, ${pIdx})" style="background:none; border:none; color:red;"><i class="fa fa-times"></i></button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button type="button" onclick="addGroupPrice(${gIdx})" style="background: rgba(255,255,255,0.05); color: #888; border: 1px dashed #444; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">+ إضافة سعر مخصص</button>
             </div>
             <input type="file" multiple accept="image/*" onchange="addImagesToGroup(event, ${gIdx})" style="font-size: 0.8rem; color: #888;">
         </div>
@@ -234,6 +264,21 @@ window.removeImageFromGroup = (gIdx, iIdx) => {
     renderGalleryGroups();
 };
 
+window.addGroupPrice = (gIdx) => {
+    if(!currentGalleryGroups[gIdx].prices) currentGalleryGroups[gIdx].prices = [];
+    currentGalleryGroups[gIdx].prices.push({ label: '', value: '' });
+    renderGalleryGroups();
+};
+
+window.removeGroupPrice = (gIdx, pIdx) => {
+    currentGalleryGroups[gIdx].prices.splice(pIdx, 1);
+    renderGalleryGroups();
+};
+
+window.updateGroupPrice = (gIdx, pIdx, key, val) => {
+    currentGalleryGroups[gIdx].prices[pIdx][key] = val;
+};
+
 // Open Modals
 if (openAddModalBtn) {
     openAddModalBtn.onclick = () => {
@@ -261,6 +306,7 @@ window.editTrip = (index) => {
     document.getElementById('trip-transport').value = trip.transport || '';
     document.getElementById('trip-description').value = trip.description || '';
     document.getElementById('trip-badge').value = trip.badge || '';
+    document.getElementById('trip-hidden').checked = trip.hidden || false;
 
     priceContainer.innerHTML = '';
     (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));

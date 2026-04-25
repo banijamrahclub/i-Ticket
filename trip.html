@@ -314,6 +314,13 @@
 
                 const imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
                 const prices = trip.prices && trip.prices.length > 0 ? trip.prices : [{ label: 'السعر', value: trip.price }];
+                
+                // Store original trip data for reset
+                window.originalTripData = {
+                    description: trip.description || '',
+                    prices: prices,
+                    monthly_prices: trip.monthly_prices || {}
+                };
 
                 let galleryHtml = '';
                 if (trip.gallery_groups && trip.gallery_groups.length > 0) {
@@ -388,6 +395,19 @@
                                 <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                         `).join('');
+
+                        // Update Description and Prices if category has specific ones
+                        if (group.description) {
+                            document.getElementById('trip-desc-text').innerText = group.description;
+                        } else {
+                            document.getElementById('trip-desc-text').innerText = window.originalTripData.description;
+                        }
+                        
+                        if (group.prices && group.prices.length > 0) {
+                            renderPriceList(group.prices);
+                        } else {
+                            renderPriceList(window.originalTripData.prices);
+                        }
                         
                         // Scroll to top of gallery
                         document.getElementById('gallery-explorer').scrollIntoView({ behavior: 'smooth' });
@@ -398,6 +418,10 @@
                         document.getElementById('expanded-view').style.display = 'none';
                         document.getElementById('btn-show-all').style.display = 'none';
                         document.getElementById('gallery-view-title').innerText = 'اكتشف المرافق والخدمات';
+                        
+                        // Reset to original data
+                        document.getElementById('trip-desc-text').innerText = window.originalTripData.description;
+                        renderPriceList(window.originalTripData.prices);
                     };
 
                 } else {
@@ -424,6 +448,36 @@
                     `;
                 }
 
+                function renderPriceList(pList) {
+                    const container = document.getElementById('dynamic-price-list');
+                    if (!container) return;
+                    container.innerHTML = pList.map(p => `
+                        <div class="price-row">
+                            <span class="p-label">${p.label}</span>
+                            <span class="p-value Cairo">${p.value} <small style="font-size: 0.8rem; font-weight: 400;">د.ب</small></span>
+                        </div>
+                    `).join('');
+                }
+
+                window.changeMonthPrice = (month) => {
+                    const mPrices = window.originalTripData.monthly_prices[month];
+                    if (mPrices && mPrices.length > 0) {
+                        renderPriceList(mPrices);
+                    } else if (month === "default") {
+                        renderPriceList(window.originalTripData.prices);
+                    }
+                };
+
+                const monthSelectorHtml = (trip.monthly_prices && Object.keys(trip.monthly_prices).length > 0) ? `
+                    <div style="margin-bottom: 20px; background: rgba(230, 57, 70, 0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(230, 57, 70, 0.1);">
+                        <label style="display: block; margin-bottom: 10px; font-weight: bold; color: var(--primary-red); font-size: 0.9rem;">عرض أسعار شهر محدد:</label>
+                        <select onchange="changeMonthPrice(this.value)" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-family: Cairo; outline: none; cursor: pointer;">
+                            <option value="default">الأسعار الحالية</option>
+                            ${Object.keys(trip.monthly_prices).map(m => `<option value="${m}">${m}</option>`).join('')}
+                        </select>
+                    </div>
+                ` : '';
+
                 document.getElementById('trip-content').innerHTML = `
                     ${galleryHtml}
 
@@ -445,33 +499,24 @@
                                 <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">النوع</div><div style="font-weight: 700;">${getCategoryLabel(trip.type)}</div></div>
                             </div>
 
-                            ${trip.description ? `
-                                <div style="margin-top: 30px; border-top: 2px solid #f5f5f5; padding-top: 25px;">
-                                    <h3 style="color: var(--primary-red); margin-bottom: 15px; font-size: 1.3rem;">
-                                        <i class="fa-solid fa-circle-info"></i> 
-                                        ${brand === 'manama' ? 'عن المكان' : 'عن الرحلة'}
-                                    </h3>
-                                    <div style="white-space: pre-line; color: #444; font-size: 1.1rem; line-height: 1.8;">${trip.description}</div>
-                                </div>
-                            ` : ''}
+                            <div style="margin-top: 30px; border-top: 2px solid #f5f5f5; padding-top: 25px;">
+                                <h3 style="color: var(--primary-red); margin-bottom: 15px; font-size: 1.3rem;">معلومات إضافية</h3>
+                                <p id="trip-desc-text" style="line-height: 1.8; color: #444; font-size: 1.1rem; white-space: pre-line;">${trip.description || 'لا يوجد وصف إضافي متوفر حالياً.'}</p>
+                            </div>
                         </div>
 
-                        <div class="price-list-box">
-                            <h3 style="margin-top:0; color: #1a1a1a; border-bottom: 1px solid #eee; padding-bottom: 10px;">أسعار الحجز</h3>
-                            ${prices.map(p => `
-                                <div class="price-row">
-                                    <span class="p-label">${p.label}</span>
-                                    <span class="p-value">${p.value} <span style="font-size: 0.9rem; color: #666;">دينار</span></span>
-                                </div>
-                            `).join('')}
-                            
-                            <button class="book-btn" onclick="bookNow('${trip.name}', '${brand}')">
-                                <i class="fa-brands fa-whatsapp"></i> احجز الآن عبر واتساب
-                            </button>
-                            <p style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 15px;">* سيتم الرد عليكم فوراً لتأكيد الحجز</p>
+                        <div class="trip-sidebar">
+                            <div class="price-list-box">
+                                ${monthSelectorHtml}
+                                <h3 style="margin-top:0; margin-bottom:20px; font-size: 1.3rem;">قائمة الأسعار</h3>
+                                <div id="dynamic-price-list"></div>
+                                <button class="book-btn" onclick="bookNow('${trip.name}', '${brand}')"><i class="fa-brands fa-whatsapp"></i> احجز الآن عبر واتساب</button>
+                                <p style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 15px;">* سيتم الرد عليكم فوراً لتأكيد الحجز</p>
+                            </div>
                         </div>
                     </div>
                 `;
+                renderPriceList(prices);
                 showSlides(1);
             } catch (error) {
                 console.error(error);

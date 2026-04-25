@@ -285,6 +285,17 @@
                         <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوصف الصغير</label>
                         <input type="text" id="offer-sub-input" class="cat-input" placeholder="مثال: خصم 20% لفترة محدودة">
                     </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">ارتباط بالرحلة (اختياري)</label>
+                        <select id="offer-trip-select" class="cat-input">
+                            <option value="">لا يوجد ارتباط</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e74c3c;">
+                            <input type="checkbox" id="offer-hidden" style="width: 16px; height: 16px;"> إخفاء هذا العرض من الموقع
+                        </label>
+                    </div>
                     <button onclick="saveOfferFromModal()" style="width: 100%; padding: 15px; background: #f1c40f; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">حفظ العرض</button>
                 </div>
             </div>
@@ -358,6 +369,11 @@
                     <input type="text" id="trip-category" placeholder="الوجهة...">
                 </div>
 
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوسم (اختياري)</label>
+                    <input type="text" id="trip-badge" class="cat-input" placeholder="مثال: عرض خاص">
+                </div>
+
                 <div class="form-group"
                     style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #444;">
                     <label style="color: var(--primary-red); font-weight: bold;">أسعار الرحلة (فئات متعددة)</label>
@@ -368,6 +384,15 @@
                     </button>
                 </div>
 
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: #5bc0de; font-size: 0.95rem;"><i class="fa fa-calendar-alt"></i> أسعار الأشهر (اختياري)</h4>
+                        <button type="button" onclick="addMonthlyPriceGroup()" style="background: rgba(91, 192, 222, 0.1); color: #5bc0de; border: 1px solid #5bc0de; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">+ إضافة شهر</button>
+                    </div>
+                    <div id="monthly-prices-container">
+                        <!-- سيتم ملؤه ديناميكياً -->
+                    </div>
+                </div>
 
                 <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555;">
                     <label style="color: var(--primary-red); font-weight: bold;">أقسام الصور الإضافية (لا نهائية)</label>
@@ -381,10 +406,6 @@
                 <div class="form-group">
                     <label>وصف الرحلة (اختياري)</label>
                     <textarea id="trip-description" rows="4"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>تسمية التميز (Badge)</label>
-                    <input type="text" id="trip-badge" placeholder="مثلاً: عرض حصري">
                 </div>
 
                 <div class="modal-footer">
@@ -425,11 +446,16 @@
             const tbody = document.getElementById('offers-list-tbody');
             if(!tbody) return;
             
-            tbody.innerHTML = iticketOffers.length === 0 ? `<tr><td colspan="3" style="text-align:center; padding:30px; color:#666;">لا توجد عروض مضافة حالياً</td></tr>` : 
+            tbody.innerHTML = iticketOffers.length === 0 ? `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">لا توجد عروض مضافة حالياً</td></tr>` : 
             iticketOffers.map((off, idx) => `
                 <tr style="border-bottom: 1px solid #222;">
                     <td style="padding: 12px;"><img src="${off.image}" style="width:60px; height:40px; object-fit:cover; border-radius:6px;"></td>
                     <td style="padding: 12px; color:white;">${off.title || 'بدون عنوان'}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        <i class="fa ${off.hidden ? 'fa-eye-slash' : 'fa-eye'}" 
+                           style="color: ${off.hidden ? '#888' : '#f1c40f'}; cursor: pointer; font-size: 1.2rem;" 
+                           onclick="toggleOfferVisibility(${idx})"></i>
+                    </td>
                     <td style="padding: 12px;">
                         <button onclick="openOfferModal(${idx})" style="background:none; border:none; color:#f1c40f; cursor:pointer; margin-left:10px;"><i class="fa fa-edit"></i> تعديل</button>
                         <button onclick="deleteOffer(${idx})" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fa fa-trash"></i> حذف</button>
@@ -448,12 +474,19 @@
             editingOfferIdx = idx;
             const modal = document.getElementById('offer-modal');
             const title = document.getElementById('offer-modal-title');
+            const select = document.getElementById('offer-trip-select');
             
+            // Populate Trip Dropdown
+            select.innerHTML = '<option value="">لا يوجد ارتباط</option>' + 
+                (window.allTrips || []).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
             if(idx !== null) {
                 const off = iticketOffers[idx];
                 title.innerText = 'تعديل العرض';
                 document.getElementById('offer-title-input').value = off.title || '';
                 document.getElementById('offer-sub-input').value = off.subtitle || '';
+                document.getElementById('offer-trip-select').value = off.tripId || '';
+                document.getElementById('offer-hidden').checked = off.hidden || false;
                 document.getElementById('offer-modal-img').src = off.image;
                 document.getElementById('offer-modal-img').style.display = 'block';
                 document.getElementById('offer-placeholder-text').style.display = 'none';
@@ -461,6 +494,8 @@
                 title.innerText = 'إضافة عرض جديد';
                 document.getElementById('offer-title-input').value = '';
                 document.getElementById('offer-sub-input').value = '';
+                document.getElementById('offer-trip-select').value = '';
+                document.getElementById('offer-hidden').checked = false;
                 document.getElementById('offer-modal-img').style.display = 'none';
                 document.getElementById('offer-placeholder-text').style.display = 'block';
             }
@@ -492,7 +527,9 @@
             if(!img || img.includes('placeholder')) return alert('يرجى اختيار صورة للعرض');
             if(!title) return alert('يرجى إدخال عنوان للعرض');
 
-            const offerData = { image: img, title, subtitle: sub };
+            const tripId = document.getElementById('offer-trip-select').value;
+            const hidden = editingOfferIdx !== null ? (iticketOffers[editingOfferIdx].hidden || false) : false;
+            const offerData = { image: img, title, subtitle: sub, tripId, hidden };
 
             if(editingOfferIdx !== null) {
                 iticketOffers[editingOfferIdx] = offerData;
@@ -502,6 +539,11 @@
 
             await syncOffersWithServer();
             closeOfferModal();
+        }
+
+        async function toggleOfferVisibility(idx) {
+            iticketOffers[idx].hidden = !iticketOffers[idx].hidden;
+            await syncOffersWithServer();
         }
 
         async function deleteOffer(idx) {

@@ -44,7 +44,9 @@ async function initApp() {
         renderOffers();      // نعبئ سلايدر العروض
         
         const tripsRes = await fetch(API_URL);
-        allTrips = await tripsRes.json() || [];
+        const data = await tripsRes.json();
+        const tripsArray = Array.isArray(data) ? data : [];
+        allTrips = tripsArray.filter(t => t.hidden !== true);
         filteredTrips = allTrips;
         
         renderFilterBar();
@@ -60,14 +62,15 @@ function renderOffers() {
     const section = document.getElementById('offers-section');
     const wrapper = document.getElementById('offers-wrapper');
     
-    if (!section || !wrapper || !currentOffers || currentOffers.length === 0) {
+    const currentOffers = (window.allOffers ? (allOffers[brand] || []) : currentOffers).filter(o => !o.hidden);
+    if (!section || !wrapper || currentOffers.length === 0) {
         if (section) section.style.display = 'none';
         return;
     }
 
     section.style.display = 'block';
     wrapper.innerHTML = currentOffers.map(offer => `
-        <div class="offer-card">
+        <div class="offer-card" ${offer.tripId ? `onclick="location.href='/trip?id=${offer.tripId}&brand=${brand}'" style="cursor: pointer;"` : ''}>
             <div class="offer-img-box">
                 <img src="${offer.image}" alt="${offer.title}" onerror="this.src='https://via.placeholder.com/400x200'">
             </div>
