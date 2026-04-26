@@ -229,7 +229,7 @@
             width: 150px;
             height: 150px;
             background: radial-gradient(circle, rgba(230, 57, 70, 0.05) 0%, transparent 70%);
-            z-index: -1;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -297,7 +297,8 @@
     <script src="app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.reveal').forEach((el) => {
+            // تصفير أي محاولة للإخفاء
+            document.querySelectorAll('.reveal').forEach(el => {
                 el.classList.add('active');
                 el.style.opacity = '1';
                 el.style.transform = 'none';

@@ -136,6 +136,7 @@
                         <tr style="text-align: right; border-bottom: 1px solid #333;">
                             <th style="padding: 15px;">الصورة</th>
                             <th style="padding: 15px;">العنوان</th>
+                            <th style="padding: 15px;">الحالة</th>
                             <th style="padding: 15px;">العمليات</th>
                         </tr>
                     </thead>
@@ -170,16 +171,11 @@
                         <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوصف الصغير</label>
                         <input type="text" id="offer-sub-input" class="cat-input" placeholder="مثال: استمتع بإقامة استثنائية">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">ارتباط بالعقار (اختياري)</label>
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">ارتباط بالرحلة</label>
                         <select id="offer-trip-select" class="cat-input">
                             <option value="">لا يوجد ارتباط</option>
                         </select>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #e74c3c;">
-                            <input type="checkbox" id="offer-hidden" style="width: 16px; height: 16px;"> إخفاء هذا العرض من الموقع
-                        </label>
                     </div>
                     <button onclick="saveOfferFromModal()" style="width: 100%; padding: 15px; background: #f1c40f; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">حفظ العرض</button>
                 </div>
@@ -260,31 +256,28 @@
                     </div>
                 </div>
 
-                <div class="form-group"
-                    style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #e02b20;">
-                    <label style="color: #e02b20; font-weight: bold;">أسعار الحجز (يوم عادي، يوم عطلة، إلخ)</label>
+                <div class="form-group">
+                    <label>المنطقة / الدولة (الموقع)</label>
+                    <input type="text" id="trip-location" placeholder="مثلاً: المنامة، البحرين">
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #444;">
+                    <label style="color: var(--primary-red); font-weight: bold;">أسعار الرحلة (فئات متعددة)</label>
                     <div id="price-categories-container"></div>
                     <button type="button" onclick="addPriceCategory()" class="btn-cancel"
-                        style="font-size: 0.8rem; margin-top: 10px; width: 100%;">
-                        <i class="fa fa-plus"></i> إضافة تصنيف سعر
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
+                        <i class="fa fa-plus"></i> إضافة فئة سعر
                     </button>
                 </div>
 
-
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوسم (اختياري)</label>
-                    <input type="text" id="trip-badge" class="cat-input" placeholder="مثال: عرض خاص">
-                </div>
-
-                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #444; margin-bottom: 20px;">
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="margin: 0; color: #5bc0de; font-size: 0.95rem;"><i class="fa fa-calendar-alt"></i> أسعار الأشهر (اختياري)</h4>
-                        <button type="button" onclick="addMonthlyPriceGroup()" style="background: rgba(91, 192, 222, 0.1); color: #5bc0de; border: 1px solid #5bc0de; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">+ إضافة شهر</button>
+                        <label style="color: #f1c40f; font-weight: bold; margin: 0;"><i class="fa fa-calendar-alt"></i> أسعار الأشهر / المواسم (اختياري)</label>
+                        <button type="button" onclick="addNewSeason()" style="background: #f1c40f; color: black; border: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">+ إضافة فترة</button>
                     </div>
-                    <div id="monthly-prices-container">
-                        <!-- سيتم ملؤه ديناميكياً -->
-                    </div>
+                    <div id="seasonal-prices-container"></div>
                 </div>
+
 
                 <div class="form-group"
                     style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #e02b20;">
@@ -304,6 +297,11 @@
                 <div class="form-group">
                     <label>تسمية التميز (Badge)</label>
                     <input type="text" id="trip-badge" placeholder="مثلاً: مميز بجوار البحر">
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+                    <input type="checkbox" id="trip-hidden" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="trip-hidden" style="margin: 0; cursor: pointer; color: #f1c40f;">إخفاء المكان/الرحلة من الموقع العام</label>
                 </div>
 
                 <div class="modal-footer">
@@ -354,10 +352,11 @@
                 <tr style="border-bottom: 1px solid #222;">
                     <td style="padding: 12px;"><img src="${off.image}" style="width:60px; height:40px; object-fit:cover; border-radius:6px;"></td>
                     <td style="padding: 12px; color:white;">${off.title || 'بدون عنوان'}</td>
-                    <td style="padding: 12px; text-align: center;">
-                        <i class="fa ${off.hidden ? 'fa-eye-slash' : 'fa-eye'}" 
-                           style="color: ${off.hidden ? '#888' : '#f1c40f'}; cursor: pointer; font-size: 1.2rem;" 
-                           onclick="toggleOfferVisibility(${idx})"></i>
+                    <td style="padding: 12px;">
+                        <button onclick="toggleOfferVisibility(${idx})" style="background:none; border:none; color:${off.hidden ? '#888' : '#2ecc71'}; cursor:pointer; margin-left:10px;" title="${off.hidden ? 'إظهار' : 'إخفاء'}">
+                            <i class="fa ${off.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i> 
+                            <span style="font-size:0.85rem; margin-right:5px;">${off.hidden ? 'مخفي' : 'ظاهر'}</span>
+                        </button>
                     </td>
                     <td style="padding: 12px;">
                         <button onclick="openOfferModal(${idx})" style="background:none; border:none; color:#f1c40f; cursor:pointer; margin-left:10px;"><i class="fa fa-edit"></i> تعديل</button>
@@ -365,7 +364,12 @@
                     </td>
                 </tr>
             `).join('');
-        }
+}
+
+async function toggleOfferVisibility(idx) {
+    manamaOffers[idx].hidden = !manamaOffers[idx].hidden;
+    await syncOffersWithServer();
+}
 
         function getTripName(id) {
             if(!id) return 'لا يوجد';
@@ -389,7 +393,6 @@
                 document.getElementById('offer-title-input').value = off.title || '';
                 document.getElementById('offer-sub-input').value = off.subtitle || '';
                 document.getElementById('offer-trip-select').value = off.tripId || '';
-                document.getElementById('offer-hidden').checked = off.hidden || false;
                 document.getElementById('offer-modal-img').src = off.image;
                 document.getElementById('offer-modal-img').style.display = 'block';
                 document.getElementById('offer-placeholder-text').style.display = 'none';
@@ -398,7 +401,6 @@
                 document.getElementById('offer-title-input').value = '';
                 document.getElementById('offer-sub-input').value = '';
                 document.getElementById('offer-trip-select').value = '';
-                document.getElementById('offer-hidden').checked = false;
                 document.getElementById('offer-modal-img').style.display = 'none';
                 document.getElementById('offer-placeholder-text').style.display = 'block';
             }
@@ -425,14 +427,13 @@
         async function saveOfferFromModal() {
             const title = document.getElementById('offer-title-input').value.trim();
             const sub = document.getElementById('offer-sub-input').value.trim();
+            const tripId = document.getElementById('offer-trip-select').value;
             const img = document.getElementById('offer-modal-img').src;
 
             if(!img || img.includes('placeholder')) return alert('يرجى اختيار صورة للعرض');
             if(!title) return alert('يرجى إدخال عنوان للعرض');
 
-            const tripId = document.getElementById('offer-trip-select').value;
-            const hidden = editingOfferIdx !== null ? (manamaOffers[editingOfferIdx].hidden || false) : false;
-            const offerData = { image: img, title, subtitle: sub, tripId, hidden };
+            const offerData = { image: img, title, subtitle: sub, tripId };
 
             if(editingOfferIdx !== null) {
                 manamaOffers[editingOfferIdx] = offerData;
@@ -442,11 +443,6 @@
 
             await syncOffersWithServer();
             closeOfferModal();
-        }
-
-        async function toggleOfferVisibility(idx) {
-            manamaOffers[idx].hidden = !manamaOffers[idx].hidden;
-            await syncOffersWithServer();
         }
 
         async function deleteOffer(idx) {

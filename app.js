@@ -18,35 +18,19 @@ async function initApp() {
         const config = await configRes.json();
         
         if (brand === 'manama') {
-            currentCategories = config.manama_categories || [
-                { id: 'hotels', label: 'فنادق', icon: 'fa-hotel' },
-                { id: 'resorts', label: 'منتجع', icon: 'fa-umbrella-beach' },
-                { id: 'chalets', label: 'شاليهات', icon: 'fa-house-chimney' },
-                { id: 'rest_houses', label: 'استراحات', icon: 'fa-tree' },
-                { id: 'jacuzzi', label: 'جاكوزي', icon: 'fa-hot-tub-person' },
-                { id: 'romantic_dinner', label: 'عشاء رومانسي', icon: 'fa-utensils' },
-                { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
-                { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' }
-            ];
-            currentOffers = config.manama_offers || [];
+            currentCategories = config.manama_categories || [];
+            currentOffers = (config.manama_offers || []).filter(off => !off.hidden);
         } else {
-            currentCategories = config.iticket_categories || [
-                { id: 'flight_tickets', label: 'تذاكر طيران', icon: 'fa-plane' },
-                { id: 'group_trips', label: 'رحلات جماعية', icon: 'fa-users' },
-                { id: 'individual_trips', label: 'رحلات فردية', icon: 'fa-user' },
-                { id: 'religious', label: 'رحلات دينية', icon: 'fa-mosque' },
-                { id: 'visas', label: 'تأشيرات', icon: 'fa-stamp' }
-            ];
-            currentOffers = config.iticket_offers || [];
+            currentCategories = config.iticket_categories || [];
+            currentOffers = (config.iticket_offers || []).filter(off => !off.hidden);
         }
 
         renderChoicesGrid(); // نعبئ التصنيفات بالأعلى
         renderOffers();      // نعبئ سلايدر العروض
         
         const tripsRes = await fetch(API_URL);
-        const data = await tripsRes.json();
-        const tripsArray = Array.isArray(data) ? data : [];
-        allTrips = tripsArray.filter(t => t.hidden !== true);
+        const rawTrips = await tripsRes.json() || [];
+        allTrips = rawTrips.filter(trip => !trip.hidden);
         filteredTrips = allTrips;
         
         renderFilterBar();
@@ -62,24 +46,30 @@ function renderOffers() {
     const section = document.getElementById('offers-section');
     const wrapper = document.getElementById('offers-wrapper');
     
-    const currentOffers = (window.allOffers ? (allOffers[brand] || []) : currentOffers).filter(o => !o.hidden);
-    if (!section || !wrapper || currentOffers.length === 0) {
+    if (!section || !wrapper || !currentOffers || currentOffers.length === 0) {
         if (section) section.style.display = 'none';
         return;
     }
 
     section.style.display = 'block';
-    wrapper.innerHTML = currentOffers.map(offer => `
-        <div class="offer-card" ${offer.tripId ? `onclick="location.href='/trip?id=${offer.tripId}&brand=${brand}'" style="cursor: pointer;"` : ''}>
-            <div class="offer-img-box">
-                <img src="${offer.image}" alt="${offer.title}" onerror="this.src='https://via.placeholder.com/400x200'">
+    wrapper.innerHTML = currentOffers.map(offer => {
+        const hasLink = offer.tripId && offer.tripId !== "";
+        const tripLink = `/trip?id=${offer.tripId}&brand=${brand}`;
+        
+        return `
+            <div class="offer-card" 
+                 style="cursor: ${hasLink ? 'pointer' : 'default'};" 
+                 ${hasLink ? `onclick="window.location.href='${tripLink}'"` : ''}>
+                <div class="offer-img-box">
+                    <img src="${offer.image}" alt="${offer.title}" onerror="this.src='https://via.placeholder.com/400x200'">
+                </div>
+                <div class="offer-info">
+                    <div class="offer-card-title Cairo">${offer.title}</div>
+                    <div class="offer-card-sub Cairo">${offer.subtitle}</div>
+                </div>
             </div>
-            <div class="offer-info">
-                <div class="offer-card-title Cairo">${offer.title}</div>
-                <div class="offer-card-sub Cairo">${offer.subtitle}</div>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Auto scroll logic for card-based slider
     startOfferTimer();
@@ -310,9 +300,10 @@ function generateTripCard(trip) {
             <div class="package-content">
                 <div class="package-category" style="font-size: 0.8rem; color: var(--primary-red); font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">${getCategoryLabel(trip.type)}</div>
                 <h3 style="margin-bottom: 10px;">${trip.name}</h3>
-                <div class="package-info" style="display: flex; gap: 15px; font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+                <div class="package-info" style="display: flex; gap: 15px; font-size: 0.8rem; color: #666; margin-bottom: 15px; flex-wrap: wrap;">
                     <span><i class="fa fa-calendar-days"></i> ${trip.duration}</span>
                     <span><i class="fa ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}"></i> ${trip.transport}</span>
+                    ${trip.location ? `<span style="color: var(--primary-red);"><i class="fa fa-map-marker-alt"></i> ${trip.location}</span>` : ''}
                 </div>
                 <div class="package-price-container">
                     ${(trip.prices || []).map(p => `
