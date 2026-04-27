@@ -913,6 +913,38 @@ section#home.active-section {
     gap: 20px;
 }
 
+/* Badge Styles */
+.package-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--primary-red);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.4);
+    z-index: 5;
+}
+
+.families-only-badge {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: var(--primary-red);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.4);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* Responsive Handling */
 @media (max-width: 992px) {
     .hero h1 {

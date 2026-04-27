@@ -364,6 +364,26 @@
                     </div>
                 </div>
 
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label><i class="fa fa-clock"></i> وقت الحضور</label>
+                        <input type="time" id="trip-checkin">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa fa-clock"></i> وقت المغادرة</label>
+                        <input type="time" id="trip-checkout">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa fa-users"></i> عدد الأشخاص (اختياري)</label>
+                        <input type="number" id="trip-max-people" placeholder="مثلاً: 2">
+                    </div>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <input type="checkbox" id="trip-families-only" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="trip-families-only" style="margin: 0; cursor: pointer; color: #3b82f6; font-weight: bold;">هذه الرحلة مخصصة للعائلات فقط</label>
+                </div>
+
                 <div class="form-group">
                     <label>المنطقة / الدولة (الموقع)</label>
                     <input type="text" id="trip-location" placeholder="مثلاً: اسطنبول، تركيا">
@@ -402,9 +422,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label>وصف الرحلة (اختياري)</label>
-                    <textarea id="trip-description" rows="4"></textarea>
+                    <label>الوصف التفصيلي (مطول)</label>
+                    <textarea id="trip-description" rows="5" placeholder="اكتب تفاصيل الرحلة أو العقار هنا..."
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
                 </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-file-contract"></i> شروط الحجز والسياسات</label>
+                    <textarea id="trip-terms" rows="4" placeholder="اكتب شروط الحجز هنا..."
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                </div>
+
                 <div class="form-group">
                     <label>تسمية التميز (Badge)</label>
                     <input type="text" id="trip-badge" placeholder="مثلاً: عرض حصري">

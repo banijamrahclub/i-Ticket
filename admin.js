@@ -151,7 +151,12 @@ tripForm.onsubmit = async (e) => {
         badge: document.getElementById('trip-badge').value,
         gallery_groups: currentGalleryGroups,
         seasonal_prices: getSeasonalPrices(),
-        hidden: document.getElementById('trip-hidden').checked
+        hidden: document.getElementById('trip-hidden').checked,
+        checkIn: document.getElementById('trip-checkin').value,
+        checkOut: document.getElementById('trip-checkout').value,
+        maxPeople: document.getElementById('trip-max-people').value,
+        familiesOnly: document.getElementById('trip-families-only').checked,
+        terms: document.getElementById('trip-terms').value
     };
 
     const submitBtn = tripForm.querySelector('button[type="submit"]');
@@ -226,6 +231,33 @@ window.renderGalleryGroups = () => {
                 <button type="button" onclick="addPriceToGroup(${gIdx})" style="background: rgba(255,255,255,0.05); color: #ccc; border: 1px dashed #555; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; cursor: pointer;">+ إضافة سعر خاص</button>
             </div>
 
+            <div style="margin-bottom: 15px; background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px;">
+                <label style="display: block; font-size: 0.8rem; color: #f1c40f; margin-bottom: 8px; font-weight: bold;"><i class="fa fa-calendar-alt"></i> أسعار الأشهر لهذا التصنيف (اختياري)</label>
+                <div id="group-seasons-${gIdx}">
+                    ${(group.seasonal_prices || []).map((season, sIdx) => `
+                        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333;">
+                            <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                                <input type="text" placeholder="اسم الفترة (مثلاً: يوليو)" value="${season.label}" 
+                                    style="flex: 1; padding: 5px; background: #111; border: 1px solid #444; color: white; font-size: 0.8rem;"
+                                    onchange="currentGalleryGroups[${gIdx}].seasonal_prices[${sIdx}].label = this.value">
+                                <button type="button" onclick="removeSeasonFromGroup(${gIdx}, ${sIdx})" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fa fa-times"></i></button>
+                            </div>
+                            <div class="group-season-prices-${gIdx}-${sIdx}">
+                                ${(season.prices || []).map((p, pIdx) => `
+                                    <div style="display: flex; gap: 3px; margin-bottom: 3px;">
+                                        <input type="text" placeholder="النوع" value="${p.label}" style="flex:1; padding:3px; background:#000; border:1px solid #222; color:white; font-size:0.75rem;" onchange="currentGalleryGroups[${gIdx}].seasonal_prices[${sIdx}].prices[${pIdx}].label = this.value">
+                                        <input type="number" placeholder="السعر" value="${p.value}" style="width:60px; padding:3px; background:#000; border:1px solid #222; color:white; font-size:0.75rem;" onchange="currentGalleryGroups[${gIdx}].seasonal_prices[${sIdx}].prices[${pIdx}].value = this.value">
+                                        <button type="button" onclick="removePriceFromGroupSeason(${gIdx}, ${sIdx}, ${pIdx})" style="background:none; border:none; color:red; cursor:pointer; font-size:0.7rem;">&times;</button>
+                                    </div>
+                                `).join('')}
+                                <button type="button" onclick="addPriceToGroupSeason(${gIdx}, ${sIdx})" style="background:none; border:1px dashed #444; color:#666; font-size:0.7rem; width:100%; margin-top:5px; cursor:pointer;">+ إضافة سعر</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button type="button" onclick="addSeasonToGroup(${gIdx})" style="background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.2); padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; cursor: pointer; width: 100%;">+ إضافة فترة زمنية (شهر)</button>
+            </div>
+
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
                 ${group.images.map((img, iIdx) => `
                     <div style="position:relative; height: 60px; border: 1px solid #333; border-radius: 6px; overflow: hidden;">
@@ -242,6 +274,28 @@ window.renderGalleryGroups = () => {
     `).join('');
 };
 
+window.addSeasonToGroup = (gIdx) => {
+    if(!currentGalleryGroups[gIdx].seasonal_prices) currentGalleryGroups[gIdx].seasonal_prices = [];
+    currentGalleryGroups[gIdx].seasonal_prices.push({ label: '', prices: [] });
+    renderGalleryGroups();
+};
+
+window.removeSeasonFromGroup = (gIdx, sIdx) => {
+    currentGalleryGroups[gIdx].seasonal_prices.splice(sIdx, 1);
+    renderGalleryGroups();
+};
+
+window.addPriceToGroupSeason = (gIdx, sIdx) => {
+    if(!currentGalleryGroups[gIdx].seasonal_prices[sIdx].prices) currentGalleryGroups[gIdx].seasonal_prices[sIdx].prices = [];
+    currentGalleryGroups[gIdx].seasonal_prices[sIdx].prices.push({ label: '', value: '' });
+    renderGalleryGroups();
+};
+
+window.removePriceFromGroupSeason = (gIdx, sIdx, pIdx) => {
+    currentGalleryGroups[gIdx].seasonal_prices[sIdx].prices.splice(pIdx, 1);
+    renderGalleryGroups();
+};
+
 window.addPriceToGroup = (gIdx) => {
     if(!currentGalleryGroups[gIdx].prices) currentGalleryGroups[gIdx].prices = [];
     currentGalleryGroups[gIdx].prices.push({ label: 'سعر افتراضي', value: '' });
@@ -254,7 +308,7 @@ window.removePriceFromGroup = (gIdx, pIdx) => {
 };
 
 window.addNewGalleryGroup = (label = '') => {
-    currentGalleryGroups.push({ label: label, images: [], description: '', prices: [] });
+    currentGalleryGroups.push({ label: label, images: [], description: '', prices: [], seasonal_prices: [] });
     renderGalleryGroups();
 };
 
@@ -284,6 +338,11 @@ if (openAddModalBtn) {
         document.getElementById('modal-title').innerText = "إضافة رحلة جديدة";
         priceContainer.innerHTML = '';
         document.getElementById('trip-hidden').checked = false;
+        document.getElementById('trip-checkin').value = "";
+        document.getElementById('trip-checkout').value = "";
+        document.getElementById('trip-max-people').value = "";
+        document.getElementById('trip-families-only').checked = false;
+        document.getElementById('trip-terms').value = "";
         
         // Default Gallery Groups
         currentGalleryGroups = [];
@@ -307,6 +366,11 @@ window.editTrip = (index) => {
     document.getElementById('trip-description').value = trip.description || '';
     document.getElementById('trip-badge').value = trip.badge || '';
     document.getElementById('trip-hidden').checked = trip.hidden || false;
+    document.getElementById('trip-checkin').value = trip.checkIn || '';
+    document.getElementById('trip-checkout').value = trip.checkOut || '';
+    document.getElementById('trip-max-people').value = trip.maxPeople || '';
+    document.getElementById('trip-families-only').checked = trip.familiesOnly || false;
+    document.getElementById('trip-terms').value = trip.terms || '';
 
     priceContainer.innerHTML = '';
     (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));

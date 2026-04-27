@@ -285,6 +285,7 @@ function generateTripCard(trip) {
                     </div>
                 ` : ''}
 
+                ${trip.familiesOnly ? `<div class="families-only-badge"><i class="fa fa-users"></i> للعائلات فقط</div>` : ''}
                 ${trip.badge ? `<div class="package-badge">${trip.badge}</div>` : ''}
                 
                 ${displayImgs.length > 1 ? `
@@ -303,6 +304,9 @@ function generateTripCard(trip) {
                 <div class="package-info" style="display: flex; gap: 15px; font-size: 0.8rem; color: #666; margin-bottom: 15px; flex-wrap: wrap;">
                     <span><i class="fa fa-calendar-days"></i> ${trip.duration}</span>
                     <span><i class="fa ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}"></i> ${trip.transport}</span>
+                    ${trip.maxPeople ? `<span><i class="fa fa-users"></i> ${trip.maxPeople}</span>` : ''}
+                    ${trip.checkIn ? `<span><i class="fa fa-clock"></i> دخول: ${trip.checkIn}</span>` : ''}
+                    ${trip.checkOut ? `<span><i class="fa fa-clock"></i> خروج: ${trip.checkOut}<span>` : ''}
                     ${trip.location ? `<span style="color: var(--primary-red);"><i class="fa fa-map-marker-alt"></i> ${trip.location}</span>` : ''}
                 </div>
                 <div class="package-price-container">
