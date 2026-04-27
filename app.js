@@ -305,8 +305,17 @@ function generateTripCard(trip) {
                     <span><i class="fa fa-calendar-days"></i> ${trip.duration}</span>
                     <span><i class="fa ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}"></i> ${trip.transport}</span>
                     ${trip.maxPeople ? `<span><i class="fa fa-users"></i> ${trip.maxPeople}</span>` : ''}
-                    ${trip.checkIn ? `<span><i class="fa fa-clock"></i> دخول: ${trip.checkIn}</span>` : ''}
-                    ${trip.checkOut ? `<span><i class="fa fa-clock"></i> خروج: ${trip.checkOut}<span>` : ''}
+                    ${(trip.timePeriods && trip.timePeriods.length > 0) ? `
+                        <div style="width: 100%; display: flex; flex-direction: column; gap: 4px; margin-top: 5px; border-top: 1px solid #f0f0f0; padding-top: 8px;">
+                            ${trip.timePeriods.map(p => `
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #555;">
+                                    <i class="fa fa-clock" style="color: var(--primary-red); font-size: 0.7rem;"></i>
+                                    ${p.label ? `<span style="font-weight: 700;">${p.label}:</span>` : ''}
+                                    <span>${p.checkIn ? 'دخول ' + p.checkIn : ''}${p.checkIn && p.checkOut ? ' | ' : ''}${p.checkOut ? 'خروج ' + p.checkOut : ''}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                     ${trip.location ? `<span style="color: var(--primary-red);"><i class="fa fa-map-marker-alt"></i> ${trip.location}</span>` : ''}
                 </div>
                 <div class="package-price-container">

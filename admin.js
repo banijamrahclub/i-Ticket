@@ -59,6 +59,28 @@ window.addPriceCategory = (label = '', value = '') => {
     priceContainer.appendChild(div);
 };
 
+// Time Periods Logic
+window.addTimePeriod = (label = '', checkIn = '', checkOut = '') => {
+    const container = document.getElementById('time-periods-container');
+    if (!container) return;
+    const div = document.createElement('div');
+    div.className = 'time-period-row';
+    div.style = 'display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;';
+    div.innerHTML = `
+        <input type="text" placeholder="اسم الفترة (اختياري)" class="tp-label" value="${label}" style="padding: 5px; background: #000; border: 1px solid #333; color: white; font-size: 0.8rem; border-radius: 4px;">
+        <div>
+            <div style="font-size: 0.7rem; color: #888;">الدخول</div>
+            <input type="time" class="tp-in" value="${checkIn}" style="width: 100%; padding: 5px; background: #000; border: 1px solid #333; color: white; font-size: 0.8rem; border-radius: 4px;">
+        </div>
+        <div>
+            <div style="font-size: 0.7rem; color: #888;">الخروج</div>
+            <input type="time" class="tp-out" value="${checkOut}" style="width: 100%; padding: 5px; background: #000; border: 1px solid #333; color: white; font-size: 0.8rem; border-radius: 4px;">
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="btn-delete" style="padding: 5px 10px; align-self: center;"><i class="fa fa-times"></i></button>
+    `;
+    container.appendChild(div);
+};
+
 // Render Table
 function renderTrips() {
     if (!tripsList) return;
@@ -134,6 +156,15 @@ tripForm.onsubmit = async (e) => {
         });
     });
 
+    const timePeriods = [];
+    document.querySelectorAll('.time-period-row').forEach(row => {
+        timePeriods.push({
+            label: row.querySelector('.tp-label').value,
+            checkIn: row.querySelector('.tp-in').value,
+            checkOut: row.querySelector('.tp-out').value
+        });
+    });
+
     const tripData = {
         id: isEdit ? window.allTrips[index].id : Date.now().toString(),
         name: document.getElementById('trip-name').value,
@@ -152,11 +183,11 @@ tripForm.onsubmit = async (e) => {
         gallery_groups: currentGalleryGroups,
         seasonal_prices: getSeasonalPrices(),
         hidden: document.getElementById('trip-hidden').checked,
-        checkIn: document.getElementById('trip-checkin').value,
-        checkOut: document.getElementById('trip-checkout').value,
+        timePeriods: timePeriods,
         maxPeople: document.getElementById('trip-max-people').value,
         familiesOnly: document.getElementById('trip-families-only').checked,
-        terms: document.getElementById('trip-terms').value
+        terms: document.getElementById('trip-terms').value,
+        instructions: document.getElementById('trip-instructions').value
     };
 
     const submitBtn = tripForm.querySelector('button[type="submit"]');
@@ -343,6 +374,8 @@ if (openAddModalBtn) {
         document.getElementById('trip-max-people').value = "";
         document.getElementById('trip-families-only').checked = false;
         document.getElementById('trip-terms').value = "";
+        document.getElementById('trip-instructions').value = "";
+        document.getElementById('time-periods-container').innerHTML = '';
         
         // Default Gallery Groups
         currentGalleryGroups = [];
@@ -366,11 +399,20 @@ window.editTrip = (index) => {
     document.getElementById('trip-description').value = trip.description || '';
     document.getElementById('trip-badge').value = trip.badge || '';
     document.getElementById('trip-hidden').checked = trip.hidden || false;
-    document.getElementById('trip-checkin').value = trip.checkIn || '';
-    document.getElementById('trip-checkout').value = trip.checkOut || '';
     document.getElementById('trip-max-people').value = trip.maxPeople || '';
     document.getElementById('trip-families-only').checked = trip.familiesOnly || false;
     document.getElementById('trip-terms').value = trip.terms || '';
+    document.getElementById('trip-instructions').value = trip.instructions || '';
+
+    // Time Periods
+    const timeContainer = document.getElementById('time-periods-container');
+    timeContainer.innerHTML = '';
+    if (trip.timePeriods && trip.timePeriods.length > 0) {
+        trip.timePeriods.forEach(p => addTimePeriod(p.label, p.checkIn, p.checkOut));
+    } else if (trip.checkIn || trip.checkOut) {
+        // Migration from old fields
+        addTimePeriod('الفترة الأساسية', trip.checkIn, trip.checkOut);
+    }
 
     priceContainer.innerHTML = '';
     (trip.prices || []).forEach(p => addPriceCategory(p.label, p.value));

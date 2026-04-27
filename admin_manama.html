@@ -285,19 +285,17 @@
                     </div>
                 </div>
 
-                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                    <div class="form-group">
-                        <label><i class="fa fa-clock"></i> وقت الدخول</label>
-                        <input type="time" id="trip-checkin">
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="color: var(--primary-red); font-weight: bold; margin: 0;"><i class="fa fa-clock"></i> فترات الدخول والخروج</label>
+                        <button type="button" onclick="addTimePeriod()" style="background: var(--primary-red); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">+ إضافة فترة زمنية</button>
                     </div>
-                    <div class="form-group">
-                        <label><i class="fa fa-clock"></i> وقت الخروج</label>
-                        <input type="time" id="trip-checkout">
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fa fa-users"></i> عدد الأشخاص (اختياري)</label>
-                        <input type="number" id="trip-max-people" placeholder="مثلاً: 10">
-                    </div>
+                    <div id="time-periods-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-users"></i> عدد الأشخاص (اختياري)</label>
+                    <input type="number" id="trip-max-people" placeholder="مثلاً: 10">
                 </div>
 
                 <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.2);">
@@ -347,6 +345,12 @@
                 <div class="form-group">
                     <label><i class="fa fa-file-contract"></i> شروط الحجز والسياسات</label>
                     <textarea id="trip-terms" rows="4" placeholder="اكتب شروط الحجز هنا (مثلاً: مبلغ التأمين، سياسة الإلغاء...)"
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-circle-info"></i> التعليمات والإرشادات</label>
+                    <textarea id="trip-instructions" rows="4" placeholder="اكتب التعليمات الإضافية هنا (مثل وقت الاستلام، طريقة الدخول...)"
                         style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
                 </div>
                 <div class="form-group">
