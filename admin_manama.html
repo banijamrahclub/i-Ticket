@@ -50,6 +50,7 @@
         body {
             font-family: 'Cairo', sans-serif;
             background: #0f0f0f;
+            overflow-x: auto !important;
         }
 
         :root {
@@ -76,6 +77,34 @@
             border-radius: 12px;
             width: 100%;
             box-sizing: border-box;
+        }
+
+        .trips-table-container {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            -webkit-overflow-scrolling: touch;
+            display: block;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th,
+        td {
+            padding: 20px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            color: #888;
+            font-weight: 400;
         }
     </style>
 </head>
