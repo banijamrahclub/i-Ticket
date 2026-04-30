@@ -216,9 +216,19 @@
 
         @media (max-width: 768px) {
             .trip-grid { grid-template-columns: 1fr; }
-            .carousel-container { height: 350px; }
+            .carousel-container { height: 350px; margin-bottom: 25px; }
             .trip-title { font-size: 1.6rem; }
-            .trip-detail-container { margin-top: 80px; }
+            .trip-detail-container { margin-top: 80px; padding: 0 15px; }
+            .trip-info-card, .price-list-box { padding: 20px !important; }
+            .info-grid { grid-template-columns: 1fr !important; }
+            .info-item[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -397,6 +407,8 @@
                         document.getElementById('btn-show-all').style.display = 'block';
                         document.getElementById('gallery-view-title').innerText = group.label || (gIdx === 0 ? 'صور مميزة' : 'صور إضافية');
                         
+                        window.activeCategoryName = group.label; // Store for WhatsApp message
+
                         // Set Details
                         document.getElementById('cat-detail-label').innerText = group.label || 'تفاصيل المرافق';
                         document.getElementById('cat-detail-desc').innerText = group.description || 'لا يوجد وصف متاح لهذا القسم حالياً.';
@@ -451,6 +463,7 @@
                         document.getElementById('expanded-view').style.display = 'none';
                         document.getElementById('btn-show-all').style.display = 'none';
                         document.getElementById('gallery-view-title').innerText = 'اكتشف المرافق والخدمات';
+                        window.activeCategoryName = null; // Clear category for WhatsApp
                     };
 
                 } else {
@@ -518,7 +531,7 @@
 
                             <h2 style="margin-top:0; border-bottom: 2px solid #f5f5f5; padding-bottom:15px; font-size: 1.5rem;">تفاصيل ومعلومات</h2>
                             
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div class="info-grid">
                                 <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
                                     <i class="fa-solid fa-calendar-days" style="font-size: 1.2rem; color: var(--primary-red);"></i>
                                     <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">المدة</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.duration}</div></div>
@@ -627,7 +640,11 @@
 
         function bookNow(packageName, brand) {
             const phone = brand === 'manama' ? '97313313100' : '97317550054';
-            const message = `السلام عليكم، أرغب في حجز: ${packageName}\nالرابط: ${window.location.href}`;
+            let finalName = packageName;
+            if (window.activeCategoryName) {
+                finalName += ` (${window.activeCategoryName})`;
+            }
+            const message = `السلام عليكم، أرغب في حجز: ${finalName}\nالرابط: ${window.location.href}`;
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
