@@ -234,6 +234,10 @@
                     class="fa fa-plus"></i> إضافة عقار جديد</button>
         </div>
 
+        <div id="admin-category-filter" style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px;">
+            <!-- أزرار التصنيف ستظهر هنا -->
+        </div>
+
         <div class="trips-table-container">
             <table>
                 <thead>
@@ -392,10 +396,13 @@
                     { id: 'limo', label: 'ليموزين', icon: 'fa-car-side' },
                     { id: 'coordination', label: 'تنسيق', icon: 'fa-cake-candles' }
                 ];
+                window.manamaCategories = manamaCategories; // Expose for admin.js
+                
                 manamaOffers = config.manama_offers || [];
                 renderCategoryManagement();
                 renderOffersManagement();
                 populateTypeDropdown();
+                if (typeof window.renderAdminCategoryFilter === 'function') window.renderAdminCategoryFilter();
             } catch (e) { console.error(e); }
         }
 

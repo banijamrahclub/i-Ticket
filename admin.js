@@ -12,6 +12,7 @@ async function fetchTrips() {
         const response = await fetch(API_URL);
         if (response.ok) {
             window.allTrips = await response.json();
+            renderAdminCategoryFilter();
             renderTrips();
             if (typeof renderOffersManagement === 'function') renderOffersManagement();
         }
@@ -59,6 +60,35 @@ window.addPriceCategory = (label = '', value = '') => {
     priceContainer.appendChild(div);
 };
 
+// Admin Category Filter
+window.currentAdminFilter = 'all';
+
+window.setAdminFilter = (typeId) => {
+    window.currentAdminFilter = typeId;
+    renderAdminCategoryFilter();
+    renderTrips();
+};
+
+window.renderAdminCategoryFilter = () => {
+    const container = document.getElementById('admin-category-filter');
+    if (!container) return;
+
+    let cats = brand === 'iticket' ? (window.iticketCategories || []) : (window.manamaCategories || []);
+    
+    let html = `
+        <button onclick="setAdminFilter('all')" style="padding: 8px 18px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.3s; border: 1px solid #444; ${window.currentAdminFilter === 'all' ? 'background: var(--primary-red); color: white; border-color: var(--primary-red); font-weight: bold;' : 'background: #222; color: #aaa;'}">عرض الكل</button>
+    `;
+
+    cats.forEach(c => {
+        const isActive = window.currentAdminFilter === c.id;
+        html += `
+            <button onclick="setAdminFilter('${c.id}')" style="padding: 8px 18px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: 0.3s; border: 1px solid #444; ${isActive ? 'background: var(--primary-red); color: white; border-color: var(--primary-red); font-weight: bold;' : 'background: #222; color: #aaa;'}">${c.label}</button>
+        `;
+    });
+
+    container.innerHTML = html;
+};
+
 // Time Periods Logic
 window.addTimePeriod = (label = '', checkIn = '', checkOut = '') => {
     const container = document.getElementById('time-periods-container');
@@ -97,6 +127,8 @@ function renderTrips() {
     tripsList.innerHTML = window.allTrips.map((trip, index) => {
         const displayPrice = trip.prices && trip.prices.length > 0 ? trip.prices[0].value : (trip.price || '0');
         const displayImage = trip.images && trip.images.length > 0 ? trip.images[0] : (trip.image || '');
+
+        if (window.currentAdminFilter !== 'all' && trip.type !== window.currentAdminFilter) return '';
 
         return `
             <tr>
@@ -247,6 +279,14 @@ window.renderGalleryGroups = () => {
                     style="width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px; color: white; height: 60px; font-size: 0.9rem;"
                     onchange="currentGalleryGroups[${gIdx}].description = this.value">${group.description || ''}</textarea>
             </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.8rem; color: #888; margin-bottom: 5px;">عدد الأشخاص لهذا التصنيف (اختياري)</label>
+                <input type="number" placeholder="مثلاً: 4" value="${group.maxPeople || ''}" 
+                    style="width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px; color: white; font-size: 0.9rem;"
+                    onchange="currentGalleryGroups[${gIdx}].maxPeople = this.value">
+            </div>
+
 
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-size: 0.8rem; color: #888; margin-bottom: 5px;">أسعار هذا التصنيف (اختياري)</label>
