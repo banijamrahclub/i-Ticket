@@ -409,8 +409,7 @@ if (openAddModalBtn) {
         document.getElementById('modal-title').innerText = "إضافة رحلة جديدة";
         priceContainer.innerHTML = '';
         document.getElementById('trip-hidden').checked = false;
-        document.getElementById('trip-checkin').value = "";
-        document.getElementById('trip-checkout').value = "";
+
         document.getElementById('trip-max-people').value = "";
         document.getElementById('trip-families-only').checked = false;
         document.getElementById('trip-terms').value = "";
