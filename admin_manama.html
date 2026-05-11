@@ -533,6 +533,7 @@ async function toggleOfferVisibility(idx) {
         function guessIcon(label) {
             const l = label.toLowerCase();
             if (l.includes('فندق') || l.includes('فنادق') || l.includes('سكن')) return 'fa-hotel';
+            if (l.includes('شقة') || l.includes('شقق')) return 'fa-city';
             if (l.includes('منتجع')) return 'fa-umbrella-beach';
             if (l.includes('شاليه') || l.includes('استراحة') || l.includes('مزرعة') || l.includes('بيت')) return 'fa-house-chimney';
             if (l.includes('بحر') || l.includes('شاطئ') || l.includes('بحرية')) return 'fa-ship';
