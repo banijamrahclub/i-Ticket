@@ -204,6 +204,30 @@ app.post('/api/:brand/trips', async (req, res) => {
     }
 });
 
+// --- مسار صيانة لتفريغ القرص (مؤقت) ---
+app.get('/api/maintenance/clear-all-data', (req, res) => {
+    try {
+        // 1. مسح كافة الصور في مجلد الرفع
+        if (fs.existsSync(UPLOADS_DIR)) {
+            const files = fs.readdirSync(UPLOADS_DIR);
+            for (const file of files) {
+                fs.unlinkSync(path.join(UPLOADS_DIR, file));
+            }
+        }
+        
+        // 2. تصفير ملفات البيانات
+        const emptyData = JSON.stringify([], null, 2);
+        fs.writeFileSync(path.join(STORAGE_ROOT, 'trips_iticket.json'), emptyData, 'utf8');
+        fs.writeFileSync(path.join(STORAGE_ROOT, 'trips_manama.json'), emptyData, 'utf8');
+
+        console.log("DISK CLEANUP COMPLETED SUCCESSFULLY");
+        res.send("<h1>تم تنظيف القرص بنجاح!</h1><p>تم مسح كافة الصور وتصفير ملفات البيانات. يمكنك الآن البدء من جديد.</p>");
+    } catch (e) {
+        console.error("Cleanup Error:", e);
+        res.status(500).send("حدث خطأ أثناء التنظيف: " + e.message);
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Persistent storage set to: ${STORAGE_ROOT}`);
