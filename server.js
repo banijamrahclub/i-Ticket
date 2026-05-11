@@ -21,9 +21,15 @@ const filesToMigrate = ['trips_iticket.json', 'trips_manama.json', 'config.json'
 filesToMigrate.forEach(fileName => {
     const localFile = path.join(__dirname, fileName);
     const diskFile = path.join(STORAGE_ROOT, fileName);
-    if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile) && !fs.existsSync(diskFile)) {
-        console.log(`Migrating ${fileName} to persistent disk...`);
-        fs.copyFileSync(localFile, diskFile);
+    if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile)) {
+        const localStat = fs.statSync(localFile);
+        const diskExists = fs.existsSync(diskFile);
+        
+        // إذا لم يكن الملف موجوداً على القرص المستمر، أو كان الملف المرفوع أحدث من الموجود حالياً
+        if (!diskExists || localStat.mtime > fs.statSync(diskFile).mtime) {
+            console.log(`Syncing ${fileName} to persistent disk...`);
+            fs.copyFileSync(localFile, diskFile);
+        }
     }
 });
 
