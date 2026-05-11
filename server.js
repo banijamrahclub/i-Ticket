@@ -16,22 +16,30 @@ if (!fs.existsSync(UPLOADS_DIR)) {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
-// هجرة البيانات: إذا كانت هناك ملفات JSON في المجلد الحالي وليست في الديسك، انقلها
-const filesToMigrate = ['trips_iticket.json', 'trips_manama.json', 'config.json'];
-filesToMigrate.forEach(fileName => {
+// هجرة البيانات: التعامل مع الملفات بحذر لضمان عدم ضياع بيانات المستخدم
+const DATA_FILES = ['trips_iticket.json', 'trips_manama.json'];
+const CONFIG_FILE_NAME = 'config.json';
+
+// 1. ملفات البيانات (الرحلات): لا يتم استبدالها أبداً إذا كانت موجودة على القرص المستمر
+DATA_FILES.forEach(fileName => {
     const localFile = path.join(__dirname, fileName);
     const diskFile = path.join(STORAGE_ROOT, fileName);
-    if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile)) {
-        const localStat = fs.statSync(localFile);
-        const diskExists = fs.existsSync(diskFile);
-        
-        // إذا لم يكن الملف موجوداً على القرص المستمر، أو كان الملف المرفوع أحدث من الموجود حالياً
-        if (!diskExists || localStat.mtime > fs.statSync(diskFile).mtime) {
-            console.log(`Syncing ${fileName} to persistent disk...`);
-            fs.copyFileSync(localFile, diskFile);
-        }
+    if (STORAGE_ROOT !== __dirname && fs.existsSync(localFile) && !fs.existsSync(diskFile)) {
+        console.log(`Initial migration of ${fileName} to persistent disk...`);
+        fs.copyFileSync(localFile, diskFile);
     }
 });
+
+// 2. ملف الإعدادات (التصنيفات): يمكن تحديثه إذا كان الملف المرفوع أحدث (لإضافة تصنيفات جديدة)
+const localConfig = path.join(__dirname, CONFIG_FILE_NAME);
+const diskConfig = path.join(STORAGE_ROOT, CONFIG_FILE_NAME);
+if (STORAGE_ROOT !== __dirname && fs.existsSync(localConfig)) {
+    const diskExists = fs.existsSync(diskConfig);
+    if (!diskExists || fs.statSync(localConfig).mtime > fs.statSync(diskConfig).mtime) {
+        console.log(`Syncing ${CONFIG_FILE_NAME} to persistent disk...`);
+        fs.copyFileSync(localConfig, diskConfig);
+    }
+}
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(__dirname));
