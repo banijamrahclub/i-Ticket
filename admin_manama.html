@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة Manama Holidays | فنادق وشاليهات</title>
+    <script>
+        (function () {
+            if (sessionStorage.getItem('admin_pass') === '1357') return;
+            document.documentElement.style.visibility = 'hidden';
+            window.addEventListener('DOMContentLoaded', () => {
+                const overlay = document.createElement('div');
+                overlay.id = 'admin-lock-overlay';
+                overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;color:white;font-family:Cairo,sans-serif;';
+                overlay.innerHTML = `
+                    <div style="background:#111;padding:40px;border-radius:24px;border:1px solid #e02b20;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.5);max-width:400px;width:90%;">
+                        <i class="fa fa-lock" style="font-size:3rem;color:#e02b20;margin-bottom:20px;"></i>
+                        <h2 style="margin-bottom:10px;">منطقة محمية</h2>
+                        <p style="color:#888;margin-bottom:25px;">يرجى إدخال كلمة المرور للمتابعة</p>
+                        <input type="password" id="admin-pass-input" placeholder="••••" style="width:100%;padding:15px;background:#222;border:1px solid #333;border-radius:12px;color:white;text-align:center;font-size:1.5rem;letter-spacing:5px;margin-bottom:20px;outline:none;box-sizing:border-box;">
+                        <button onclick="checkAdminPass()" style="width:100%;padding:15px;background:#e02b20;color:white;border:none;border-radius:12px;font-weight:bold;cursor:pointer;font-size:1.1rem;transition:0.3s;">دخول النظام</button>
+                        <p id="lock-error" style="color:#e02b20;margin-top:15px;display:none;">كلمة المرور غير صحيحة!</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                document.documentElement.style.visibility = 'visible';
+                window.checkAdminPass = () => {
+                    const val = document.getElementById('admin-pass-input').value;
+                    if (val === '1357') {
+                        sessionStorage.setItem('admin_pass', '1357');
+                        overlay.remove();
+                    } else {
+                        document.getElementById('lock-error').style.display = 'block';
+                        document.getElementById('admin-pass-input').value = '';
+                    }
+                };
+                document.getElementById('admin-pass-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkAdminPass();
+                });
+            });
+        })();
+    </script>
+    <link rel="stylesheet" href="style.css?v=1.5">
+    <link rel="icon" type="image/png"
+        href="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0f0f0f;
+            overflow-x: auto !important;
+        }
+
+        :root {
+            --primary-red: #e02b20;
+        }
+
+        .admin-header h2 {
+            color: #e02b20;
+        }
+
+        .btn-add {
+            background: #e02b20;
+        }
+
+        .btn-add:hover {
+            background: #b01b1b;
+        }
+
+        .cat-input {
+            padding: 12px;
+            background: #222;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .trips-table-container {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            -webkit-overflow-scrolling: touch;
+            display: block;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th,
+        td {
+            padding: 20px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            color: #888;
+            font-weight: 400;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="scrolled">
+        <div class="logo">
+            <img
+                src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="manama.html">معاينة الموقع</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="admin-container" style="padding: 40px 5%; margin-top: 80px;">
+
+        <!-- Manage Categories Section -->
+        <div
+            style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #5bc0de;"><i class="fa fa-map-location-dot"></i> إدارة أنواع الخدمات
+                    والأماكن</h3>
+                <button onclick="addNewCategoryRow()"
+                    style="background: rgba(255,255,255,0.05); color: white; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;">
+                    <i class="fa fa-plus"></i> إضافة نوع جديد
+                </button>
+            </div>
+
+            <div id="categories-manage-container"
+                style="display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 20px;">
+                <!-- ستظهر التصنيفات هنا من الإعدادات -->
+            </div>
+
+            <div style="text-align: left;">
+                <button onclick="saveCategories()" id="save-cats-btn"
+                    style="background: #5bc0de; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; margin-right: auto;">
+                    <i class="fa fa-save"></i> حفظ جميع الأنواع
+                </button>
+            </div>
+        </div>
+
+        <!-- Manage Offers Slider -->
+        <div style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: #f1c40f;"><i class="fa fa-star"></i> إدارة العروض المميزة</h3>
+                <button onclick="openOfferModal()" style="background: #f1c40f; color: black; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                    <i class="fa fa-plus"></i> إضافة عرض جديد
+                </button>
+            </div>
+            
+            <div class="trips-table-container">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: right; border-bottom: 1px solid #333;">
+                            <th style="padding: 15px;">الصورة</th>
+                            <th style="padding: 15px;">العنوان</th>
+                            <th style="padding: 15px;">الحالة</th>
+                            <th style="padding: 15px;">العمليات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offers-list-tbody">
+                        <!-- ستظهر العروض هنا -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Offer Modal -->
+        <div id="offer-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+            <div style="background: #111; width: 90%; max-width: 500px; border-radius: 24px; border: 1px solid #333; overflow: hidden; animation: slideUp 0.4s ease;">
+                <div style="padding: 20px 30px; background: #1a1a1a; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="offer-modal-title" style="margin: 0; color: #f1c40f;">إضافة عرض جديد</h3>
+                    <button onclick="closeOfferModal()" style="background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div style="padding: 30px;">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">صورة العرض</label>
+                        <div id="offer-img-preview" style="width: 100%; height: 150px; background: #222; border-radius: 12px; border: 2px dashed #444; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; position: relative;" onclick="document.getElementById('offer-img-input').click()">
+                            <span id="offer-placeholder-text" style="color: #666;">اضغط لرفع صورة</span>
+                            <img id="offer-modal-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                            <input type="file" id="offer-img-input" style="display: none;" onchange="previewOfferImage(this)">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">العنوان الرئيسي</label>
+                        <input type="text" id="offer-title-input" class="cat-input" placeholder="مثال: خصم خاص على الفيلات">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">الوصف الصغير</label>
+                        <input type="text" id="offer-sub-input" class="cat-input" placeholder="مثال: استمتع بإقامة استثنائية">
+                    </div>
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">ارتباط بالرحلة</label>
+                        <select id="offer-trip-select" class="cat-input">
+                            <option value="">لا يوجد ارتباط</option>
+                        </select>
+                    </div>
+                    <button onclick="saveOfferFromModal()" style="width: 100%; padding: 15px; background: #f1c40f; color: black; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">حفظ العرض</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Description Section -->
+        <div
+            style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; display: flex; align-items: flex-end; gap: 20px;">
+            <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem;">وصف العلامة التجارية
+                    (يظهر في صفحة اختيار الموقع)</label>
+                <textarea id="brand-desc-input" placeholder="أدخل الوصف هنا..."
+                    style="width: 100%; height: 60px; background: #222; color: white; border: 1px solid #333; border-radius: 12px; padding: 12px; resize: none; font-family: Cairo; line-height: 1.4; outline: none;"></textarea>
+            </div>
+            <button onclick="saveBrandDesc()" id="save-desc-btn"
+                style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 50px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-save"></i> حفظ الوصف
+            </button>
+        </div>
+
+        <div class="admin-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2>إدارة الفنادق والشاليهات والاستراحات</h2>
+            <button class="btn-add" id="open-add-modal"
+                style="background: var(--primary-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;"><i
+                    class="fa fa-plus"></i> إضافة عقار جديد</button>
+        </div>
+
+        <div id="admin-category-filter" style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px;">
+            <!-- أزرار التصنيف ستظهر هنا -->
+        </div>
+
+        <div class="trips-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>النوع</th>
+                        <th>السعر</th>
+                        <th>المنطقة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="trips-list">
+                    <!-- البيانات ستظهر هنا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="trip-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">إضافة عقار جديد</h3>
+            <form id="trip-form">
+                <input type="hidden" id="trip-id">
+                <div class="form-group">
+                    <label>اسم العقار (فندق/شاليه/استراحة)</label>
+                    <input type="text" id="trip-name" required placeholder="مثلاً: شاليه الجبنة - الزلاق">
+                </div>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>النوع</label>
+                        <select id="trip-type">
+                            <!-- سيتم ملؤه ديناميكياً -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المنطقة (الزلاق، جزر الحوار، المحرق..)</label>
+                        <input type="text" id="trip-category" placeholder="الموقع...">
+                    </div>
+                </div>
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>مدة الإقامة (يوم/ليلة)</label>
+                        <input type="text" id="trip-duration" placeholder="مثلاً: يوم كامل">
+                    </div>
+                    <div class="form-group">
+                        <label>مواصفات العقار (مسبح، مرافق..)</label>
+                        <input type="text" id="trip-transport" placeholder="مسبح خاص، إطلالة بحر، إلخ..">
+                    </div>
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="color: var(--primary-red); font-weight: bold; margin: 0;"><i class="fa fa-clock"></i> فترات الدخول والخروج</label>
+                        <button type="button" onclick="addTimePeriod()" style="background: var(--primary-red); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">+ إضافة فترة زمنية</button>
+                    </div>
+                    <div id="time-periods-container"></div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-users"></i> عدد الأشخاص (اختياري)</label>
+                    <input type="number" id="trip-max-people" placeholder="مثلاً: 10">
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <input type="checkbox" id="trip-families-only" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="trip-families-only" style="margin: 0; cursor: pointer; color: #3b82f6; font-weight: bold;">هذا المكان مخصص للعائلات فقط</label>
+                </div>
+
+                <div class="form-group">
+                    <label>المنطقة / الدولة (الموقع)</label>
+                    <input type="text" id="trip-location" placeholder="مثلاً: المنامة، البحرين">
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #444;">
+                    <label style="color: var(--primary-red); font-weight: bold;">أسعار الرحلة (فئات متعددة)</label>
+                    <div id="price-categories-container"></div>
+                    <button type="button" onclick="addPriceCategory()" class="btn-cancel"
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
+                        <i class="fa fa-plus"></i> إضافة فئة سعر
+                    </button>
+                </div>
+
+                <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #555;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <label style="color: #f1c40f; font-weight: bold; margin: 0;"><i class="fa fa-calendar-alt"></i> أسعار الأشهر / المواسم (اختياري)</label>
+                        <button type="button" onclick="addNewSeason()" style="background: #f1c40f; color: black; border: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">+ إضافة فترة</button>
+                    </div>
+                    <div id="seasonal-prices-container"></div>
+                </div>
+
+
+                <div class="form-group"
+                    style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px dashed #e02b20;">
+                    <label style="color: #e02b20; font-weight: bold;">أقسام الصور الإضافية</label>
+                    <div id="gallery-groups-container"></div>
+                    <button type="button" onclick="addNewGalleryGroup()" class="btn-cancel"
+                        style="font-size: 0.8rem; margin-top: 10px; width: 100%; border: 1px solid #444;">
+                        <i class="fa fa-plus"></i> إضافة قسم صور جديد
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>الوصف التفصيلي (مطول)</label>
+                    <textarea id="trip-description" rows="5" placeholder="اكتب تفاصيل الرحلة أو العقار هنا..."
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-file-contract"></i> شروط الحجز والسياسات</label>
+                    <textarea id="trip-terms" rows="4" placeholder="اكتب شروط الحجز هنا (مثلاً: مبلغ التأمين، سياسة الإلغاء...)"
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa fa-circle-info"></i> التعليمات والإرشادات</label>
+                    <textarea id="trip-instructions" rows="4" placeholder="اكتب التعليمات الإضافية هنا (مثل وقت الاستلام، طريقة الدخول...)"
+                        style="width: 100%; padding: 12px; background: #222; border: 1px solid #333; border-radius: 12px; color: white; resize: vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>تسمية التميز (Badge)</label>
+                    <input type="text" id="trip-badge" placeholder="مثلاً: مميز بجوار البحر">
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px;">
+                    <input type="checkbox" id="trip-hidden" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="trip-hidden" style="margin: 0; cursor: pointer; color: #f1c40f;">إخفاء المكان/الرحلة من الموقع العام</label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="close-modal">إلغاء</button>
+                    <button type="submit" class="btn-add">حفظ البيانات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let manamaCategories = [];
+
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                if (config.manama_desc) document.getElementById('brand-desc-input').value = config.manama_desc;
+
+                manamaCategories = config.manama_categories || [
+                    { id: 'hotels', label: 'فنادق', icon: 'fa-hotel' },
+                    { id: 'resorts', label: 'منتجع', icon: 'fa-umbrella-beach' },
+                    { id: 'chalets', label: 'شاليهات', icon: 'fa-house-chimney' },
+                    { id: 'rest_houses', label: 'استراحات', icon: 'fa-tree' },
+                    { id: 'jacuzzi', label: 'جاكوزي', icon: 'fa-hot-tub-person' },
+                    { id: 'romantic_dinner', label: 'عشاء رومانسي', icon: 'fa-utensils' },
+                    { id: 'sea_trips', label: 'رحلات بحرية', icon: 'fa-ship' },
+                    { id: 'horse_riding', label: 'ركوب الخيل', icon: 'fa-horse' },
+                    { id: 'limo', label: 'ليموزين', icon: 'fa-car-side' },
+                    { id: 'coordination', label: 'تنسيق', icon: 'fa-cake-candles' }
+                ];
+                window.manamaCategories = manamaCategories; // Expose for admin.js
+                
+                manamaOffers = config.manama_offers || [];
+                renderCategoryManagement();
+                renderOffersManagement();
+                populateTypeDropdown();
+                if (typeof window.renderAdminCategoryFilter === 'function') window.renderAdminCategoryFilter();
+            } catch (e) { console.error(e); }
+        }
+
+        let manamaOffers = [];
+        let editingOfferIdx = null;
+
+        function renderOffersManagement() {
+            const tbody = document.getElementById('offers-list-tbody');
+            if(!tbody) return;
+            
+            tbody.innerHTML = manamaOffers.length === 0 ? `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">لا توجد عروض مضافة حالياً</td></tr>` : 
+            manamaOffers.map((off, idx) => `
+                <tr style="border-bottom: 1px solid #222;">
+                    <td style="padding: 12px;"><img src="${off.image}" style="width:60px; height:40px; object-fit:cover; border-radius:6px;"></td>
+                    <td style="padding: 12px; color:white;">${off.title || 'بدون عنوان'}</td>
+                    <td style="padding: 12px;">
+                        <button onclick="toggleOfferVisibility(${idx})" style="background:none; border:none; color:${off.hidden ? '#888' : '#2ecc71'}; cursor:pointer; margin-left:10px;" title="${off.hidden ? 'إظهار' : 'إخفاء'}">
+                            <i class="fa ${off.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i> 
+                            <span style="font-size:0.85rem; margin-right:5px;">${off.hidden ? 'مخفي' : 'ظاهر'}</span>
+                        </button>
+                    </td>
+                    <td style="padding: 12px;">
+                        <button onclick="openOfferModal(${idx})" style="background:none; border:none; color:#f1c40f; cursor:pointer; margin-left:10px;"><i class="fa fa-edit"></i> تعديل</button>
+                        <button onclick="deleteOffer(${idx})" style="background:none; border:none; color:#e74c3c; cursor:pointer;"><i class="fa fa-trash"></i> حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+}
+
+async function toggleOfferVisibility(idx) {
+    manamaOffers[idx].hidden = !manamaOffers[idx].hidden;
+    await syncOffersWithServer();
+}
+
+        function getTripName(id) {
+            if(!id) return 'لا يوجد';
+            const trip = (window.allTrips || []).find(t => t.id == id);
+            return trip ? trip.name : 'عقار محذوف';
+        }
+
+        function openOfferModal(idx = null) {
+            editingOfferIdx = idx;
+            const modal = document.getElementById('offer-modal');
+            const title = document.getElementById('offer-modal-title');
+            const select = document.getElementById('offer-trip-select');
+            
+            // Populate Trip Dropdown
+            select.innerHTML = '<option value="">لا يوجد ارتباط</option>' + 
+                (window.allTrips || []).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+            if(idx !== null) {
+                const off = manamaOffers[idx];
+                title.innerText = 'تعديل العرض';
+                document.getElementById('offer-title-input').value = off.title || '';
+                document.getElementById('offer-sub-input').value = off.subtitle || '';
+                document.getElementById('offer-trip-select').value = off.tripId || '';
+                document.getElementById('offer-modal-img').src = off.image;
+                document.getElementById('offer-modal-img').style.display = 'block';
+                document.getElementById('offer-placeholder-text').style.display = 'none';
+            } else {
+                title.innerText = 'إضافة عرض جديد';
+                document.getElementById('offer-title-input').value = '';
+                document.getElementById('offer-sub-input').value = '';
+                document.getElementById('offer-trip-select').value = '';
+                document.getElementById('offer-modal-img').style.display = 'none';
+                document.getElementById('offer-placeholder-text').style.display = 'block';
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeOfferModal() {
+            document.getElementById('offer-modal').style.display = 'none';
+        }
+
+        function previewOfferImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('offer-modal-img');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('offer-placeholder-text').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function saveOfferFromModal() {
+            const title = document.getElementById('offer-title-input').value.trim();
+            const sub = document.getElementById('offer-sub-input').value.trim();
+            const tripId = document.getElementById('offer-trip-select').value;
+            const img = document.getElementById('offer-modal-img').src;
+
+            if(!img || img.includes('placeholder')) return alert('يرجى اختيار صورة للعرض');
+            if(!title) return alert('يرجى إدخال عنوان للعرض');
+
+            const offerData = { image: img, title, subtitle: sub, tripId };
+
+            if(editingOfferIdx !== null) {
+                manamaOffers[editingOfferIdx] = offerData;
+            } else {
+                manamaOffers.push(offerData);
+            }
+
+            await syncOffersWithServer();
+            closeOfferModal();
+        }
+
+        async function deleteOffer(idx) {
+            if(!confirm('هل أنت متأكد من حذف هذا العرض؟')) return;
+            manamaOffers.splice(idx, 1);
+            await syncOffersWithServer();
+        }
+
+        async function syncOffersWithServer() {
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manama_offers: manamaOffers })
+                });
+                if (res.ok) {
+                    renderOffersManagement();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function guessIcon(label) {
+            const l = label.toLowerCase();
+            if (l.includes('فندق') || l.includes('فنادق') || l.includes('سكن')) return 'fa-hotel';
+            if (l.includes('شقة') || l.includes('شقق')) return 'fa-city';
+            if (l.includes('منتجع')) return 'fa-umbrella-beach';
+            if (l.includes('شاليه') || l.includes('استراحة') || l.includes('مزرعة') || l.includes('بيت')) return 'fa-house-chimney';
+            if (l.includes('بحر') || l.includes('شاطئ') || l.includes('بحرية')) return 'fa-ship';
+            if (l.includes('جاكوزي') || l.includes('مسبح')) return 'fa-hot-tub-person';
+            if (l.includes('عشاء') || l.includes('مطعم')) return 'fa-utensils';
+            if (l.includes('خيل') || l.includes('ركوب')) return 'fa-horse';
+            if (l.includes('طيران')) return 'fa-plane';
+            if (l.includes('عرض') || l.includes('عروض')) return 'fa-tags';
+            if (l.includes('تأشير') || l.includes('فيزا')) return 'fa-stamp';
+            if (l.includes('سارة') || l.includes('ليموزين') || l.includes('توصيل')) return 'fa-car-side';
+            if (l.includes('تنسيق') || l.includes('ترتيب') || l.includes('حفلة')) return 'fa-cake-candles';
+            return 'fa-location-dot';
+        }
+
+        function renderCategoryManagement() {
+            const container = document.getElementById('categories-manage-container');
+            if (!container) return;
+            container.innerHTML = `
+                <div style="color: #888; font-size: 0.8rem;">اسم النوع</div>
+                <div></div>
+            ` + manamaCategories.map((cat, idx) => `
+                <div style="position:relative;">
+                    <input type="text" class="cat-label cat-input" value="${cat.label}" placeholder="مثال: شاليهات فاخرة">
+                    <input type="hidden" class="cat-id" value="${cat.id}">
+                    <input type="hidden" class="cat-icon" value="${cat.icon || 'fa-location-dot'}">
+                </div>
+                <button onclick="removeCategoryRow(${idx})" style="background:rgba(231, 76, 60, 0.1); color:#e74c3c; border:none; border-radius:12px; padding:0 20px; cursor:pointer;"><i class="fa fa-trash"></i></button>
+            `).join('');
+        }
+
+        function removeCategoryRow(idx) {
+            if (manamaCategories.length <= 1) return alert('يجب وجود نوع واحد على الأقل');
+            manamaCategories.splice(idx, 1);
+            renderCategoryManagement();
+        }
+
+        async function saveCategories() {
+            const btn = document.getElementById('save-cats-btn');
+            const labels = document.querySelectorAll('.cat-label');
+            const ids = document.querySelectorAll('.cat-id');
+            const icons = document.querySelectorAll('.cat-icon');
+
+            const updatedCats = [];
+            for (let i = 0; i < labels.length; i++) {
+                let label = labels[i].value.trim();
+                if (!label) continue;
+                let id = ids[i].value || 'mc_' + Math.random().toString(36).substr(2, 9);
+                let icon = icons[i].value;
+                if (!icon || icon === 'fa-location-dot') {
+                    icon = guessIcon(label);
+                }
+                updatedCats.push({ label, id, icon });
+            }
+
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manama_categories: updatedCats })
+                });
+                if (res.ok) {
+                    alert('تم الحفظ بنجاح');
+                    manamaCategories = updatedCats;
+                    renderCategoryManagement();
+                    populateTypeDropdown();
+                }
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        function populateTypeDropdown() {
+            const select = document.getElementById('trip-type');
+            if (!select) return;
+            select.innerHTML = manamaCategories.map(cat => `<option value="${cat.id}">${cat.label}</option>`).join('');
+            window.manamaCategories = manamaCategories; // For admin.js access
+        }
+
+        async function saveBrandDesc() {
+            const btn = document.getElementById('save-desc-btn');
+            const desc = document.getElementById('brand-desc-input').value;
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ manama_desc: desc })
+                });
+                if (res.ok) alert('تم حفظ الوصف بنجاح');
+            } catch (e) { alert(e); }
+            finally { btn.disabled = false; }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
+
+    <script>window.BRAND = 'manama';</script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

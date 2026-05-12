@@ -1,0 +1,106 @@
+[
+  {
+    "id": "1776272244265",
+    "name": "رحلة تركيا",
+    "type": "group_trips",
+    "category": "اذربيجان",
+    "location": "اسطنبول",
+    "price": "120",
+    "prices": [
+      {
+        "label": "السعر الأساسي",
+        "value": "120"
+      }
+    ],
+    "duration": "21",
+    "transport": "طيران مباشر",
+    "description": "",
+    "images": [
+      "/uploads/img_iticket_1776272244265_0_1776272244612.jpg",
+      "/uploads/img_iticket_1776272244265_1_1776272244694.png",
+      "/uploads/img_iticket_1776272244265_2_1776272244714.jpg",
+      "/uploads/img_iticket_1776272244265_3_1776272244715.jpg",
+      "/uploads/img_iticket_1776272244265_4_1776272244716.jpg",
+      "/uploads/img_iticket_1776272244265_5_1776272244720.jpg",
+      "/uploads/img_iticket_1776272244265_6_1776272244721.jpg",
+      "/uploads/img_iticket_1776272244265_7_1776272244723.png",
+      "/uploads/img_iticket_1776272244265_8_1776272244725.png"
+    ],
+    "image": "/uploads/img_iticket_1776272244265_0_1776272244612.jpg",
+    "badge": "",
+    "gallery_groups": [
+      {
+        "label": "صور الرحلة",
+        "images": [
+          "/uploads/img_iticket_1776272244265_0_1776272244612.jpg",
+          "/uploads/img_iticket_1776272244265_1_1776272244694.png",
+          "/uploads/img_iticket_1776272244265_2_1776272244714.jpg",
+          "/uploads/img_iticket_1776272244265_3_1776272244715.jpg",
+          "/uploads/img_iticket_1776272244265_4_1776272244716.jpg",
+          "/uploads/img_iticket_1776272244265_5_1776272244720.jpg",
+          "/uploads/img_iticket_1776272244265_6_1776272244721.jpg",
+          "/uploads/img_iticket_1776272244265_7_1776272244723.png",
+          "/uploads/img_iticket_1776272244265_8_1776272244725.png"
+        ]
+      }
+    ],
+    "seasonal_prices": [],
+    "hidden": false,
+    "timePeriods": [
+      {
+        "label": "المساء",
+        "checkIn": "19:13",
+        "checkOut": "19:16"
+      },
+      {
+        "label": "صباح",
+        "checkIn": "19:15",
+        "checkOut": "19:19"
+      }
+    ],
+    "maxPeople": "",
+    "familiesOnly": false,
+    "terms": "nkj.kjn",
+    "instructions": "jkhlon"
+  },
+  {
+    "id": "1776415978395",
+    "name": "النمسا - زيارة فيينا",
+    "type": "individual_trips",
+    "category": "اذربيجان",
+    "price": "120",
+    "prices": [
+      {
+        "label": "السعر الأساسي",
+        "value": "120"
+      }
+    ],
+    "duration": "21",
+    "transport": "طيران مباشر",
+    "description": "",
+    "images": [],
+    "image": "",
+    "badge": "",
+    "hidden": false
+  },
+  {
+    "id": "1776416019962",
+    "name": "شاليه",
+    "type": "group_trips",
+    "category": "اذربيجان",
+    "price": "120",
+    "prices": [
+      {
+        "label": "السعر الأساسي",
+        "value": "120"
+      }
+    ],
+    "duration": "9",
+    "transport": "ممتاز",
+    "description": "",
+    "images": [],
+    "image": "",
+    "badge": "",
+    "hidden": false
+  }
+]

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">تفاصيل الرحلة | i Ticket & Manama Holidays</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Outfit:wght@300;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e63946;
+            --soft-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-dark: #222222;
+            --text-gray: #666666;
+            --light-border: #eeeeee;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--soft-bg);
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .trip-detail-container {
+            max-width: 1000px;
+            margin: 100px auto 50px;
+            padding: 0 20px;
+        }
+
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
+            height: 500px;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            background: #fdfdfd;
+        }
+
+        .carousel-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: fadeEffect 0.5s;
+        }
+
+        @keyframes fadeEffect {
+            from { opacity: 0.4 }
+            to { opacity: 1 }
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f9f9f9;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            color: #222;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.5rem;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary-red);
+            color: #fff;
+        }
+
+        .prev-btn { right: 20px; }
+        .next-btn { left: 20px; }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .dot.active {
+            background-color: var(--primary-red);
+            width: 25px;
+            border-radius: 5px;
+        }
+
+        .trip-title-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(255, 255, 255, 0.95));
+            padding: 40px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .trip-title {
+            font-size: 2.2rem;
+            margin: 0;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+
+        .trip-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .trip-info-card {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 24px;
+            border: 1px solid var(--light-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-item i {
+            color: var(--primary-red);
+            font-size: 1.5rem;
+            width: 30px;
+        }
+
+        .price-list-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            border: 2px solid var(--primary-red);
+            position: sticky;
+            top: 100px;
+            box-shadow: 0 15px 40px rgba(230, 57, 70, 0.08);
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .price-row:last-child { border-bottom: none; }
+        .p-label { color: var(--text-gray); font-size: 1.05rem; }
+        .p-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-red); }
+
+        .book-btn {
+            background: #25d366;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .book-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2); }
+
+        header.scrolled {
+            background: #ffffff !important;
+            border-bottom: 2px solid var(--primary-red) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header.scrolled .logo span, 
+        header.scrolled .logo b {
+            color: #1a1a1a !important;
+        }
+
+        #header-logo {
+            border: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .trip-grid { grid-template-columns: 1fr; }
+            .carousel-container { height: 350px; margin-bottom: 25px; }
+            .trip-title { font-size: 1.6rem; }
+            .trip-detail-container { margin-top: 80px; padding: 0 15px; }
+            .trip-info-card, .price-list-box { padding: 20px !important; }
+            .info-grid { grid-template-columns: 1fr !important; }
+            .info-item[style*="grid-column: span 2"] { grid-column: span 1 !important; }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="scrolled" id="main-header">
+        <div class="logo">
+            <a href="/" id="header-link"
+                style="text-decoration: none; color: white; display: flex; align-items: center;">
+                <img id="header-logo" src="/uploads/iticket-logo.png">
+                <span id="header-name" class="outfit">i <b>Ticket</b></span>
+            </a>
+        </div>
+    </header>
+
+    <div class="trip-detail-container">
+        <a href="/" id="back-btn" class="back-link"
+            style="color: var(--text-gray); text-decoration: none; margin-bottom: 20px; display: inline-block;">
+            <i class="fa fa-arrow-right"></i> العودة للرئيسية
+        </a>
+
+        <div id="trip-content">
+            <p style="text-align: center;">جاري التحميل...</p>
+        </div>
+    </div>
+
+    <script>
+        let slideIndex = 1;
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("carousel-slide");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            if (slides.length > 0) {
+                slides[slideIndex - 1].style.display = "block";
+                dots[slideIndex - 1].className += " active";
+            }
+        }
+
+        window.plusSlides = (n) => showSlides(slideIndex += n);
+        window.currentSlide = (n) => showSlides(slideIndex = n);
+
+        async function loadTripDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const tripId = params.get('id');
+            const brand = params.get('brand') || 'iticket';
+
+            // تحديث الثيم
+            let currentCategories = [];
+            try {
+                const configRes = await fetch('/api/config');
+                const config = await configRes.json();
+                currentCategories = brand === 'manama' ? (config.manama_categories || []) : (config.iticket_categories || []);
+            } catch(e) {}
+
+            function getCategoryLabel(type) {
+                const cat = currentCategories.find(c => c.id === type);
+                return cat ? cat.label : type;
+            }
+
+            if (brand === 'manama') {
+                document.documentElement.style.setProperty('--primary-red', '#e02b20');
+                document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/Screenshot%202026-03-03%20001253.png';
+                document.getElementById('header-name').style.display = 'none';
+                document.getElementById('header-link').href = '/manama';
+                document.getElementById('back-btn').href = '/manama';
+            } else {
+                document.getElementById('header-logo').src = 'https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/574253881_18532941568039264_5622425311968020289_n.jpg';
+                document.getElementById('header-name').style.display = 'none';
+                document.getElementById('header-link').href = '/iticket';
+                document.getElementById('back-btn').href = '/iticket';
+            }
+
+            if (!tripId) return;
+
+            try {
+                const response = await fetch(`/api/${brand}/trips`);
+                const allTrips = await response.json();
+                const trip = allTrips.find(t => t.id.toString() === tripId);
+
+                if (!trip || (trip.hidden && !params.get('preview'))) {
+                    document.getElementById('trip-content').innerHTML = `
+                        <div style="text-align: center; padding: 50px;">
+                            <h2 style="color: var(--primary-red);">عذراً، هذا العرض غير متاح حالياً</h2>
+                            <p>تم إخفاء هذا المكان أو العرض مؤقتاً من قبل الإدارة.</p>
+                            <a href="/${brand}" style="color: var(--primary-red); font-weight: bold; text-decoration: none; border-bottom: 2px solid;">العودة لصفحة العروض</a>
+                        </div>
+                    `;
+                    return;
+                }
+                window.currentTripData = trip;
+
+                const imgs = trip.images && trip.images.length > 0 ? trip.images : (trip.image ? [trip.image] : []);
+                const prices = trip.prices && trip.prices.length > 0 ? trip.prices : [{ label: 'السعر', value: trip.price }];
+                const seasonalPrices = trip.seasonal_prices || [];
+
+                let galleryHtml = '';
+                if (trip.gallery_groups && trip.gallery_groups.length > 0) {
+                    galleryHtml = `
+                        <div class="gallery-explorer" id="gallery-explorer">
+                            <div class="gallery-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h3 id="gallery-view-title" style="color: var(--primary-red); margin: 0; font-size: 1.6rem; border-right: 5px solid var(--primary-red); padding-right: 15px;">اكتشف المرافق والخدمات</h3>
+                                <button id="btn-show-all" onclick="resetGalleryView()" style="display: none; background: #f5f5f5; border: 1px solid #ddd; padding: 8px 20px; border-radius: 12px; cursor: pointer; font-family: Cairo; font-weight: 700;">عرض كافة الأقسام <i class="fa fa-th-large"></i></button>
+                            </div>
+                            
+                            <!-- Grid of Categories -->
+                            <div class="category-grid" id="category-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                                ${trip.gallery_groups.map((group, gIdx) => `
+                                    <div class="cat-viewer-card" id="cat-card-${gIdx}" style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; cursor: pointer;" onclick="filterToCategory(${gIdx})">
+                                        <div class="cat-mini-carousel" style="height: 220px; position: relative;">
+                                            <img id="group-img-${gIdx}" src="${group.images[0]}" style="width: 100%; height: 100%; object-fit: cover; transition: 0.5s;" onerror="this.src='/placeholder.jpg'">
+                                            
+                                            ${group.images.length > 1 ? `
+                                                <button class="mini-arr next" onclick="event.stopPropagation(); changeGroupImg(${gIdx}, 1)">❯</button>
+                                                <button class="mini-arr prev" onclick="event.stopPropagation(); changeGroupImg(${gIdx}, -1)">❮</button>
+                                                <div class="mini-counter" id="group-counter-${gIdx}">1 / ${group.images.length}</div>
+                                            ` : ''}
+                                        </div>
+                                        <div class="cat-label-bar" style="padding: 15px 20px; font-weight: 800; text-align: center; color: #1a1a1a; font-size: 1.1rem;">
+                                            ${group.label || (gIdx === 0 ? 'صور مميزة' : 'صور إضافية')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <!-- Expanded Category View -->
+                            <div id="expanded-view" style="display: none;">
+                                <div id="category-details-box" style="background: #f9f9f9; padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 1px solid #eee;">
+                                    <h4 style="margin: 0 0 10px; color: var(--primary-red); font-size: 1.3rem;" id="cat-detail-label"></h4>
+                                    <p id="cat-detail-desc" style="color: #666; line-height: 1.6; margin-bottom: 15px;"></p>
+                                    <div id="cat-detail-people" style="margin-bottom: 15px; font-weight: 700; color: #444; display: none; align-items: center; gap: 8px;"></div>
+                                    <div id="cat-detail-prices" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                                </div>
+                                <div class="expanded-grid" id="expanded-images-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px;">
+                                    <!-- الصور المكبرة ستظهر هنا -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <style>
+                            .mini-arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; transition: 0.3s; z-index: 10; font-size: 12px; }
+                            .mini-arr:hover { background: var(--primary-red); }
+                            .mini-arr.next { right: 10px; }
+                            .mini-arr.prev { left: 10px; }
+                            .mini-counter { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+                            .cat-viewer-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+                            .cat-viewer-card { transition: 0.4s ease; }
+                            .season-tab { padding: 10px 20px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.3s; }
+                            .season-tab.active { background: var(--primary-red); color: white; border-color: var(--primary-red); }
+                        </style>
+                    `;
+
+                    // Logic to stay accessible
+                    window.groupImgIndices = trip.gallery_groups.map(() => 0);
+                    window.changeGroupImg = (gIdx, delta) => {
+                        const group = trip.gallery_groups[gIdx];
+                        let newIdx = window.groupImgIndices[gIdx] + delta;
+                        if (newIdx < 0) newIdx = group.images.length - 1;
+                        if (newIdx >= group.images.length) newIdx = 0;
+                        window.groupImgIndices[gIdx] = newIdx;
+                        document.getElementById(`group-img-${gIdx}`).src = group.images[newIdx];
+                        document.getElementById(`group-counter-${gIdx}`).innerText = `${newIdx + 1} / ${group.images.length}`;
+                    };
+
+                    window.filterToCategory = (gIdx) => {
+                        const group = trip.gallery_groups[gIdx];
+                        document.getElementById('category-grid').style.display = 'none';
+                        document.getElementById('expanded-view').style.display = 'block';
+                        document.getElementById('btn-show-all').style.display = 'block';
+                        document.getElementById('gallery-view-title').innerText = group.label || (gIdx === 0 ? 'صور مميزة' : 'صور إضافية');
+                        
+                        window.activeCategoryName = group.label; // Store for WhatsApp message
+
+                        // Set Details
+                        document.getElementById('cat-detail-label').innerText = group.label || 'تفاصيل المرافق';
+                        document.getElementById('cat-detail-desc').innerText = group.description || 'لا يوجد وصف متاح لهذا القسم حالياً.';
+                        
+                        const peopleContainer = document.getElementById('cat-detail-people');
+                        if (group.maxPeople) {
+                            peopleContainer.style.display = 'flex';
+                            peopleContainer.innerHTML = `<i class="fa fa-users" style="color: var(--primary-red);"></i> السعة: ${group.maxPeople} أشخاص`;
+                        } else {
+                            peopleContainer.style.display = 'none';
+                        }
+                        
+                        const priceContainer = document.getElementById('cat-detail-prices');
+                        let groupPricesHtml = '';
+                        if (group.prices && group.prices.length > 0) {
+                            groupPricesHtml = group.prices.map(p => `
+                                <div style="background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--primary-red); font-weight: 800; min-width: 100px; text-align: center;">
+                                    <span style="color: #666; font-size: 0.85rem; display: block;">${p.label}</span>
+                                    <span style="color: var(--primary-red); font-size: 1.2rem;">${p.value} دينار</span>
+                                </div>
+                            `).join('');
+                        } else {
+                            groupPricesHtml = '<span style="color: #999; font-size: 0.9rem;">يتبع الأسعار الأساسية للرحلة</span>';
+                        }
+
+                        let groupSeasonalHtml = '';
+                        if (group.seasonal_prices && group.seasonal_prices.length > 0) {
+                            groupSeasonalHtml = `
+                                <div style="width: 100%; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                                    <h5 style="margin: 0 0 10px; color: #555; font-size: 1rem;"><i class="fa fa-calendar-days"></i> أسعار الأشهر لهذا النوع:</h5>
+                                    <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+                                        ${group.seasonal_prices.map((s, si) => `
+                                            <div style="min-width: 140px; background: white; padding: 12px; border-radius: 15px; border: 1px solid #e0e0e0; box-shadow: 0 4px 10px rgba(0,0,0,0.02); text-align: center;">
+                                                <div style="font-size: 0.8rem; color: #888; margin-bottom: 5px; font-weight: 600;">${s.label}</div>
+                                                ${s.prices.map(p => `
+                                                    <div style="font-size: 1.1rem; font-weight: 800; color: var(--primary-red);">${p.value} <span style="font-size:0.7rem;">د.ب</span></div>
+                                                    <div style="font-size: 0.7rem; color: #666; border-top: 1px solid #f5f5f5; margin-top:3px; padding-top:3px;">${p.label}</div>
+                                                `).join('')}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        priceContainer.innerHTML = `<div style="display: flex; gap: 10px; flex-wrap: wrap;">${groupPricesHtml}</div>${groupSeasonalHtml}`;
+
+                        const grid = document.getElementById('expanded-images-grid');
+                        grid.innerHTML = group.images.map(img => `
+                            <div style="border-radius: 20px; overflow: hidden; height: 300px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer;" onclick="window.open('${img}', '_blank')">
+                                <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        `).join('');
+                        
+                        document.getElementById('gallery-explorer').scrollIntoView({ behavior: 'smooth' });
+                    };
+
+                    window.resetGalleryView = () => {
+                        document.getElementById('category-grid').style.display = 'grid';
+                        document.getElementById('expanded-view').style.display = 'none';
+                        document.getElementById('btn-show-all').style.display = 'none';
+                        document.getElementById('gallery-view-title').innerText = 'اكتشف المرافق والخدمات';
+                        window.activeCategoryName = null; // Clear category for WhatsApp
+                    };
+
+                } else {
+                    galleryHtml = `
+                        <div class="carousel-container">
+                            ${imgs.map(img => `
+                                <div class="carousel-slide">
+                                    <img src="${img}" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop'">
+                                </div>
+                            `).join('')}
+
+                            <button class="carousel-btn prev-btn" onclick="plusSlides(1)">❯</button>
+                            <button class="carousel-btn next-btn" onclick="plusSlides(-1)">❮</button>
+
+                            <div class="carousel-indicators">
+                                ${imgs.map((_, i) => `<span class="dot" onclick="currentSlide(${i + 1})"></span>`).join('')}
+                            </div>
+
+                            <div class="trip-title-overlay">
+                                <div style="font-size: 0.95rem; color: var(--primary-red); font-weight: 800; margin-bottom: 5px; letter-spacing: 1px;">${trip.category || ''}</div>
+                                <h1 class="trip-title">${trip.name}</h1>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Seasonal Prices Logic
+                let seasonalHtml = '';
+                if (seasonalPrices.length > 0) {
+                    seasonalHtml = `
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="color: var(--primary-red); margin-bottom: 15px; font-size: 1.4rem;"><i class="fa fa-calendar-alt"></i> اختر الفترة الزمنية لرؤية الأسعار:</h3>
+                            <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
+                                <button class="season-tab active" onclick="switchSeason(this, -1)">الأسعار الحالية</button>
+                                ${seasonalPrices.map((s, idx) => `
+                                    <button class="season-tab" onclick="switchSeason(this, ${idx})">${s.label}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    window.switchSeason = (btn, sIdx) => {
+                        document.querySelectorAll('.season-tab').forEach(t => t.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        const targetPrices = sIdx === -1 ? prices : seasonalPrices[sIdx].prices;
+                        const priceContainer = document.getElementById('main-prices-list');
+                        priceContainer.innerHTML = targetPrices.map(p => `
+                            <div class="price-row">
+                                <span class="p-label">${p.label}</span>
+                                <span class="p-value">${p.value} دينار</span>
+                            </div>
+                        `).join('');
+                    };
+                }
+
+                document.getElementById('trip-content').innerHTML = `
+                    ${galleryHtml}
+
+                    <div class="trip-grid" style="margin-top: 40px;">
+                        <div class="trip-info-card">
+                            <h1 class="trip-title" style="margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">${trip.name}</h1>
+                            
+                            ${seasonalHtml}
+
+                            <h2 style="margin-top:0; border-bottom: 2px solid #f5f5f5; padding-bottom:15px; font-size: 1.5rem;">تفاصيل ومعلومات</h2>
+                            
+                            <div class="info-grid">
+                                <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                    <i class="fa-solid fa-calendar-days" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                    <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">المدة</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.duration}</div></div>
+                                </div>
+                                <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                    <i class="fa-solid ${brand === 'manama' ? 'fa-hotel' : 'fa-plane'}" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                    <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">${brand === 'manama' ? 'المواصفات' : 'وسائل النقل'}</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.transport || 'متوفر'}</div></div>
+                                </div>
+                                ${trip.maxPeople ? `
+                                <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                    <i class="fa-solid fa-users" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                    <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">السعة</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.maxPeople} أشخاص</div></div>
+                                </div>
+                                ` : ''}
+                                ${trip.location ? `
+                                <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                    <i class="fa-solid fa-map-marker-alt" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                    <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">الموقع</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.location}</div></div>
+                                </div>
+                                ` : ''}
+                                ${trip.timePeriods && trip.timePeriods.length > 0 ? 
+                                    trip.timePeriods.map(period => `
+                                    <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0; grid-column: span 2; display: flex; flex-direction: column; align-items: flex-start;">
+                                        <div style="color: var(--primary-red); font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; width: 100%; border-bottom: 1px solid #f5f5f5; padding-bottom: 5px;">
+                                            <i class="fa-solid fa-clock"></i> ${period.label || 'الفترة الزمنية'}
+                                        </div>
+                                        <div style="display: flex; gap: 20px; width: 100%;">
+                                            ${period.checkIn ? `<div><div style="color: var(--text-gray); font-size: 0.75rem; font-weight: 600;">الدخول</div><div style="font-weight: 700; font-size: 0.95rem; color: #2ecc71;">${period.checkIn}</div></div>` : ''}
+                                            ${period.checkOut ? `<div><div style="color: var(--text-gray); font-size: 0.75rem; font-weight: 600;">الخروج</div><div style="font-weight: 700; font-size: 0.95rem; color: #e63946;">${period.checkOut}</div></div>` : ''}
+                                        </div>
+                                    </div>
+                                    `).join('') 
+                                : `
+                                    ${trip.checkIn ? `
+                                    <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                        <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">الدخول</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.checkIn}</div></div>
+                                    </div>
+                                    ` : ''}
+                                    ${trip.checkOut ? `
+                                    <div class="info-item" style="background: #fff; padding: 15px; border-radius: 15px; border: 1px solid #f0f0f0;">
+                                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.2rem; color: var(--primary-red);"></i>
+                                        <div><div style="color: var(--text-gray); font-size: 0.8rem; font-weight: 600;">الخروج</div><div style="font-weight: 700; font-size: 0.95rem;">${trip.checkOut}</div></div>
+                                    </div>
+                                    ` : ''}
+                                `}
+                            </div>
+
+                            ${trip.familiesOnly ? `
+                            <div style="margin-bottom: 20px; background: rgba(227, 30, 36, 0.1); padding: 12px 20px; border-radius: 15px; color: var(--primary-red); font-weight: bold; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(227, 30, 36, 0.2);">
+                                <div style="background: var(--primary-red); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-user-group" style="font-size: 0.9rem;"></i>
+                                </div>
+                                للعائلات فقط
+                            </div>
+                            ` : ''}
+
+                            <div class="info-item">
+                                <i class="fa-solid fa-tag"></i>
+                                <div><div style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600;">النوع</div><div style="font-weight: 700;">${getCategoryLabel(trip.type)}</div></div>
+                            </div>
+
+                            <button onclick="openTermsModal()" style="width: 100%; margin: 20px 0; background: #fff; border: 2px solid #eee; padding: 15px; border-radius: 15px; font-family: Cairo; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: 0.3s; color: #444;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <i class="fa-solid fa-file-shield" style="color: var(--primary-red); font-size: 1.2rem;"></i>
+                                    شروط الحجز والسياسات
+                                </div>
+                                <i class="fa-solid fa-chevron-left" style="font-size: 0.8rem; color: #ccc;"></i>
+                            </button>
+
+                            ${trip.description ? `
+                                <div style="margin-top: 30px; border-top: 2px solid #f5f5f5; padding-top: 25px;">
+                                    <h3 style="color: var(--primary-red); margin-bottom: 15px; font-size: 1.3rem;">
+                                        <i class="fa-solid fa-circle-info"></i> 
+                                        ${brand === 'manama' ? 'عن المكان' : 'عن الرحلة'}
+                                    </h3>
+                                    <div style="white-space: pre-line; color: #444; font-size: 1.1rem; line-height: 1.8;">${trip.description}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="price-list-box">
+                            <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 1.3rem;">قائمة الأسعار</h3>
+                            <div id="main-prices-list">
+                                ${prices.map(p => `
+                                    <div class="price-row">
+                                        <span class="p-label">${p.label}</span>
+                                        <span class="p-value">${p.value} <span style="font-size: 0.9rem; color: #666;">دينار</span></span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <button class="book-btn" onclick="bookNow('${trip.name}', '${brand}')">
+                                <i class="fa-brands fa-whatsapp"></i> احجز الآن عبر واتساب
+                            </button>
+                            <p style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 15px;">* سيتم الرد عليكم فوراً لتأكيد الحجز</p>
+                        </div>
+                    </div>
+                `;
+                showSlides(1);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('trip-content').innerHTML = '<h2>حدث خطأ أثناء تحميل البيانات</h2>';
+            }
+        }
+
+        function bookNow(packageName, brand) {
+            const phone = brand === 'manama' ? '97313313100' : '97317550054';
+            let finalName = packageName;
+            if (window.activeCategoryName) {
+                finalName += ` (${window.activeCategoryName})`;
+            }
+            const message = `السلام عليكم، أرغب في حجز: ${finalName}\nالرابط: ${window.location.href}`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        window.openTermsModal = () => {
+            const trip = window.currentTripData;
+            if(!trip) {
+                console.error("No trip data found");
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.id = "terms-modal";
+            modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); transition: 0.3s; padding: 20px;";
+            modal.onclick = () => modal.remove();
+            
+            const content = document.createElement('div');
+            content.style = "background:white; width:100%; max-width:500px; border-radius:25px; padding:30px; position:relative; max-height:80vh; overflow-y:auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5);";
+            content.onclick = (e) => e.stopPropagation();
+            
+            content.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
+                    <h3 style="margin:0; font-size:1.4rem; color:var(--primary-red); font-family: Cairo;"><i class="fa fa-file-contract"></i> شروط الحجز</h3>
+                    <button onclick="this.closest('#terms-modal').remove()" style="background:none; border:none; font-size:2rem; cursor:pointer; color:#999; line-height:1;">&times;</button>
+                </div>
+                <div style="white-space:pre-line; color:#444; line-height:1.8; font-size:1.1rem; font-family: Cairo; text-align: right;" dir="rtl">
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 800; color: var(--primary-red); margin-bottom: 5px;"><i class="fa fa-file-contract"></i> شروط الحجز والسياسات:</div>
+                        ${trip.terms || 'لا توجد شروط حجز محددة لهذه الرحلة حالياً.'}
+                    </div>
+                    
+                    ${trip.instructions ? `
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ddd;">
+                        <div style="font-weight: 800; color: var(--primary-red); margin-bottom: 5px;"><i class="fa fa-circle-info"></i> التعليمات والإرشادات:</div>
+                        ${trip.instructions}
+                    </div>
+                    ` : ''}
+                </div>
+                <button onclick="this.closest('#terms-modal').remove()" style="width:100%; margin-top:25px; background:var(--primary-red); color:white; border:none; padding:15px; border-radius:15px; font-family:Cairo; font-weight:700; cursor:pointer; font-size: 1.1rem;">فهمت ذلك</button>
+            `;
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        };
+
+        window.onload = loadTripDetails;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | i Ticket & Manama Holidays</title>
+    <script>
+        (function() {
+            if (sessionStorage.getItem('admin_pass') === '1357') return;
+            document.documentElement.style.visibility = 'hidden';
+            window.addEventListener('DOMContentLoaded', () => {
+                const overlay = document.createElement('div');
+                overlay.id = 'admin-lock-overlay';
+                overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;color:white;font-family:Cairo,sans-serif;';
+                overlay.innerHTML = `
+                    <div style="background:#111;padding:40px;border-radius:24px;border:1px solid #e63946;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.5);max-width:400px;width:90%;">
+                        <i class="fa fa-lock" style="font-size:3rem;color:#e63946;margin-bottom:20px;"></i>
+                        <h2 style="margin-bottom:10px;">منطقة محمية</h2>
+                        <p style="color:#888;margin-bottom:25px;">يرجى إدخال كلمة المرور للمتابعة</p>
+                        <input type="password" id="admin-pass-input" placeholder="••••" style="width:100%;padding:15px;background:#222;border:1px solid #333;border-radius:12px;color:white;text-align:center;font-size:1.5rem;letter-spacing:5px;margin-bottom:20px;outline:none;box-sizing:border-box;">
+                        <button onclick="checkAdminPass()" style="width:100%;padding:15px;background:#e63946;color:white;border:none;border-radius:12px;font-weight:bold;cursor:pointer;font-size:1.1rem;transition:0.3s;">دخول النظام</button>
+                        <p id="lock-error" style="color:#e63946;margin-top:15px;display:none;">كلمة المرور غير صحيحة!</p>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                document.documentElement.style.visibility = 'visible';
+                
+                window.checkAdminPass = () => {
+                    const val = document.getElementById('admin-pass-input').value;
+                    if (val === '1357') {
+                        sessionStorage.setItem('admin_pass', '1357');
+                        overlay.remove();
+                    } else {
+                        document.getElementById('lock-error').style.display = 'block';
+                        document.getElementById('admin-pass-input').value = '';
+                    }
+                };
+
+                document.getElementById('admin-pass-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') checkAdminPass();
+                });
+            });
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #e63946;
+            --manama-gold: #d4af37;
+            --dark-bg: #0a0a0a;
+            --card-bg: #111;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 40px 0;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .welcome-container {
+            text-align: center;
+            width: 100%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            font-weight: 800;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .choice-card {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 50px 30px;
+            text-decoration: none;
+            color: white;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-iticket:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-10px);
+        }
+
+        .card-manama:hover {
+            border-color: var(--manama-gold);
+            transform: translateY(-10px);
+        }
+
+        .brand-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary-red);
+        }
+
+        .card-manama .brand-icon {
+            color: var(--manama-gold);
+        }
+
+        .brand-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .brand-desc {
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .brand-btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            background: #222;
+            transition: 0.3s;
+        }
+
+        .card-iticket:hover .brand-btn {
+            background: var(--primary-red);
+        }
+
+        .card-manama:hover .brand-btn {
+            background: var(--manama-gold);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                overflow-y: auto;
+                padding: 40px 0;
+            }
+
+            .choices-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="welcome-container">
+        <h1 class="welcome-title">لوحة التحكم الإدارية</h1>
+        <p style="margin-bottom: 40px; color: #888;">اختر النظام الذي ترغب في إدارته وتعديل بياناته</p>
+
+        <div class="choices-grid">
+            <!-- Admin i Ticket -->
+            <a href="admin_iticket" class="choice-card card-iticket">
+                <i class="fa fa-globe brand-icon"></i>
+                <div class="brand-name">i <b>Ticket</b> Admin</div>
+                <div class="brand-desc">إدارة الرحلات الدولية والبرامج السياحية الخارجية.</div>
+                <div class="brand-btn">دخول النظام</div>
+            </a>
+
+            <!-- Admin Manama Holidays -->
+            <a href="admin_manama" class="choice-card card-manama">
+                <i class="fa fa-landmark brand-icon"></i>
+                <div class="brand-name">Manama <b>Holidays</b> Admin</div>
+                <div class="brand-desc">إدارة برامج السياحة الداخلية داخل مملكة البحرين.</div>
+                <div class="brand-btn">دخول النظام</div>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>
