@@ -1,920 +1,246 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حلاق الشكر | نظام الإدارة المتكامل</title>
-    <link rel="stylesheet" href="style.css">
+    <title>i Ticket & Manama Holidays | منصة الحجز المتكاملة</title>
+    <link rel="stylesheet" href="style.css?v=1.6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Outfit:wght@300;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png"
+        href="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/FINAL_LOGO%20copy-1.png">
     <style>
-        .card-glass {
-            background: rgba(15, 23, 42, 0.8) !important;
-            backdrop-filter: blur(20px) !important;
-            -webkit-backdrop-filter: blur(20px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+        :root {
+            --primary-red: #e63946;
+            --manama-gold: #d4af37;
+            --light-bg: #f8f9fa;
+            /* لون أبيض مريح للعين */
+            --card-white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-muted: #666;
         }
-        
-        .input-field {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: white !important;
-            border-radius: 12px !important;
-            padding: 12px 15px !important;
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .welcome-container {
+            text-align: center;
             width: 100%;
-            transition: all 0.3s ease;
+            max-width: 1200px;
+            padding: 20px;
         }
-        
-        .input-field:focus {
-            border-color: var(--primary) !important;
-            outline: none;
-            background: rgba(255, 255, 255, 0.08) !important;
+
+        .welcome-title {
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            font-weight: 800;
+            color: var(--text-dark);
+            animation: fadeInDown 1s ease;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .choice-card {
+            background: var(--card-white);
+            border-radius: 30px;
+            padding: 50px 30px;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* i Ticket Theme */
+        .card-iticket:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 20px 60px rgba(230, 57, 70, 0.15);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card-iticket .brand-btn {
+            background: var(--primary-red);
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        /* Manama Theme */
+        .card-manama:hover {
+            border-color: var(--manama-gold);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card-manama .brand-btn {
+            background: var(--manama-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .brand-logo {
+            width: 200px;
+            height: 120px;
+            margin-bottom: 25px;
+            object-fit: contain;
+            border-radius: 0;
+            background: transparent;
+            padding: 0;
+            border: none;
+        }
+
+        .brand-name {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .brand-desc {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .brand-btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-break {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                overflow-y: auto;
+                padding: 40px 0;
+            }
+
+            .choices-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .brand-logo {
+                width: 100%;
+                height: 80px;
+            }
+
+            .brand-name {
+                font-size: 1.2rem;
+                line-height: 1.2;
+            }
+
+            .mobile-break {
+                display: block;
+            }
+
+            .choice-card {
+                padding: 20px 10px;
+            }
+
+            .brand-desc {
+                display: none;
+            }
+
+            .brand-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .welcome-title {
+                font-size: 1.8rem;
+            }
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/jpeg"
-        href="https://raw.githubusercontent.com/banijamrahclub/shakar-photo/f4bdba935a23d08c7b13c24ac6e843dd5a1367cd/560520585_17848960644571743_4454414339529875747_n.jpg">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 
 <body>
 
-    <div id="site-auth-overlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 20000; align-items: center; justify-content: center; flex-direction: column; text-align: center;">
-        <div class="auth-card" style="background: #111; padding: 40px; border-radius: 20px; border: 1px solid #333;">
-            <img src="https://raw.githubusercontent.com/banijamrahclub/shakar-photo/f4bdba935a23d08c7b13c24ac6e843dd5a1367cd/560520585_17848960644571743_4454414339529875747_n.jpg" 
-                 style="width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 2px solid var(--primary);">
-            <h1 style="color: var(--primary); margin-bottom: 10px; font-family: 'Outfit';">نظام إدارة حلاق الشكر</h1>
-            <p style="margin-bottom: 25px; color: var(--text-muted);">يرجى إدخال رمز الدخول للمتابعة</p>
-            <input type="password" id="site-pass" placeholder="رمز الدخول"
-                style="text-align: center; margin-bottom: 20px; font-size: 1.5rem; background: #000; color: white; border: 1px solid #333; padding: 10px; border-radius: 10px; width: 100%;">
-            <button class="btn-action" onclick="verifySiteAccess()" style="width: 100%;">دخول النظام</button>
+    <div class="welcome-container">
+        <h1 class="welcome-title">اختر موقعك المفضل</h1>
+
+        <div class="choices-grid">
+            <!-- i Ticket Card -->
+            <a href="/iticket" class="choice-card card-iticket">
+                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/1a5d9f0f31afff135fab6abd24f863d0a418b223/FINAL_LOGO%20copy-1.png"
+                    class="brand-logo" style="background: white;">
+                <div class="brand-name outfit">i Ticket <br class="mobile-break">Travel</div>
+                <div class="brand-desc" id="iticket-desc">الرحلات الخارجية والمؤتمرات والسياحة الدولية. استمتع بأفضل
+                    العروض حول العالم.
+                </div>
+                <div class="brand-btn">احجز الآن</div>
+            </a>
+
+            <!-- Manama Holidays Card -->
+            <a href="/manama" class="choice-card card-manama">
+                <img src="https://raw.githubusercontent.com/banijamrahclub/i-Ticket-photo/59879d329862954c3aeaac4b8a845a74144e7bb8/Screenshot%202026-03-20%20232636.png"
+                    class="brand-logo" style="border-radius: 20px;">
+                <div class="brand-name">Manama <br class="mobile-break">Holidays</div>
+                <div class="brand-desc" id="manama-desc">اكتشف أرقى الفنادق، الشاليهات، والمنتجعات الاستثنائية في مملكة
+                    البحرين. إقامتك
+                    المثالية تبدأ هنا.</div>
+                <div class="brand-btn"
+                    style="background: var(--primary-red); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);">احجز الآن
+                </div>
+            </a>
         </div>
+
+        <p style="margin-top: 50px; color: #555;">جميع الحقوق محفوظة &copy; 2026</p>
     </div>
 
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <h1 style="color: var(--primary); margin-bottom: 20px;">🔒 محمي</h1>
-            <p style="margin-bottom: 25px; color: var(--text-muted);">أدخل الرمز السري للوصول</p>
-            <input type="password" id="admin-pass" placeholder="الرقم السري"
-                style="text-align: center; margin-bottom: 20px; font-size: 1.5rem;">
-            <button class="btn-action" onclick="verifyAdmin()">فتح الوصول</button>
-            <button class="btn-action"
-                style="background: transparent; color: white; border: 1px solid #333; margin-top: 10px;"
-                onclick="closeAuth()">إغلاق</button>
-        </div>
-    </div>
-
-    <div class="app-layout" style="display: none;">
-        <!-- Aside Menu (Sidebar) -->
-        <aside>
-            <div class="brand">
-                <img src="https://raw.githubusercontent.com/banijamrahclub/shakar-photo/f4bdba935a23d08c7b13c24ac6e843dd5a1367cd/560520585_17848960644571743_4454414339529875747_n.jpg"
-                    alt="Logo" class="logo-img">
-                <div style="flex:1;">
-                    <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); line-height:1.2;">حلاق
-                        الشكر</h2>
-                    <div style="display: flex; gap: 5px; margin-top: 5px;">
-                        <button onclick="refreshFromCloud()"
-                            style="background: var(--primary); color: black; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; border:1px solid rgba(0,0,0,0.1);">
-                            🔄 تحديث
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- مؤشر تزامن السحابة -->
-            <div id="cloud-sync-status" style="margin: 0 15px 10px; padding: 10px; border-radius: 12px; font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                    <span id="sync-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span>
-                    <span id="sync-text" style="color: var(--text-muted); font-weight: 600;">بانتظار المزامنة...</span>
-                </div>
-                <div id="sync-time" style="color: rgba(255,255,255,0.3); font-size: 0.65rem;">آخر حفظ: --:--</div>
-            </div>
-
-            <!-- مؤشر تاريخ النظام الحالي -->
-            <div id="active-date-display"
-                style="margin: 10px 15px; padding: 10px; background: rgba(148, 163, 184, 0.05); border-radius: 12px; font-size: 0.8rem; text-align: center; border: 1px solid var(--border);">
-                <div style="color: var(--text-muted); margin-bottom: 5px;">📅 تاريخ العمليات الحالي:</div>
-                <b id="current-system-date" style="color: var(--primary); font-size: 1rem;">2026-02-18</b>
-                <button onclick="resetSystemDate()"
-                    style="display:none; width:100%; background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.75rem; text-decoration:underline; font-weight:700; margin-top:5px;"
-                    id="reset-date-btn">🔙 استعادة اليوم</button>
-            </div>
-            <nav class="nav-menu">
-                <div id="dynamic-barber-links">
-                    <!-- JS Generated -->
-                </div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin: 10px 15px 5px 0; font-weight: 800;">
-                    المحاسبة والتقارير</div>
-                <div class="nav-link" onclick="handleNav('analytics')">
-                    <span>📊 الرسوم والتحليلات</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('fixed-exp')">
-                    <span>💰 المصاريف الثابتة</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('quick-profit')">
-                    <span>🚀 ربح سريع</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('emergency-exp')">
-                    <span>💸 مصاريف طارئة</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('history')">
-                    <span>📜 كشف المبيعات</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('top-services')">
-                    <span>⭐ الخدمات الأكثر طلباً</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('manage-services')">
-                    <span>🛠️ إدارة الخدمات</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('manage-packages')">
-                    <span>📦 إدارة البكجات</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('appointments')">
-                    <span>📅 الحجوزات القادمة</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('settings')">
-                    <span>⚙️ أوقات العمل</span>
-                </div>
-                <div class="nav-link" onclick="handleNav('manage-barbers')">
-                    <span>👥 إدارة الموظفين</span>
-                </div>
-            </nav>
-            <div style="padding: 20px; border-top: 1px solid var(--border);">
-                <p id="role-status" style="color: var(--primary); font-size: 0.8rem; text-align: center;">المسؤول:
-                    الموظف</p>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main>
-            <!-- Global Stats (ONLY FOR OWNER) -->
-            <div class="top-stats">
-                <div class="stat-card owner-only">
-                    <div class="stat-label">دخل اليوم</div>
-                    <div class="stat-value gold" id="daily-total">0.000</div>
-                </div>
-                <div class="stat-card owner-only">
-                    <div class="stat-label">مصاريف اليوم</div>
-                    <div class="stat-value" id="daily-exp" style="color: var(--danger);">0.000</div>
-                </div>
-                <div class="stat-card owner-only">
-                    <div class="stat-label">صافي الشهر متوقع</div>
-                    <div class="stat-value" id="monthly-net">0.000</div>
-                </div>
-                <div class="stat-card owner-only">
-                    <div class="stat-label">عمليات اليوم</div>
-                    <div class="stat-value" id="daily-count">0</div>
-                </div>
-            </div>
-
-            <!-- PAGE: POS -->
-            <div id="page-pos" class="page active">
-                <div class="pos-grid">
-                    <div class="card-glass">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h2 style="margin: 0;">الخدمات المتاحة</h2>
-                            <div id="barber-daily-summary"
-                                style="background: var(--bg-input); padding: 8px 15px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.9rem;">
-                                👤 <span id="pos-barber-name" style="color: var(--primary); font-weight: 700;">-</span>:
-                                <b id="pos-barber-count"
-                                    style="color: var(--success); font-size: 1.1rem; margin-right: 5px;">0</b> عملية
-                                اليوم
-                            </div>
-                        </div>
-
-                        <!-- تبديل بين الخدمات والبكجات والمنتجات -->
-                        <div class="finance-sub-nav" style="margin-bottom: 20px;">
-                            <div class="sub-link active" id="pos-tab-services" onclick="switchPosType('service')">✂️ الخدمات</div>
-                            <div class="sub-link" id="pos-tab-packages" onclick="switchPosType('package')">🎁 البكجات</div>
-                            <div class="sub-link" id="pos-tab-products" onclick="switchPosType('product')">🧴 المنتجات</div>
-                        </div>
-
-                        <div class="services-list" id="services-grid"></div>
-                    </div>
-                    <div class="cart-box">
-                        <h3 style="margin-bottom: 15px;">الفاتورة الحالية</h3>
-                        <div id="cart-items"
-                            style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid var(--border);">
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label
-                                style="display: block; margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">طريقة
-                                الدفع:</label>
-                            <div style="display: flex; gap: 10px;">
-                                <label class="payment-method-btn" style="flex: 1;">
-                                    <input type="radio" name="payment-method" value="cash" checked
-                                        style="display: none;">
-                                    <div class="method-box">كاش</div>
-                                </label>
-                                <label class="payment-method-btn" style="flex: 1;">
-                                    <input type="radio" name="payment-method" value="benefit" style="display: none;">
-                                    <div class="method-box">بينفت</div>
-                                </label>
-                            </div>
-                        </div>
-                        <button class="btn-action" onclick="confirmSale()">تأكيد وإتمام العملية</button>
-                        <button class="btn-action"
-                            style="background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-top: 10px;"
-                            onclick="clearCart()">حذف السلة</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: QUICK PROFIT -->
-            <div id="page-quick-profit" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 25px; display:flex; align-items:center; gap:12px;">🚀 إضافة ربح سريع (مبلغ
-                        مخصص)
-                    </h2>
-                    <p style="color: var(--text-muted); margin-bottom: 30px;">إضافة مبالغ إضافية للفاتورة مثل بيع بضاعة
-                        أو
-                        إكراميات.</p>
-
-                    <div
-                        style="background: var(--bg-input); padding: 30px; border-radius: 20px; border: 1px solid var(--border);">
-                        <!-- مبالغ جاهزة -->
-                        <div style="margin-bottom: 25px;">
-                            <label
-                                style="display:block; margin-bottom:10px; color:var(--text-muted); font-size:0.9rem;">إضافة
-                                مبلغ سريع:</label>
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button onclick="setQuickAmount(0.5)"
-                                    style="flex:1; background:var(--bg-dark); border:1px solid var(--success); color:var(--success); padding:15px; border-radius:12px; font-weight:800; cursor:pointer; font-size:1.1rem;">+0.500</button>
-                                <button onclick="setQuickAmount(1.0)"
-                                    style="flex:1; background:var(--bg-dark); border:1px solid var(--success); color:var(--success); padding:15px; border-radius:12px; font-weight:800; cursor:pointer; font-size:1.1rem;">+1.000</button>
-                                <button onclick="setQuickAmount(2.0)"
-                                    style="flex:1; background:var(--bg-dark); border:1px solid var(--success); color:var(--success); padding:15px; border-radius:12px; font-weight:800; cursor:pointer; font-size:1.1rem;">+2.000</button>
-                                <button onclick="setQuickAmount(5.0)"
-                                    style="flex:1; background:var(--bg-dark); border:1px solid var(--success); color:var(--success); padding:15px; border-radius:12px; font-weight:800; cursor:pointer; font-size:1.1rem;">+5.000</button>
-                            </div>
-                        </div>
-
-                        <div
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                            <div class="form-group">
-                                <label>المبلغ (د.ب):</label>
-                                <input type="number" id="quick-profit-amount" placeholder="0.000" step="0.100"
-                                    class="input-field"
-                                    style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); font-size: 1.5rem; height: 60px; font-weight: 800; color: var(--success);">
-                            </div>
-                            <div class="form-group">
-                                <label>ملاحظة العملية:</label>
-                                <input type="text" id="quick-profit-note" placeholder="مثلاً: بيع عطر، أدوات حلاقة..."
-                                    class="input-field" style="height: 60px;">
-                            </div>
-                        </div>
-
-                        <div
-                            style="margin-top: 20px; display: flex; gap: 15px; align-items: center; border-top:1px dashed var(--border); padding-top:20px;">
-                            <div style="flex:1;">
-                                <label
-                                    style="display:block; margin-bottom:10px; color:var(--text-muted); font-size:0.8rem;">طريقة
-                                    الدفع:</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <label class="payment-method-btn" style="flex: 1;">
-                                        <input type="radio" name="quick-payment-method" value="cash" checked
-                                            style="display: none;">
-                                        <div class="method-box">كاش</div>
-                                    </label>
-                                    <label class="payment-method-btn" style="flex: 1;">
-                                        <input type="radio" name="quick-payment-method" value="benefit"
-                                            style="display: none;">
-                                        <div class="method-box">بينفت</div>
-                                    </label>
-                                </div>
-                            </div>
-                            <button class="btn-action"
-                                style="background: var(--success); color: white; height: 60px; margin-top:20px; font-size:1.2rem;"
-                                onclick="addQuickProfit()">تسجيل الربح 🚀</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: ANALYTICS -->
-            <div id="page-analytics" class="page">
-                <div class="card-glass" style="margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
-                        <div>
-                            <h3 style="margin: 0;">📈 أداء المحل والتحليلات</h3>
-                            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 5px;">تتبع الأرباح والمصاريف حسب الشهر المختار</p>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <select id="chart-month-select" class="input-field" style="width: auto; padding: 8px 15px; background: var(--bg-input); color: white; border: 1px solid var(--border); border-radius: 10px;" onchange="updateChartFilters()">
-                                <option value="0">يناير (1)</option>
-                                <option value="1">فبراير (2)</option>
-                                <option value="2">مارس (3)</option>
-                                <option value="3">أبريل (4)</option>
-                                <option value="4">مايو (5)</option>
-                                <option value="5">يونيو (6)</option>
-                                <option value="6">يوليو (7)</option>
-                                <option value="7">أغسطس (8)</option>
-                                <option value="8">سبتمبر (9)</option>
-                                <option value="9">أكتوبر (10)</option>
-                                <option value="10">نوفمبر (11)</option>
-                                <option value="11">ديسمبر (12)</option>
-                            </select>
-                            <select id="chart-year-select" class="input-field" style="width: auto; padding: 8px 15px; background: var(--bg-input); color: white; border: 1px solid var(--border); border-radius: 10px;" onchange="updateChartFilters()">
-                                <!-- JS سيولد السنوات -->
-                            </select>
-                        </div>
-                    </div>
-                    <div style="height: 400px;">
-                        <canvas id="profitChart"></canvas>
-                    </div>
-                </div>
-                <div class="summary-grid"
-                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                    <div class="stat-card" style="background: rgba(16, 185, 129, 0.05);">
-                        <div class="stat-label">إجمالي دخل الشهر المختار</div>
-                        <div class="stat-value" id="m-income">0.000</div>
-                    </div>
-                    <div class="stat-card" style="background: rgba(239, 68, 68, 0.05);">
-                        <div class="stat-label">إجمالي مصروفات الشهر المختار</div>
-                        <div class="stat-value" id="m-exp" style="color: var(--danger)">0.000</div>
-                    </div>
-                    <div class="stat-card" style="background: rgba(59, 130, 246, 0.05);">
-                        <div class="stat-label">عدد زبائن الشهر</div>
-                        <div class="stat-value" id="m-customers" style="color: #3b82f6;">0</div>
-                    </div>
-                    <div class="stat-card" style="background: rgba(168, 85, 247, 0.05);">
-                        <div class="stat-label">عدد زبائن السنة</div>
-                        <div class="stat-value" id="y-customers" style="color: #a855f7;">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: FIXED EXPENSES -->
-            <div id="page-fixed-exp" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">إدارة المصاريف الثابتة</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">مثل الأجار، فواتير الكهرباء، والرواتب
-                        الشهرية</p>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; margin-bottom: 30px;">
-                        <input type="text" id="fixed-name" placeholder="البيان (مثلاً: أجار المحل)">
-                        <input type="number" id="fixed-amount" placeholder="المبلغ">
-                        <button class="btn-action" style="width: auto; padding-left: 30px; padding-right: 30px;"
-                            onclick="addFixedExpense()">إضافة</button>
-                    </div>
-                    <div class="table-container">
-                        <table id="fixed-table">
-                            <thead>
-                                <tr>
-                                    <th>المسمى</th>
-                                    <th>المبلغ الشهري</th>
-                                    <th>الإجراء</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: EMERGENCY EXPENSES -->
-            <div id="page-emergency-exp" class="page">
-                <div class="card-glass" style="max-width: 600px; margin: 0 auto;">
-                    <h2 style="margin-bottom: 20px;">تسجيل مصروف طارئ</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">للمصاريف المباشرة التي لا تتكرر شهرياً</p>
-                    <div class="form-group">
-                        <label>المبلغ</label>
-                        <input type="number" id="exp-amount" placeholder="0.000">
-                    </div>
-                    <div class="form-group">
-                        <label>السبب</label>
-                        <input type="text" id="exp-note" placeholder="شراء أغراض تنظيف مثلاً">
-                    </div>
-                    <button class="btn-action" onclick="saveExpense()">حفظ المصروف فوراً</button>
-                </div>
-
-                <!-- جدول عرض المصاريف الطارئة لليوم المدار -->
-                <div class="table-container" style="margin-top: 30px;">
-                    <table id="expenses-table">
-                        <thead>
-                            <tr>
-                                <th>السبب</th>
-                                <th>المبلغ</th>
-                                <th>التاريخ</th>
-                                <th>الإجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="expenses-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- PAGE: HISTORY -->
-            <div id="page-history" class="page">
-                <div class="card-glass" style="margin-bottom: 2rem;">
-                    <h3 style="margin-bottom: 20px;">📅 استعراض السجلات والتقارير</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; margin-bottom: 20px;">
-                        <select id="history-month" class="btn-action"
-                            style="background: var(--bg-input); color: white; border: 1px solid var(--border);"
-                            onchange="renderHistoryTable()">
-                            <option value="0">يناير</option>
-                            <option value="1">فبراير</option>
-                            <option value="2">مارس</option>
-                            <option value="3">أبريل</option>
-                            <option value="4">مايو</option>
-                            <option value="5">يونيو</option>
-                            <option value="6">يوليو</option>
-                            <option value="7">أغسطس</option>
-                            <option value="8">سبتمبر</option>
-                            <option value="9">أكتوبر</option>
-                            <option value="10">نوفمبر</option>
-                            <option value="11">ديسمبر</option>
-                        </select>
-                        <select id="history-year" class="btn-action"
-                            style="background: var(--bg-input); color: white; border: 1px solid var(--border);"
-                            onchange="renderHistoryTable()">
-                            <!-- Years will be added by JS -->
-                        </select>
-                        <button class="btn-action" style="width: auto; padding: 0 30px;"
-                            onclick="renderHistoryTable()">تحديث
-                            العرض</button>
-                    </div>
-
-                    <div style="border-top: 1px solid var(--border); padding-top: 20px;">
-                        <span style="color: var(--text-muted); font-size: 0.9rem;">بحث عن يوم محدد بالتفصيل:</span>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <input type="date" id="search-date" style="flex: 1;">
-                            <button class="btn-action" style="width: auto; padding: 0 40px;"
-                                onclick="performSearch()">تقرير
-                                مفصل</button>
-                        </div>
-                    </div>
-
-                    <div id="search-result"
-                        style="display:none; margin-top: 20px; background: rgba(212, 175, 55, 0.05); padding: 25px; border-radius: 20px; border: 1px solid var(--primary);">
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <h3
-                        style="padding: 1.5rem; background: var(--bg-card); display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>كشف مبيعات الشهر</span>
-                            <span id="history-month-label" style="color: var(--primary);"></span>
-                        </div>
-                        <div id="history-monthly-summary"
-                            style="display: flex; gap: 20px; flex-wrap: wrap; font-size: 0.9rem; border-top: 1px solid var(--border); padding-top: 10px;">
-                            <!-- JS Generated Breakdown -->
-                        </div>
-                    </h3>
-                    <table id="history-table">
-                        <thead>
-                            <tr>
-                                <th>اليوم</th>
-                                <th>التاريخ</th>
-                                <th>دخل الحلاق</th>
-                                <th>دخل الموظف</th>
-                                <th>المجموع</th>
-                                <th>المصاريف</th>
-                                <th>الصافي</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <button class="btn-action"
-                    style="background: transparent; border: none; color: var(--danger); margin-top: 40px; font-size: 0.8rem;"
-                    onclick="resetData()">حذف سجلات النظام بالكامل</button>
-            </div>
-
-            <!-- PAGE: TOP SERVICES -->
-            <div id="page-top-services" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">⭐ الخدمات الأكثر طلباً هذا الشهر</h2>
-                    <div id="top-services-list" style="display: flex; flex-direction: column; gap: 15px;">
-                        <!-- JS Content -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: MANAGE SERVICES -->
-            <div id="page-manage-services" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">🛠️ إدارة قائمة الخدمات</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">يمكنك إضافة خدمة جديدة أو تعديل الأسعار
-                        والأسماء الحالية.</p>
-
-                    <div
-                        style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1fr 1fr auto; gap: 15px; margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border: 1px solid var(--border);">
-                        <input type="text" id="new-service-name" placeholder="الاسم (خدمة أو منتج)">
-                        <select id="new-service-type" style="background: var(--bg-input); color: white; border: 1px solid var(--border); border-radius: 10px; padding: 0 10px;">
-                            <option value="service">✂️ خدمة حلاقة</option>
-                            <option value="product">🧴 منتج (شامبو، كريم، إلخ)</option>
-                        </select>
-                        <select id="new-service-category" style="background: var(--bg-input); color: white; border: 1px solid var(--border); border-radius: 10px; padding: 0 10px;">
-                            <option value="hair">💇‍♂️ شعر</option>
-                            <option value="beard">🧔 لحية</option>
-                            <option value="skincare">✨ عناية بالبشرة</option>
-                            <option value="other">📦 أخرى</option>
-                        </select>
-                        <input type="number" id="new-service-price" placeholder="السعر (د.ب)">
-                        <input type="number" id="new-service-duration" placeholder="المدة (دقيقة)">
-                        <button class="btn-action" style="width: auto; padding: 0 30px;" onclick="addService()">إضافة</button>
-                    </div>
-
-                    <div class="table-container">
-                        <table id="manage-services-table">
-                            <thead>
-                                <tr>
-                                    <th>اسم الخدمة</th>
-                                    <th>النوع</th>
-                                    <th>التصنيف</th>
-                                    <th>السعر (د.ب)</th>
-                                    <th>المدة (دقيقة)</th>
-                                    <th>الترتيب</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manage-services-table-body">
-                                <!-- JS Generated -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Category Management Section -->
-                    <div style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
-                        <h3 style="margin-bottom: 20px;">📁 إدارة تصنيفات الخدمات</h3>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">يمكنك هنا إضافة أو حذف التصنيفات التي تظهر للزبائن في صفحة الحجز.</p>
-                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
-                            <input type="text" id="new-category-name" placeholder="اسم التصنيف الجديد (مثال: 🧖‍♂️ حمام مغربي)">
-                            <button class="btn-action" style="width: auto; padding: 0 25px;" onclick="addCategory()">إضافة تصنيف</button>
-                        </div>
-                        <div id="manage-categories-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-                            <!-- JS Content -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: MANAGE PACKAGES -->
-            <div id="page-manage-packages" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">📦 إدارة بكجات الحلاقة</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">البكجات تظهر للزبائن كعروض خاصة تشمل أكثر
-                        من خدمة بسعر مخفض.</p>
-
-                    <div
-                        style="margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border: 1px solid var(--border);">
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <input type="text" id="new-package-name" placeholder="اسم البكج الجديد">
-                            <input type="number" id="new-package-price" placeholder="السعر (د.ب)">
-                            <input type="number" id="new-package-duration" placeholder="المدة (دقيقة)">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px;">
-                            <input type="text" id="new-package-desc"
-                                placeholder="وصف المكونات (مثال: قص شعر + لحية + غسيل)">
-                            <button class="btn-action" style="width: auto; padding: 0 30px;"
-                                onclick="addPackage()">إضافة
-                                البكج</button>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>اسم البكج</th>
-                                    <th>الوصف</th>
-                                    <th>السعر (د.ب)</th>
-                                    <th>المدة</th>
-                                    <th>الترتيب</th>
-                                    <th>إجراء</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manage-packages-table-body">
-                                <!-- JS Content -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: MANAGE BARBERS -->
-            <div id="page-manage-barbers" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">👥 إدارة الموظفين (الحلاقين)</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">يمكنك إضافة موظف جديد أو تعديل أسماء
-                        الموظفين الحاليين.</p>
-
-                    <div
-                        style="display: grid; grid-template-columns: 1fr auto; gap: 15px; margin-bottom: 30px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 15px; border: 1px solid var(--border);">
-                        <input type="text" id="new-barber-name" placeholder="اسم الموظف الجديد">
-                        <button class="btn-action" style="width: auto; padding: 0 30px;" onclick="addBarber()">إضافة
-                            موظف</button>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>اسم الموظف</th>
-                                    <th>الدور</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="manage-barbers-table-body">
-                                <!-- JS Generated -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- PAGE: SETTINGS -->
-            <div id="page-settings" class="page">
-                <div class="card-glass">
-                    <h2 style="margin-bottom: 20px;">⚙️ إعدادات الموقع</h2>
-                    
-                    <!-- وضع الصيانة -->
-                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h3 style="margin-bottom: 5px; font-size: 1.1rem;">🛠️ وضع الصيانة (إيقاف الموقع)</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem;">عند التفعيل، ستظهر صفحة صيانة للزبائن ولن يتمكنوا من الحجز.</p>
-                        </div>
-                        <div id="maintenance-status-container">
-                            <button id="btn-toggle-maintenance" onclick="toggleMaintenanceMode()" class="btn-action" style="width: auto; padding: 10px 25px; background: var(--border); color: white;">جاري التحميل...</button>
-                        </div>
-                    </div>
-
-                    <h3 style="margin-bottom: 20px; color: var(--primary);">🕒 أوقات العمل الرسمية</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 25px;">حدد أوقات بدء ونهاية الدوام ليتمكن الزبائن من الحجز خلالها فقط.</p>
-
-                    <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 25px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px;">
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">بداية الفترة:</label>
-                                <input type="time" id="new-interval-open" value="10:00" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">نهاية الفترة:</label>
-                                <input type="time" id="new-interval-close" value="22:00" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group" style="display: flex; align-items: flex-end;">
-                                <button class="btn-action" onclick="addWorkInterval()" style="background: var(--primary); color: black;">➕ إضافة فترة</button>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 25px;">
-                            <h4 style="margin-bottom: 10px; color: var(--primary);">فترات العمل الحالية (يومياً):</h4>
-                            <div id="work-intervals-list" style="display: grid; gap: 10px;">
-                                <!-- قائمة الفترات عبر JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border);">
-
-                    <h2 style="margin-bottom: 20px;">🗓️ أوقات خاصة (أيام محددة)</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">يمكنك هنا تحديد ساعات عمل مختلفة ليوم معين (مثل يوم إجازة أو ساعات محدودة في يوم مناسبة).</p>
-                    
-                    <div style="background: rgba(148, 163, 184, 0.05); padding: 20px; border-radius: 20px; border: 1px solid var(--border);">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">التاريخ:</label>
-                                <input type="date" id="special-date" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">وقت الفتح:</label>
-                                <input type="time" id="special-open" value="10:00" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">وقت الإغلاق:</label>
-                                <input type="time" id="special-close" value="22:00" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group" style="display: flex; align-items: flex-end;">
-                                <button class="btn-action" onclick="addSpecialDay()" style="background: var(--success); color: black;">➕ إضافة</button>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 25px;">
-                            <h4 style="margin-bottom: 10px; color: var(--primary);">الأيام المضافة حالياً:</h4>
-                            <div id="special-days-list" style="display: grid; gap: 10px;">
-                                <!-- قائمة الأيام عبر JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border);">
-
-                    <h2 style="margin-bottom: 20px;">🔒 إغلاق الحجوزات (أيام عطلة)</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">اختر تواريخ محددة لإغلاق الصالون فيها تماماً ومنع أي حجوزات.</p>
-                    
-                    <div style="background: rgba(239, 68, 68, 0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px;">
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">تاريخ الإغلاق:</label>
-                                <input type="date" id="closed-date-input" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group">
-                                <label style="display: block; margin-bottom: 5px; font-size: 0.8rem;">السبب (اختياري):</label>
-                                <input type="text" id="closed-reason-input" placeholder="مثال: إجازة رسمية، صيانة" class="input-field" style="background:var(--bg-input); color:white;">
-                            </div>
-                            <div class="input-group" style="display: flex; align-items: flex-end;">
-                                <button class="btn-action" onclick="addClosedDate()" style="background: var(--danger); color: white;">🔒 إغلاق هذا اليوم</button>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 25px;">
-                            <h4 style="margin-bottom: 10px; color: #ef4444;">أيام العطلة المضافة:</h4>
-                            <div id="closed-dates-list" style="display: grid; gap: 10px;">
-                                <!-- قائمة أيام الإغلاق عبر JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        style="margin-top: 30px; padding: 15px; background: rgba(255,165,0,0.1); border: 1px solid orange; border-radius: 12px; color: orange; font-size: 0.85rem;">
-                        ⚠️ ملاحظة: المواعيد السابقة لن تتأثر، التغيير سيطبق على الحجوزات الجديدة فقط.
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: APPOINTMENTS -->
-            <div id="page-appointments" class="page">
-                <div class="card-glass">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-                        <div>
-                            <h2 style="margin: 0;">📅 الحجوزات القادمة (من الموقع وقوقل)</h2>
-                            <p style="color: var(--text-muted); margin-top: 5px;">هذه القائمة محدثة تلقائياً من نظام الحجز ومن قوقل كلندر.</p>
-                        </div>
-                        <button class="btn-action" onclick="toggleManualAppForm()" style="width: auto; padding: 0 20px; background: var(--primary); color: #000;">➕ إضافة حجز يدوي</button>
-                    </div>
-
-                    <!-- شريط البحث والفلاتر -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; border: 1px solid var(--border); align-items: center;">
-                        <div style="flex: 2; min-width: 200px; position: relative;">
-                            <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">🔍</span>
-                            <input type="text" id="app-search-input" oninput="handleAppSearch()" placeholder="ابحث بالاسم أو رقم الهاتف..." 
-                                   style="width: 100%; padding: 12px 40px 12px 15px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; color: white;">
-                        </div>
-                        <div style="flex: 1; min-width: 150px; position: relative;">
-                            <span style="position: absolute; right: 12px; top: 1px; font-size: 0.6rem; color: var(--primary); font-weight: 700;">تصفية حسب التاريخ:</span>
-                            <input type="date" id="app-date-filter" oninput="handleAppSearch()" 
-                                   style="width: 100%; padding: 18px 15px 6px 15px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 0.9rem;">
-                        </div>
-                        <div class="finance-sub-nav" style="margin: 0; background: transparent; border: none; flex: 2; justify-content: flex-end;">
-                            <div class="sub-link active" id="app-filter-all" onclick="setAppFilter('all')">الكل</div>
-                            <div class="sub-link" id="app-filter-confirmed" onclick="setAppFilter('confirmed')">المؤكدة</div>
-                            <div class="sub-link" id="app-filter-pending" onclick="setAppFilter('pending')">بانتظار العربون</div>
-                        </div>
-                    </div>
-
-                    <!-- نموذج إضافة حجز يدوي (مخفي افتراضياً) -->
-                    <div id="manual-app-form" 
-                         style="display: none; margin-bottom: 25px; background: rgba(148, 163, 184, 0.05); padding: 25px; border-radius: 20px; border: 1px solid var(--primary);">
-                        <h3 style="margin-bottom: 15px; color: var(--primary);">تسجيل حجز جديد يدوياً</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                            <div style="display: flex; flex-direction: column; gap: 15px;">
-                                <div class="stat-card" style="background: var(--bg-input); padding: 10px;">
-                                    <label style="font-size: 0.7rem; color: var(--text-muted);">اسم الزبون</label>
-                                    <input type="text" id="m-app-name" placeholder="مثال: يوسف الكويتي" style="width: 100%; background: transparent; border: none; color: white;">
-                                </div>
-                                <div class="stat-card" style="background: var(--bg-input); padding: 10px;">
-                                    <label style="font-size: 0.7rem; color: var(--text-muted);">رقم الهاتف</label>
-                                    <input type="text" id="m-app-phone" placeholder="973XXXX" style="width: 100%; background: transparent; border: none; color: white;">
-                                </div>
-                                <div class="stat-card" style="background: var(--bg-input); padding: 10px;">
-                                    <label style="font-size: 0.7rem; color: var(--text-muted);">تاريخ ووقت الموعد</label>
-                                    <input type="datetime-local" id="m-app-start" style="width: 100%; background: transparent; border: none; color: white;">
-                                </div>
-                            </div>
-
-                            <div class="stat-card" style="background: var(--bg-input); padding: 10px; max-height: 300px; overflow-y: auto;">
-                                <label style="font-size: 0.7rem; color: var(--text-muted);">اختر الخدمات والبكجات</label>
-                                <div id="m-services-list" style="margin-top: 10px; display: grid; gap: 8px;">
-                                    <!-- JS Generated -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- خلاصة الموعد -->
-                        <div id="m-app-summary" class="stat-card" style="margin-top: 20px; background: rgba(148, 163, 184, 0.1); display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                            <div>
-                                <div id="m-selected-names" style="font-size: 0.9rem; font-weight: 700;"></div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                                    السعر الإجمالي: <span id="m-total-price" style="color: var(--success); font-weight: 800;">0</span> د.ب | 
-                                    المدة المتوقعة: <span id="m-total-duration" style="color: var(--primary); font-weight: 800;">0</span> دقيقة
-                                </div>
-                            </div>
-                            <!-- خيار المزامنة -->
-                            <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border);">
-                                <input type="checkbox" id="m-sync-google" checked style="width: 20px; height: 20px; cursor: pointer;">
-                                <label for="m-sync-google" style="font-size: 0.85rem; cursor: pointer; user-select: none;">مزامنة مع قوقل كلندر</label>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 20px; display: flex; gap: 10px;">
-                            <button class="btn-action" onclick="saveManualAppointment()" style="width: auto; padding: 0 40px;">حفظ الحجز الآن</button>
-                            <button class="btn-action" style="width: auto; padding: 0 20px; background: transparent; border: 1px solid var(--danger); color: var(--danger);" onclick="toggleManualAppForm()">إلغاء</button>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table id="appointments-table">
-                            <thead>
-                                <tr>
-                                    <th>الوقت</th>
-                                    <th>الاسم</th>
-                                    <th>الهاتف</th>
-                                    <th>الخدمة</th>
-                                    <th>إجراء</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- JS Content -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- MODAL: Edit Appointment -->
-    <div id="edit-app-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; align-items: center; justify-content: center; padding: 20px;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);" onclick="closeEditModal()"></div>
-        <div class="card-glass" style="position: relative; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 30px; border-radius: 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="margin: 0; font-size: 1.5rem; color: var(--primary);">✏️ تعديل الحجز</h2>
-                <button onclick="closeEditModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem;">✕</button>
-            </div>
-            
-            <input type="hidden" id="edit-app-id">
-            
-            <div class="input-group" style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--primary);">👤 اسم الزبون:</label>
-                <input type="text" id="edit-app-name" class="input-field">
-            </div>
-            
-            <div class="input-group" style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--primary);">📞 رقم الهاتف:</label>
-                <input type="tel" id="edit-app-phone" class="input-field">
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--primary);">📅 التاريخ:</label>
-                    <input type="date" id="edit-app-date" class="input-field">
-                </div>
-                <div class="input-group" style="margin-bottom: 15px;">
-                    <label style="display: block; margin-bottom: 5px; font-size: 0.85rem; color: var(--primary);">⏰ الوقت:</label>
-                    <input type="time" id="edit-app-time" class="input-field">
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; font-size: 0.85rem; color: var(--primary);">✂️ اختر الخدمات/البكجات:</label>
-                <div id="edit-services-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <!-- JS Generated Grid -->
-                </div>
-            </div>
-
-            <!-- ملخص الحجز الجديد -->
-            <div id="edit-app-summary" style="background: rgba(var(--primary-rgb), 0.1); border: 1px dashed var(--primary); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                    <span>الخدمات:</span>
-                    <span id="e-selected-names" style="font-weight: 700; color: var(--primary);">--</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px;">
-                    <span>السعر الإجمالي:</span>
-                    <span style="font-weight: 700; color: var(--success);"><span id="e-total-price">0.000</span> د.ب</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-                    <span>المدة المتوقعة (دقائق):</span>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="number" id="edit-custom-duration" class="input-field" style="width: 80px; padding: 5px 10px !important; text-align: center; border-radius: 8px !important; margin: 0;">
-                        <span style="font-weight: 700; color: var(--text-muted);">(تلقائي: <span id="e-total-duration">0</span>)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                <input type="checkbox" id="edit-app-sync" checked style="width: 20px; height: 20px; cursor: pointer;">
-                <label for="edit-app-sync" style="font-size: 0.85rem; cursor: pointer; user-select: none; color: white;">تحديث الموعد في قوقل كلندر أيضاً</label>
-            </div>
-            
-            <div id="edit-app-error" style="display: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.85rem; margin-bottom: 15px;"></div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button class="btn-action" onclick="saveAppointmentEdit()" style="flex: 2; font-weight: 700;">💾 حفظ التعديلات</button>
-                <button class="btn-action" onclick="closeEditModal()" style="flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-muted);">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+    <script>
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/config?v=' + Date.now());
+                const config = await res.json();
+                if (config.iticket_desc) document.getElementById('iticket-desc').innerText = config.iticket_desc;
+                if (config.manama_desc) document.getElementById('manama-desc').innerText = config.manama_desc;
+            } catch (e) {
+                console.error("Config load error:", e);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
 </body>
 
 </html>
